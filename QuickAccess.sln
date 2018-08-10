@@ -5,6 +5,10 @@ VisualStudioVersion = 15.0.27703.2047
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuickAccess.Parser", "QuickAccess.Parser\QuickAccess.Parser.csproj", "{0CBF804E-989D-4593-B998-DDBE29E2A734}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QuickAccess.DataStructures", "QuickAccess.DataStructures\QuickAccess.DataStructures.csproj", "{BCC055DB-9D60-491B-BF87-76BE7A3130E9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuickAccess.DataStructures.Tests", "QuickAccess.DataStructures.Tests\QuickAccess.DataStructures.Tests.csproj", "{C4AFDF1B-B1B9-4BF3-B039-C4FA8B0BEA27}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{0CBF804E-989D-4593-B998-DDBE29E2A734}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0CBF804E-989D-4593-B998-DDBE29E2A734}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0CBF804E-989D-4593-B998-DDBE29E2A734}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BCC055DB-9D60-491B-BF87-76BE7A3130E9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BCC055DB-9D60-491B-BF87-76BE7A3130E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BCC055DB-9D60-491B-BF87-76BE7A3130E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BCC055DB-9D60-491B-BF87-76BE7A3130E9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C4AFDF1B-B1B9-4BF3-B039-C4FA8B0BEA27}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C4AFDF1B-B1B9-4BF3-B039-C4FA8B0BEA27}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C4AFDF1B-B1B9-4BF3-B039-C4FA8B0BEA27}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C4AFDF1B-B1B9-4BF3-B039-C4FA8B0BEA27}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
