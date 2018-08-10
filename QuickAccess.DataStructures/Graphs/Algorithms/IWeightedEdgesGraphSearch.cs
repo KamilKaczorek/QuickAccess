@@ -37,70 +37,33 @@
 
 #endregion
 
-using System.Collections.Generic;
+using System;
 using System.Diagnostics.Contracts;
 using QuickAccess.DataStructures.Graphs.Model;
 
 namespace QuickAccess.DataStructures.Graphs.Algorithms
 {
 	/// <summary>
-	/// The breadth first search implementation.
+	///     The interface of the graph search algorithm where the edges are weighted.
+	///     <seealso cref="IGraphSearch" />
 	/// </summary>
-	/// <seealso cref="IGraphSearch" />
-	public sealed class BreadthFirstSearch
-		: IGraphSearch
+	public interface IWeightedEdgesGraphSearch
 	{
-		/// <inheritdoc />
+		/// <summary>Gets the search map from the specified start vertex.</summary>
+		/// <typeparam name="TEdgeData">The type of the edge data.</typeparam>
+		/// <param name="graph">The graph connectivity.</param>
+		/// <param name="startVertexIndex">The index of the start vertex.</param>
+		/// <param name="getEdgeWeightCallback">The get edge weight callback.</param>
+		/// <param name="filterAdjacentVerticesCallback">
+		///     The filter adjacent vertices callback, it returns sequence of indexes of adjacent (destination) vertices.
+		///     If <c>null</c> it selects all adjacent vertices (no filtering).
+		/// </param>
+		/// <returns>The graph search map from the specified start vertex.</returns>
 		[Pure]
-		public VertexSearchMap<int> GetSearchMapFrom<TEdgeData>(
+		VertexSearchMap<int> GetSearchMapFrom<TEdgeData>(
 			GraphConnectivityDefinition<TEdgeData> graph,
 			int startVertexIndex,
-			FilterAdjacentVerticesCallback<TEdgeData> filterAdjacentVerticesCallback = null)
-		{
-			Dictionary<int, int> destToSourceMap = null;
-
-			if (graph.ContainsVertexAt(startVertexIndex))
-			{
-				var queue = new Queue<int>();
-
-				queue.Enqueue(startVertexIndex);
-				destToSourceMap = new Dictionary<int, int>();
-
-				while (queue.Count > 0)
-				{
-					var source = queue.Dequeue();
-
-					var adj = graph[source];
-					foreach (var destination in filterAdjacentVerticesCallback == null
-						? adj.AdjacentIndexes
-						: filterAdjacentVerticesCallback.Invoke(source, adj))
-					{
-						if (destination == source && startVertexIndex != source)
-						{
-							continue;
-						}
-
-						if (destToSourceMap.ContainsKey(destination))
-						{
-							continue;
-						}
-
-						destToSourceMap[destination] = source;
-
-						if (graph[destination].EdgesCount > 0)
-						{
-							queue.Enqueue(destination);
-						}
-					}
-				}
-
-				if (destToSourceMap.Count <= 0)
-				{
-					destToSourceMap = null;
-				}
-			}
-
-			return new VertexSearchMap<int>(startVertexIndex, destToSourceMap);
-		}
+			Func<Edge<int, TEdgeData>, double> getEdgeWeightCallback,
+			FilterAdjacentVerticesCallback<TEdgeData> filterAdjacentVerticesCallback = null);
 	}
 }

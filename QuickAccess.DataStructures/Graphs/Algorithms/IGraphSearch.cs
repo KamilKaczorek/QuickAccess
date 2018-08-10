@@ -37,12 +37,14 @@
 
 #endregion
 
+using System.Diagnostics.Contracts;
 using QuickAccess.DataStructures.Graphs.Model;
 
 namespace QuickAccess.DataStructures.Graphs.Algorithms
 {
 	/// <summary>
 	/// The interface of the graph search algorithm where the edges are not weighted.
+	/// <seealso cref="IWeightedEdgesGraphSearch"/>
 	/// </summary>
 	public interface IGraphSearch
 	{
@@ -56,6 +58,7 @@ namespace QuickAccess.DataStructures.Graphs.Algorithms
 		/// </param>
 		/// <returns>The graph search map from the specified start vertex.
 		/// </returns>
+		[Pure]
 		VertexSearchMap<int> GetSearchMapFrom<TEdgeData>(
 			GraphConnectivityDefinition<TEdgeData> graph,
 			int startVertexIndex,

@@ -111,7 +111,7 @@ namespace QuickAccess.DataStructures.Tests.Graphs.Model
 				e.Define("J", "A");
 			}
 
-			graph.AddEdgeRange(e.Vertices, getEdgeDataCallback, addEdgePredicate);
+			graph.AddEdgeRange(e.AdjacentVerticesPairs, getEdgeDataCallback, addEdgePredicate);
 		}
 
 		// ReSharper disable InconsistentNaming
