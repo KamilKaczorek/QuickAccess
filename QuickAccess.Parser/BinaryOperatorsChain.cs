@@ -42,7 +42,7 @@ using System;
 namespace QuickAccess.Parser
 {
 	/// <summary>
-	///     The interface of the binary operators chain builder that builds the binary operators expression list from the
+	///     The implementation of the binary operators chain builder that builds the binary operators expression list from the
 	///     elements provided according to the pattern:  (expression [{operator expression}]).
 	///     It gives functionality to convert provided flat operators expression sequence to the operators binary tree,
 	///     respecting the operators precedence.
