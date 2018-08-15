@@ -203,6 +203,37 @@ namespace QuickAccess.DataStructures.Graphs.Extensions
 			return graph.Connectivity.ConvertReversedPathToEdgeData(reversedIndexPath);
 		}
 
+		/// <summary>Adds the vertex self loop to the graph source.</summary>
+		/// <typeparam name="TEdgeData">The type of the edge data.</typeparam>
+		/// <typeparam name="TSymbol">The type of the symbol.</typeparam>
+		/// <param name="source">The graph editing source.</param>
+		/// <param name="vertex">The vertex to be self looped.</param>
+		/// <param name="edgeData">The data of a buckle edge.</param>
+		/// <returns>
+		///   <c>true</c> if new edge was added (number of edges was increased); otherwise <c>false</c>, the data of existing edge was replaced.
+		/// </returns>
+		public static bool AddSelfLoop<TEdgeData, TSymbol>(
+			this IGraphSource<TEdgeData, TSymbol> source,
+			TSymbol vertex,
+			TEdgeData edgeData)
+		{
+			return source.AddEdge(vertex, vertex, edgeData);
+		}
+
+		/// <summary>Adds the vertex self loop to the graph source.</summary>
+		/// <typeparam name="TSymbol">The type of the symbol.</typeparam>
+		/// <param name="source">The graph editing source.</param>
+		/// <param name="vertex">The vertex to be self looped.</param>
+		/// <returns>
+		///   <c>true</c> if new edge was added (number of edges was increased); otherwise <c>false</c>, the data of existing edge was replaced.
+		/// </returns>
+		public static bool AddSelfLoop<TSymbol>(
+			this IGraphSource<EmptyValue, TSymbol> source,
+			TSymbol vertex)
+		{
+			return source.AddEdge(vertex, vertex, default);
+		}
+
 		/// <summary>Adds the symbol edge to the graph source.</summary>
 		/// <typeparam name="TEdgeData">The type of the edge data.</typeparam>
 		/// <typeparam name="TSymbol">The type of the symbol.</typeparam>
@@ -347,7 +378,6 @@ namespace QuickAccess.DataStructures.Graphs.Extensions
 		/// <typeparam name="TEdgeData">The type of the edge data.</typeparam>
 		/// <param name="graph">The graph connectivity.</param>
 		/// <param name="startVertexIndex">The index of the start vertex.</param>
-		/// <param name="filterAdjacentVerticesCallback">The filter adjacent vertices callback.</param>
 		/// <returns>The graph search map from the specified start vertex.</returns>
 		[Pure]
 		public static VertexSearchMap<int> GetSearchMapFrom<TEdgeData>(
@@ -439,7 +469,7 @@ namespace QuickAccess.DataStructures.Graphs.Extensions
 		[Pure]
 		public static IEnumerable<int> GetVerticesIndexes<TEdgeData>(this IReadOnlyGraph<TEdgeData> source)
 		{
-			return source.Connectivity.GetVerticesIndexes();
+			return source.Connectivity.GetVertexIndexes();
 		}
 
 		/// <summary>
@@ -536,7 +566,7 @@ namespace QuickAccess.DataStructures.Graphs.Extensions
 			var map = source.SymbolToIndexConverter;
 			var con = source.Connectivity;
 
-			return con.GetVerticesIndexes()
+			return con.GetVertexIndexes()
 			          .SelectMany(srcIdx =>
 			          {
 				          var src = map.GetSymbolAt(srcIdx);
@@ -815,7 +845,7 @@ namespace QuickAccess.DataStructures.Graphs.Extensions
 		///		Gets the compacted read-only graph with reassigned indexes.
 		///     The operation will sort vertices by number of edges, 
 		///     putting vertices with lower number of adjacent edges at the end.
-		///     It doesn't allocate memory for empty vertices but provides virtualized (dummy) access to them.</summary>
+		///     It doesn't allocate memory for empty vertices but provides virtual (dummy) access to them.</summary>
 		/// <typeparam name="TEdgeData">The type of the edge data.</typeparam>
 		/// <typeparam name="TSymbol">The type of the symbol.</typeparam>
 		/// <param name="source">The source.</param>
@@ -823,8 +853,8 @@ namespace QuickAccess.DataStructures.Graphs.Extensions
 		/// <returns>The reindexing result with compacted graph.</returns>
 		[Pure]
 		public static ReindexedDataResult<ReadOnlySymbolGraph<TEdgeData, TSymbol>> GetCompacted<TEdgeData, TSymbol>(
-					this IReadOnlyGraph<TEdgeData, TSymbol> source,
-					IVertexAdjacencyFactory<TEdgeData> verticesFactory = null)
+			this IReadOnlyGraph<TEdgeData, TSymbol> source,
+			IVertexAdjacencyFactory<TEdgeData> verticesFactory = null)
 		{
 			var res = source.Connectivity.ToCompacted(verticesFactory);
 			return res.IndexTranslator.ToReindexedDataResult(new ReadOnlySymbolGraph<TEdgeData, TSymbol>(res.Data,
@@ -902,7 +932,7 @@ namespace QuickAccess.DataStructures.Graphs.Extensions
 			var map = source.SymbolToIndexConverter;
 			var conn = source.Connectivity;
 
-			return conn.GetVerticesIndexes().Select(idx => map.GetSymbolAt(idx));
+			return conn.GetVertexIndexes().Select(idx => map.GetSymbolAt(idx));
 		}
 
 		/// <summary>
@@ -997,7 +1027,7 @@ namespace QuickAccess.DataStructures.Graphs.Extensions
 		///     Gets the compacted read-only graph connectivity with reassigned indexes.
 		///     The operation will sort vertices by number of edges, putting vertices with lower number of adjacent edges at the
 		///     end.
-		///     It doesn't allocate memory for empty vertices but provides virtualized (dummy) access to them.
+		///     It doesn't allocate memory for empty vertices but provides virtual (dummy) access to them.
 		/// </summary>
 		/// <typeparam name="TEdgeData">The type of the edge data.</typeparam>
 		/// <param name="source">The source of extension.</param>
@@ -1015,7 +1045,7 @@ namespace QuickAccess.DataStructures.Graphs.Extensions
 		///     Gets the compacted read-only graph connectivity with reassigned indexes.
 		///     The operation will sort vertices by number of edges, 
 		///     putting vertices with lower number of adjacent edges at the end.
-		///     It doesn't allocate memory for empty vertices but provides virtualized (dummy) access to them.
+		///     It doesn't allocate memory for empty vertices but provides virtual (dummy) access to them.
 		///		<remarks>
 		///		It reuses vertex instance with same adjacency. 
 		///     It uses given <see cref="edgeDataEqualityComparer"/> to determine if the vertices adjacency is equal.
@@ -1042,7 +1072,7 @@ namespace QuickAccess.DataStructures.Graphs.Extensions
 		///     Gets the compacted read-only graph connectivity with reassigned indexes.
 		///     The operation will sort vertices by number of edges, 
 		///     putting vertices with lower number of adjacent edges at the end.
-		///     It doesn't allocate memory for empty vertices but provides virtualized (dummy) access to them.
+		///     It doesn't allocate memory for empty vertices but provides virtual (dummy) access to them.
 		///		<remarks>
 		///		It reuses vertex instance with same adjacency. 
 		///     It uses given <see cref="vertexEqualityComparer"/> to determine if the vertices adjacency is equal.

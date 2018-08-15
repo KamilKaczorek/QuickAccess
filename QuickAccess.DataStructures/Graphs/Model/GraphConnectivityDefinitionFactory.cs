@@ -384,8 +384,119 @@ namespace QuickAccess.DataStructures.Graphs.Model
 			/// <inheritdoc />
 			public override IEnumerator<VertexAdjacency<TEdgeData>> GetEnumerator()
 			{
-				return GetVerticesIndexes().Select(idx => this[idx]).GetEnumerator();
+				return GetVertexIndexes().Select(idx => this[idx]).GetEnumerator();
+			}
+		}
+
+		internal sealed class GraphConnectivityDefinitionEdgeFilter<TEdgeData> : GraphConnectivityDefinition<TEdgeData>
+		{
+			internal readonly GraphConnectivityDefinition<TEdgeData> Wrapped;
+			internal readonly Func<Edge<int, TEdgeData>, bool> SelectEdgePredicate;
+			private readonly Dictionary<int, VertexAdjacency<TEdgeData>> _adjWrappers;
+
+			public GraphConnectivityDefinitionEdgeFilter(GraphConnectivityDefinition<TEdgeData> wrapped, Func<Edge<int, TEdgeData>, bool> selectEdgePredicate)
+			{
+				Wrapped = wrapped ?? throw new ArgumentNullException(nameof(wrapped));
+				SelectEdgePredicate = selectEdgePredicate ?? throw new ArgumentNullException(nameof(selectEdgePredicate));
+				_adjWrappers = new Dictionary<int, VertexAdjacency<TEdgeData>>(wrapped.Count);
+			}
+
+			private sealed class VertexAdjacencyWrapper : VertexAdjacency<TEdgeData>
+			{
+				private readonly GraphConnectivityDefinitionEdgeFilter<TEdgeData> _owner;				
+				private readonly int _currentIndex;
+
+				private VertexAdjacency<TEdgeData> Wrapped => _owner.Wrapped[_currentIndex];
+				private bool IsIncluded(AdjacentEdge<TEdgeData> adj) => _owner.SelectEdgePredicate.Invoke(adj.ToEdge(_currentIndex));
+				private bool IsIncluded(int dst, TEdgeData data) => _owner.SelectEdgePredicate.Invoke(Edge.Create(_currentIndex, dst, data));
+
+				public VertexAdjacencyWrapper(GraphConnectivityDefinitionEdgeFilter<TEdgeData> owner, int currentIndex)
+				{
+					_owner = owner ?? throw new ArgumentNullException(nameof(owner));
+					_currentIndex = currentIndex;
+				}
+
+				/// <inheritdoc />
+				public override int EdgesCount =>
+					Wrapped.Count(IsIncluded);
+
+				/// <inheritdoc />
+				public override IEnumerable<int> AdjacentIndexes =>
+					Wrapped.Where(IsIncluded).Select(adj => adj.Destination);
+
+				/// <inheritdoc />
+				public override bool ContainsEdgeToIndex(int destVertexIndex)
+				{
+					return Wrapped.TryGetEdgeToIndex(destVertexIndex, out var data) &&
+					       IsIncluded(destVertexIndex, data);
+				}
+
+				/// <inheritdoc />
+				public override TEdgeData GetEdgeToIndex(int destVertexIndex)
+				{
+					var data = Wrapped.GetEdgeToIndex(destVertexIndex);
+
+					if(!IsIncluded(destVertexIndex, data))
+					{
+						throw new KeyNotFoundException("Specified edge at ({_currentIndex},{destVertexIndex}) was filtered out.");
+					}
+
+					return data;
+				}
+
+				/// <inheritdoc />
+				public override IEnumerator<AdjacentEdge<TEdgeData>> GetEnumerator()
+				{
+					return Wrapped.Where(IsIncluded).GetEnumerator();
+				}
+
+				/// <inheritdoc />
+				public override bool TryGetEdgeToIndex(int destVertexIndex, out TEdgeData edgeData)
+				{
+					var res = Wrapped.TryGetEdgeToIndex(destVertexIndex, out edgeData) &&
+					          IsIncluded(destVertexIndex, edgeData);
+					if (!res)
+					{
+						edgeData = default;
+					}
+
+					return res;
+				}
+			}
+
+			/// <inheritdoc />
+			public override IEnumerator<VertexAdjacency<TEdgeData>> GetEnumerator()
+			{
+				for (var i = 0; i < Wrapped.Count; ++i)
+				{
+					yield return this[i];
+				}
+			}
+
+			/// <inheritdoc />
+			public override int Count => Wrapped.Count;
+
+			/// <inheritdoc />
+			public override VertexAdjacency<TEdgeData> this[int index]
+			{
+				get
+				{
+					if (!Wrapped.ContainsVertexAt(index))
+					{
+						throw new IndexOutOfRangeException();
+					}
+
+					if (!_adjWrappers.TryGetValue(index, out var wrapper))
+					{
+						wrapper = new VertexAdjacencyWrapper(this, index);
+						_adjWrappers[index] = wrapper;
+					}
+
+					return wrapper;
+				}
 			}
 		}
 	}
+
+
 }

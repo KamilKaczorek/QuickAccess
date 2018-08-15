@@ -129,10 +129,10 @@ namespace QuickAccess.DataStructures.Graphs.Model
 			return this;
 		}
 
-		/// <summary>Defines the self edges for the specified vertices.</summary>
+		/// <summary>Defines the self loops (buckles) for the specified vertices.</summary>
 		/// <param name="vertices">The vertices.</param>
 		/// <returns><c>this</c> for the fluent API.</returns>
-		public GraphEdgeSequenceAssembler<TVertexKey> DefineSelfEdges(IEnumerable<TVertexKey> vertices)
+		public GraphEdgeSequenceAssembler<TVertexKey> DefineSelfLoops(IEnumerable<TVertexKey> vertices)
 		{
 			foreach (var vertex in vertices)
 			{
@@ -142,10 +142,10 @@ namespace QuickAccess.DataStructures.Graphs.Model
 			return this;
 		}
 
-		/// <summary>Defines the self edges for the specified vertices.</summary>
+		/// <summary>Defines the self loops (buckles) for the specified vertices.</summary>
 		/// <param name="vertices">The vertices.</param>
 		/// <returns><c>this</c> for the fluent API.</returns>
-		public GraphEdgeSequenceAssembler<TVertexKey> DefineSelfEdges(params TVertexKey[] vertices)
+		public GraphEdgeSequenceAssembler<TVertexKey> DefineSelfLoops(params TVertexKey[] vertices)
 		{
 			foreach (var vertex in vertices)
 			{
@@ -221,7 +221,7 @@ namespace QuickAccess.DataStructures.Graphs.Model
 				return this;
 			}
 
-			public VertexConfig DefineToSelf()
+			public VertexConfig DefineSelfLoop()
 			{
 				_pairs.Add(new VerticesPair<TVertexKey>(_vertex, _vertex));
 				return this;

@@ -157,7 +157,7 @@ namespace QuickAccess.DataStructures.Graphs.Model
 		/// <summary>
 		/// Evaluates if the other adjacent edge is equal to the current one, using specified <paramref name="comparer"/> for
 		/// edge data comparison.
-		/// <seealso cref="Equals(QuickAccess.DataStructures.Graphs.Model.AdjacentEdge{TEdgeData})"/>
+		/// <seealso cref="Equals(AdjacentEdge{TEdgeData})"/>
 		/// </summary>
 		/// <param name="other">The other adjacent edge.</param>
 		/// <param name="comparer">The edge data comparer.</param>

@@ -50,7 +50,7 @@ namespace QuickAccess.DataStructures.Graphs.Model
 	/// </summary>
 	/// <typeparam name="TVertexKey">The type of the vertex key.</typeparam>
 	/// <typeparam name="TEdgeData">The type of the edge data.</typeparam>
-	public struct Edge<TVertexKey, TEdgeData> : IEquatable<Edge<TVertexKey, TEdgeData>>
+	public struct Edge<TVertexKey, TEdgeData>
 	{
 		/// <summary>
 		///     Initializes a new instance of the <see cref="Edge{TVertexKey, TEdgeData}" /> structure with vertices pair and
@@ -142,29 +142,6 @@ namespace QuickAccess.DataStructures.Graphs.Model
 		}
 
 		/// <inheritdoc />
-		public bool Equals(Edge<TVertexKey, TEdgeData> other)
-		{
-			return Equals(other, EqualityComparer<TEdgeData>.Default);
-		}
-
-		public bool Equals(Edge<TVertexKey, TEdgeData> other, IEqualityComparer<TEdgeData> edgeDataComparer)
-		{
-			return Vertices.Equals(other.Vertices) && edgeDataComparer.Equals(Data, other.Data);
-		}
-
-		/// <inheritdoc />
-		public override bool Equals(object obj)
-		{
-			return obj is Edge<TVertexKey, TEdgeData> edge && Equals(edge);
-		}
-
-		/// <inheritdoc />
-		public override int GetHashCode()
-		{
-			return Vertices.GetHashCode();
-		}
-
-		/// <inheritdoc />
 		public override string ToString()
 		{
 			return $"{Vertices} : {Data}";
@@ -182,6 +159,12 @@ namespace QuickAccess.DataStructures.Graphs.Model
 		                                                                          TEdgeData edgeData)
 		{
 			return new Edge<TVertexKey, TEdgeData>(sourceVertex, destinationVertex, edgeData);
+		}
+
+		public static Edge<TVertexKey, TEdgeData> CreateSelfLoop<TVertexKey, TEdgeData>(TVertexKey vertex,		                                                            
+		                                                                        TEdgeData edgeData)
+		{
+			return new Edge<TVertexKey, TEdgeData>(vertex, vertex, edgeData);
 		}
 
 		public static Edge<int, TEdgeData> Create<TEdgeData>(int sourceVertexIndex, AdjacentEdge<TEdgeData> adjacentEdge)

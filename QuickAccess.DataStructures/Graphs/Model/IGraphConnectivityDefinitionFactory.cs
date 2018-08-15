@@ -149,18 +149,18 @@ namespace QuickAccess.DataStructures.Graphs.Model
 			IEqualityComparer<VertexAdjacency<TSrcEdgeData>> vertexEqualityComparer = null);
 
 		/// <summary>
-		///     Gets the compacted read-only graph connectivity with reassigned indexes.
-		///     The operation will sort vertices by number of edges, putting vertices with lower number of adjacent edges at the
-		///     end of the vertex list.
-		///     It doesn't allocate memory for empty vertices but provides virtualized access to them.
+		/// Gets the compacted read-only graph connectivity with reassigned indexes.
+		/// The operation will sort vertices by number of edges, putting vertices with lower number of adjacent edges at the
+		/// end of the vertex list.
+		/// It doesn't allocate memory for empty vertices but provides virtual access to them.
 		/// </summary>
 		/// <typeparam name="TEdgeData">The type of the edge data.</typeparam>
 		/// <param name="source">The source of extension.</param>
-		/// <param name="verticesFactory">The vertices factory (if <c>null</c> default is used).</param>
+		/// <param name="verticesFactory">The vertices factory (if <c>null</c> default is used).</param>		
 		/// <param name="sharedVerticesInstances">if set to <c>true</c> the new instance will reuse vertex instances if possible.</param>
 		/// <param name="vertexEqualityComparer">The vertex equality comparer.</param>
 		/// <returns>
-		///     The reindexing operation result with new, optimized instance of graph connectivity and reassigned index map.
+		/// The reindexing operation result with new, optimized instance of graph connectivity and reassigned index map.
 		/// </returns>
 		[Pure]
 		ReindexedDataResult<GraphConnectivityDefinition<TEdgeData>> CreateCompacted<TEdgeData>(
@@ -168,5 +168,7 @@ namespace QuickAccess.DataStructures.Graphs.Model
 			IVertexAdjacencyFactory<TEdgeData> verticesFactory,
 			bool sharedVerticesInstances,
 			IEqualityComparer<VertexAdjacency<TEdgeData>> vertexEqualityComparer = null);
+
+		
 	}
 }

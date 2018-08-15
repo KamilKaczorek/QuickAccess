@@ -72,7 +72,7 @@ namespace QuickAccess.DataStructures.Tests.Graphs.Model
 
 			if ((set & DefinitionSet.Set2) != 0)
 			{
-				e.DefineSelfEdges(VertexSymbolsA2J);
+				e.DefineSelfLoops(VertexSymbolsA2J);
 			}
 
 			if ((set & DefinitionSet.Set3) != 0)
@@ -103,7 +103,7 @@ namespace QuickAccess.DataStructures.Tests.Graphs.Model
 
 			if ((set & DefinitionSet.Set7) != 0)
 			{
-				e["T"].DefineToSelf();
+				e["T"].DefineSelfLoop();
 			}
 
 			if ((set & DefinitionSet.Set8) != 0)

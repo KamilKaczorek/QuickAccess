@@ -156,7 +156,7 @@ namespace QuickAccess.DataStructures.Tests.Graphs.Model
 		}
 
 		[TestMethod]
-		public void ON_GetPathTo_WHEN_Vertex_Self_Adjacent_And_Alternative_Path_Exist_SHOULD_Return_Self_Path()
+		public void ON_GetPathTo_WHEN_Vertex_Self_Looped_And_Alternative_Path_Exist_SHOULD_Return_Buckle_Path()
 		{
 			// Arrange
 			var uut = new SymbolGraph<string, string>(40, StringComparer.InvariantCultureIgnoreCase);
@@ -176,7 +176,7 @@ namespace QuickAccess.DataStructures.Tests.Graphs.Model
 		}
 
 		[TestMethod]
-		public void ON_GetPathTo_WHEN_Vertex_Self_Adjacent_SHOULD_Return_Single_Edge_Path()
+		public void ON_GetPathTo_WHEN_Vertex_Self_Looped_SHOULD_Return_Buckle_Path()
 		{
 			// Arrange
 			var uut = new SymbolGraph<string, string>(40, StringComparer.InvariantCultureIgnoreCase);
@@ -287,7 +287,22 @@ namespace QuickAccess.DataStructures.Tests.Graphs.Model
 		}
 
 		[TestMethod]
-		public void ON_GetCompacted_SHOULD_Result_Contains_All_Source_Edges()
+		public void ON_GetCompacted_SHOULD_Return_Graph_With_All_Source_Graph_Edges()
+		{
+			// Arrange
+			var source = new SymbolGraph<string, string>(40, StringComparer.InvariantCultureIgnoreCase);
+
+			TestEdgesFactory.Define(source, v => v.Source + v.Destination,
+				TestEdgesFactory.DefinitionSet.PathA2J | TestEdgesFactory.DefinitionSet.PathsFromQRS |
+				TestEdgesFactory.DefinitionSet.SelfT);
+			// Act
+			var uut = source.GetCompacted().Data;
+			// Assert
+			CollectionAssert.AreEquivalent(source.GetEdges().ToArray(), uut.GetEdges().ToArray());
+		}
+
+		[TestMethod]
+		public void ON_GetCompacted_WHEN_Edges_Filtered_Out_SHOULD_Return_Graph_With_All_Not_Filtered_Edges_Source_Graph_Edges()
 		{
 			// Arrange
 			var source = new SymbolGraph<string, string>(40, StringComparer.InvariantCultureIgnoreCase);

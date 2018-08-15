@@ -50,7 +50,7 @@ namespace QuickAccess.DataStructures.Graphs.Model
 	/// </summary>
 	/// <typeparam name="TVertexKey">The type of the vertex key.</typeparam>
 	[Serializable]
-	public struct VerticesPair<TVertexKey> : IEquatable<VerticesPair<TVertexKey>>, IEnumerable<TVertexKey>
+	public struct VerticesPair<TVertexKey> : IEnumerable<TVertexKey>
 	{
 		/// <summary>
 		/// Initializes a new instance of the <see cref="VerticesPair{TVertexKey}" /> structure with specified source and destination vertices.
@@ -95,25 +95,11 @@ namespace QuickAccess.DataStructures.Graphs.Model
 
 		/// <inheritdoc />
 		[Pure]
-		public bool Equals(VerticesPair<TVertexKey> other)
-		{
-			return Comparer.Equals(Source, other.Source) && Comparer.Equals(Destination, other.Destination);
-		}
-
-		/// <inheritdoc />
-		[Pure]
 		public IEnumerator<TVertexKey> GetEnumerator()
 		{
 			yield return Source;
 			yield return Destination;
-		}
-
-		/// <inheritdoc />
-		[Pure]
-		public override bool Equals(object obj)
-		{
-			return obj is VerticesPair<TVertexKey> pair && Equals(pair);
-		}
+		}		
 
 		/// <inheritdoc />
 		[Pure]

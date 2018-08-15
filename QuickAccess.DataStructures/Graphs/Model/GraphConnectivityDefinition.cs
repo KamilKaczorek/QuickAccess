@@ -65,7 +65,26 @@ namespace QuickAccess.DataStructures.Graphs.Model
 		public abstract int Count { get; }
 
 		/// <inheritdoc />
+		/// <exception cref="System.IndexOutOfRangeException">Thrown when <paramref name="index"/> is out of the proper range.</exception>
 		public abstract VertexAdjacency<TEdgeData> this[int index] { get; }
+
+		/// <summary>Gets the indexes of self looped vertices.</summary>
+		/// <returns>Sequence of indexes of self looped vertices.</returns>
+		[Pure]
+		public IEnumerable<int> GetSelfLoopedVertexIndexes()
+		{
+			return this.Select((v, idx) => v.ContainsEdgeToIndex(idx) ? idx : -1).Where(idx => idx >= 0);
+		}
+
+		/// <summary>Determines whether the vertex at the specified index is self looped (contains buckle).</summary>
+		/// <param name="index">The vertex index.</param>
+		/// <returns><c>true</c> if the vertex is self looped; otherwise, <c>false</c>.</returns>
+		/// <exception cref="System.IndexOutOfRangeException">Thrown when <paramref name="index"/> is out of the proper range.</exception>
+		[Pure]
+		public bool IsSelfLooped(int index)
+		{
+			return this[index].ContainsEdgeToIndex(index);
+		}
 
 		/// <summary>
 		///     Gets the sequence of indexes of all vertices contained by the current graph.
@@ -74,7 +93,7 @@ namespace QuickAccess.DataStructures.Graphs.Model
 		///     The vertex indexes.
 		/// </returns>
 		[Pure]
-		public IEnumerable<int> GetVerticesIndexes()
+		public IEnumerable<int> GetVertexIndexes()
 		{
 			return Enumerable.Range(0, Count);
 		}
@@ -276,6 +295,7 @@ namespace QuickAccess.DataStructures.Graphs.Model
 		/// <param name="verticesPair">The vertices pair.</param>
 		/// <returns>The edge data.</returns>
 		/// <exception cref="KeyNotFoundException">Thrown when specified edge doesn't exist.</exception>
+		[Pure]
 		public TEdgeData GetEdgeData(
 			VerticesPair<int> verticesPair)
 		{
@@ -286,10 +306,11 @@ namespace QuickAccess.DataStructures.Graphs.Model
 		///     Gets the data of the edge defined by the specified vertices pair.
 		/// </summary>
 		/// <typeparam name="TEdgeData">The type of the edge data.</typeparam>
-		/// <param name="srcIndex"></param>
-		/// <param name="dstIndex"></param>
+		/// <param name="srcIndex">The source vertex index.</param>
+		/// <param name="dstIndex">The destination vertex index.</param>
 		/// <returns>The edge data.</returns>
 		/// <exception cref="KeyNotFoundException">Thrown when specified edge doesn't exist.</exception>
+		[Pure]
 		public TEdgeData GetEdgeData(
 			int srcIndex,
 			int dstIndex)

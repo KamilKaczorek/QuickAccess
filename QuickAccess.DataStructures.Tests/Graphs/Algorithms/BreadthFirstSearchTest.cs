@@ -175,7 +175,7 @@ namespace QuickAccess.DataStructures.Tests.Graphs.Algorithms
 		}
 
 		[TestMethod]
-		public void ON_GetSearchMapFrom_WHEN_Self_Path_Defined_From_SourceVertex_SHOULD_Return_Map_With_Self_Path()
+		public void ON_GetSearchMapFrom_WHEN_SourceVertex_Self_Looped_SHOULD_Return_Buckle_Path()
 		{
 			// Arrange
 			_adj.Add(Adjacency.WithAdjacentIndexes(1)); //0
@@ -186,11 +186,11 @@ namespace QuickAccess.DataStructures.Tests.Graphs.Algorithms
 			var map = _uut.GetSearchMapFrom(Graph, 1);
 
 			// Assert
-			Assert.IsTrue(map.ContainsPath((1, 1).Enumerate()));
+			Assert.IsTrue(map.HasSelfLoop);
 		}
 
 		[TestMethod]
-		public void ON_GetSearchMapFrom_WHEN_Self_Path_Not_Defined_From_SourceVertex_SHOULD_Return_Map_Without_Self_Path()
+		public void ON_GetSearchMapFrom_WHEN_SourceVertex_Is_Not_Self_Looped_SHOULD_Return_Map_Without_Buckle_Path()
 		{
 			// Arrange
 			_adj.Add(Adjacency.WithAdjacentIndexes(1)); //0
@@ -201,7 +201,7 @@ namespace QuickAccess.DataStructures.Tests.Graphs.Algorithms
 			var map = _uut.GetSearchMapFrom(Graph, 1);
 
 			// Assert
-			Assert.IsFalse(map.ContainsPath((1, 1).Enumerate()));
+			Assert.IsFalse(map.HasSelfLoop);
 		}
 
 		[TestMethod]

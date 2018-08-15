@@ -38,8 +38,6 @@
 #endregion
 
 using System.Collections.Generic;
-using System.Linq;
-using QuickAccess.DataStructures.Common;
 using QuickAccess.DataStructures.Graphs.Model;
 
 namespace QuickAccess.DataStructures.Graphs.Factory.Internal
@@ -53,107 +51,50 @@ namespace QuickAccess.DataStructures.Graphs.Factory.Internal
 	/// </summary>
 	/// <typeparam name="TEdgeData">The type of the edge data.</typeparam>
 	/// <seealso cref="PoolableVertexAdjacency{TEdgeData}" />
-	internal sealed class VertexAdjacency1Edge<TEdgeData> : PoolableVertexAdjacency<TEdgeData>
+	internal sealed class VertexAdjacency1Edge<TEdgeData> : PoolableVertexAdjacencyWithFixedCapacity<TEdgeData>
 	{
-		private int _destVertexIndex;
-		private TEdgeData _edgeData;
+		private int _destVertexIndex1;
+		private TEdgeData _edgeData1;
 
 		/// <inheritdoc />
 		public override int EdgesCount => 1;
 
-
-		/// <inheritdoc />
-		public override int MaxCapacity => 1;
-
 		/// <inheritdoc />
 		public override IEnumerable<int> AdjacentIndexes
 		{
-			get { yield return _destVertexIndex; }
-		}
-
-		
-
-		/// <inheritdoc />
-		public override bool AddEdge(PoolableVertexFactoryInterface<TEdgeData> pool,
-		                             int destVertexIndex,
-		                             TEdgeData edgeData,
-		                             out PoolableVertexAdjacency<TEdgeData> final)
-		{
-			if (destVertexIndex == _destVertexIndex)
+			get
 			{
-				_edgeData = edgeData;
-				final = this;
-				return false;
+				yield return _destVertexIndex1;
 			}
-
-			final = pool.GetInstance(
-				EnumerableExtensions.Enumerate(new AdjacentEdge<TEdgeData>(_destVertexIndex, _edgeData),
-					new AdjacentEdge<TEdgeData>(destVertexIndex, edgeData)), 2);
-
-			pool.ReturnInstance(this);
-			return true;
-		}
-
-		/// <inheritdoc />
-		public override bool RemoveEdge(PoolableVertexFactoryInterface<TEdgeData> pool,
-		                                int destVertexIndex,
-		                                out PoolableVertexAdjacency<TEdgeData> final)
-		{
-			if (destVertexIndex != _destVertexIndex)
-			{
-				final = this;
-				return false;
-			}
-
-			final = pool.Empty;
-
-			pool.ReturnInstance(this);
-			return true;
 		}
 
 		/// <inheritdoc />
 		public override bool ContainsEdgeToIndex(int destVertexIndex)
 		{
-			return destVertexIndex == _destVertexIndex;
-		}
-
-		/// <inheritdoc />
-		public override void Initialize(IEnumerable<AdjacentEdge<TEdgeData>> edgesTo)
-		{
-			var first = edgesTo.Single();
-			_edgeData = first.Data;
-			_destVertexIndex = first.Destination;
-		}
-
-		/// <inheritdoc />
-		public override void Reset()
-		{
-			_edgeData = default;
-			_destVertexIndex = -1;
-		}
-
-		/// <inheritdoc />
-		public override bool TryGetEdgeToIndex(int destVertexIndex, out TEdgeData edgeData)
-		{
-			edgeData = _edgeData;
-			return ContainsEdgeToIndex(destVertexIndex);
+			return destVertexIndex == _destVertexIndex1;
 		}
 
 		/// <inheritdoc />
 		public override TEdgeData GetEdgeToIndex(int destVertexIndex)
 		{
-			if (!ContainsEdgeToIndex(destVertexIndex))
+			if (_destVertexIndex1 == destVertexIndex)
 			{
-				throw new KeyNotFoundException();
-			}
+				return _edgeData1;
+			}			
 
-			return _edgeData;
+			throw new KeyNotFoundException();
 		}
 
 		/// <inheritdoc />
 		public override IEnumerator<AdjacentEdge<TEdgeData>> GetEnumerator()
 		{
-			yield return AdjacentEdge.Create(_destVertexIndex, _edgeData);
+			yield return AdjacentEdge.Create(_destVertexIndex1, _edgeData1);
+		}
+
+		/// <inheritdoc />
+		protected override void Set(AdjacencyEnumerator data)
+		{
+			_destVertexIndex1 = data.GetNext(out _edgeData1);
 		}
 	}
 
@@ -164,77 +105,32 @@ namespace QuickAccess.DataStructures.Graphs.Factory.Internal
 	/// enumeration and contains operations execution time.
 	/// </summary>
 	/// <seealso cref="PoolableVertexAdjacency{TEdgeData}" />
-	internal sealed class VertexAdjacency1Edge : PoolableVertexAdjacency
+	internal sealed class VertexAdjacency1Edge : PoolableVertexAdjacencyWithFixedCapacity
 	{
-		private int _destVertexIndex;
+		private int _destVertexIndex1;
 
 		/// <inheritdoc />
 		public override int EdgesCount => 1;
 
-
-		/// <inheritdoc />
-		public override int MaxCapacity => 1;
-
 		/// <inheritdoc />
 		public override IEnumerable<int> AdjacentIndexes
 		{
-			get { yield return _destVertexIndex; }
-		}
-
-		
-		/// <inheritdoc />
-		public override bool AddEdge(PoolableVertexFactoryInterface<EmptyValue> pool,
-		                             int destVertexIndex,
-		                             EmptyValue edgeData,
-		                             out PoolableVertexAdjacency<EmptyValue> final)
-		{
-			if (destVertexIndex == _destVertexIndex)
+			get
 			{
-				final = this;
-				return false;
+				yield return _destVertexIndex1;
 			}
-
-			final = pool.GetInstance(
-				EnumerableExtensions.Enumerate(new AdjacentEdge<EmptyValue>(_destVertexIndex, default),
-					new AdjacentEdge<EmptyValue>(destVertexIndex, edgeData)), 2);
-			pool.ReturnInstance(this);
-			return true;
-		}
-
-		
-
-		/// <inheritdoc />
-		public override bool RemoveEdge(PoolableVertexFactoryInterface<EmptyValue> pool,
-		                                int destVertexIndex,
-		                                out PoolableVertexAdjacency<EmptyValue> final)
-		{
-			if (destVertexIndex != _destVertexIndex)
-			{
-				final = this;
-				return false;
-			}
-
-			final = pool.Empty;
-			pool.ReturnInstance(this);
-			return true;
 		}
 
 		/// <inheritdoc />
 		public override bool ContainsEdgeToIndex(int destVertexIndex)
 		{
-			return destVertexIndex == _destVertexIndex;
+			return destVertexIndex == _destVertexIndex1;
 		}
 
 		/// <inheritdoc />
-		public override void Initialize(IEnumerable<int> destIndexes)
+		protected override void Set(AdjacencyEnumerator adj)
 		{
-			_destVertexIndex = destIndexes.Single();
-		}
-
-		/// <inheritdoc />
-		public override void Reset()
-		{
-			_destVertexIndex = -1;
+			_destVertexIndex1 = adj.GetNext();
 		}
 	}
 }

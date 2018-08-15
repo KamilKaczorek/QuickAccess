@@ -37,6 +37,7 @@
 
 #endregion
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
@@ -45,7 +46,199 @@ using QuickAccess.DataStructures.Common;
 using QuickAccess.DataStructures.Graphs.Model;
 
 namespace QuickAccess.DataStructures.Graphs.Algorithms
-{
+{	
+	/// <summary>
+	/// The graph search map for specified source vertex.
+	/// It exposes operations that returns path to the given destination vertex.
+	/// The map can be created by one of <see cref="VertexSearchMap"/> static factory methods. 
+	/// <seealso cref="IGraphSearch" />
+	/// <seealso cref="IWeightedEdgesGraphSearch"/>
+	/// </summary>
+	/// <typeparam name="TKey">The type of the vertex key (index/symbol).</typeparam>
+	public struct VertexSearchMap<TKey> : IEnumerable<VerticesPair<TKey>>
+	{
+		private readonly Dictionary<TKey, TKey> _destToSourceMap;
+
+		/// <summary>Gets the source vertex (starting position).</summary>
+		/// <value>The source vertex.</value>
+		[Pure]
+		public TKey SourceVertex { get; }
+
+		/// <summary>Initializes a new instance of the <see cref="VertexSearchMap{TKey}" /> structure.</summary>
+		/// <param name="sourceVertex">The source vertex (starting position).</param>
+		/// <param name="destToSourceMap">The destination to source map dictionary that is wrapped by created map.</param>
+		public VertexSearchMap(TKey sourceVertex, Dictionary<TKey, TKey> destToSourceMap)
+		{
+			SourceVertex = sourceVertex;
+			_destToSourceMap = destToSourceMap;
+		}
+
+		/// <summary>
+		///     Determines whether the map is empty (<see cref="SourceVertex" /> doesn't contain any adjacent vertices or is
+		///     not defined.
+		/// </summary>
+		/// <returns><c>true</c> if this map is empty; otherwise, <c>false</c>.</returns>
+		[Pure]
+		public bool IsEmpty => _destToSourceMap == null || _destToSourceMap.Count <= 0;
+
+		/// <summary>Gets a value indicating whether the <see cref="SourceVertex"/> has self loop (buckle).</summary>
+		/// <value><c>true</c> if the <see cref="SourceVertex"/> has self loop; otherwise, <c>false</c>.</value>
+		/// <seealso cref="HasPathToSelf"/>
+		[Pure]
+		public bool HasSelfLoop => _destToSourceMap != null && _destToSourceMap.TryGetValue(SourceVertex, out var src) &&
+		                           Comparer.Equals(SourceVertex, src);
+
+
+		/// <summary>Gets a value indicating whether the (circular or self loop) path from <see cref="SourceVertex"/> to <see cref="SourceVertex"/> exists.</summary>
+		/// <value><c>true</c> if the <see cref="SourceVertex"/> has path to itself; otherwise, <c>false</c>.</value>
+		/// <seealso cref="HasSelfLoop"/>
+		public bool HasPathToSelf => _destToSourceMap != null && _destToSourceMap.ContainsKey(SourceVertex);
+		
+		/// <summary>
+		///     Determines whether the graph contains the path from the <see cref="SourceVertex" /> to the given
+		///     <paramref name="destinationVertex" />.
+		/// </summary>
+		/// <param name="destinationVertex">The destination vertex.</param>
+		/// <returns><c>true</c> if it has path to the specified destination; otherwise, <c>false</c>.</returns>
+		[Pure]
+		public bool HasPathTo(TKey destinationVertex)
+		{
+			return _destToSourceMap?.ContainsKey(destinationVertex) ?? false;
+		}
+
+		/// <summary>Gets the indexes of all vertices that the <see cref="SourceVertex" /> has path to.</summary>
+		/// <value>The destination vertices.</value>
+		[Pure]
+		public IEnumerable<TKey> DestVertices => EnumerableExtensions.EnumerateNotNullOrReturnEmpty(_destToSourceMap?.Keys);
+
+		/// <summary>Determines whether the map contains specified regular path.</summary>
+		/// <param name="path">The path.</param>
+		/// <returns>
+		///   <c>true</c> if the map contains specified path; otherwise, <c>false</c>.</returns>
+		[Pure]
+		public bool ContainsPath(IEnumerable<TKey> path)
+		{
+			var count = 0;
+			TKey expectedSourceVertex = default;
+			var cmp = Comparer;
+			foreach (var destVertex in path)
+			{
+				++count;
+				if (count == 1)
+				{
+					expectedSourceVertex = destVertex;
+					continue;
+				}
+
+				if (!_destToSourceMap.TryGetValue(destVertex, out var sourceVertex))
+				{
+					return false;
+				}
+
+				if (!cmp.Equals(expectedSourceVertex, sourceVertex))
+				{
+					return false;
+				}
+
+				expectedSourceVertex = destVertex;
+			}
+
+			if (count == 1)
+			{
+				throw new ArgumentException("The specified path is wrong. Path must be empty or must contain more than one vertex.", nameof(path));
+			}
+
+			return true;
+		}
+
+		/// <summary>Determines whether the map contains specified reversed path.</summary>
+		/// <param name="reversedPath">The reversed path.</param>
+		/// <returns>
+		///   <c>true</c> if the map contains specified reversed path; otherwise, <c>false</c>.</returns>
+		[Pure]
+		public bool ContainsReversedPath(IEnumerable<TKey> reversedPath)
+		{
+			var count = 0;
+			TKey sourceVertex = default;
+			var cmp = Comparer;
+			foreach (var destVertex in reversedPath)
+			{
+				if (count < 0)
+				{
+					return false;
+				}
+
+				++count;
+
+				if (count > 1 && !cmp.Equals(destVertex, sourceVertex))
+				{
+					return false;
+				}
+
+				if (!_destToSourceMap.TryGetValue(destVertex, out sourceVertex))
+				{
+					count = -1;
+				}							
+			}
+
+			if (count == 1)
+			{
+				throw new ArgumentException("The specified path is wrong. Path must be empty or must contain more than one vertex.", nameof(reversedPath));
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		///     Gets the reversed (starting from destination vertex) path from the <see cref="SourceVertex" /> to the
+		///     <paramref name="destinationVertex" />.
+		///     Getting of reversed path is more optimal than getting of regular path from source to destination.
+		/// </summary>
+		/// <param name="destinationVertex">The destination vertex.</param>
+		/// <returns>Reversed path from source to destination vertex represented as sequence of vertices.</returns>
+		/// <seealso cref="VertexSearchMap.GetPathTo{TKey}" />
+		[Pure]
+		public IEnumerable<TKey> GetReversedPathTo(TKey destinationVertex)
+		{
+			if (_destToSourceMap == null || !_destToSourceMap.TryGetValue(destinationVertex, out var src))
+			{
+				yield break;
+			}
+
+			yield return destinationVertex;
+			yield return src;
+
+			var cmp = Comparer;
+			while (!cmp.Equals(src, SourceVertex))
+			{
+				src = _destToSourceMap[src];
+				yield return src;
+			}
+		}
+
+		/// <summary>Gets the vertex key comparer.</summary>
+		/// <value>The comparer.</value>
+		[Pure]
+		public IEqualityComparer<TKey> Comparer => _destToSourceMap?.Comparer ?? EqualityComparer<TKey>.Default;
+
+		/// <summary>Returns an enumerator that iterates through all edges of the map.</summary>
+		/// <returns>An enumerator that can be used to iterate through the collection.</returns>
+		[Pure]
+		public IEnumerator<VerticesPair<TKey>> GetEnumerator()
+		{
+			return EnumerableExtensions.EnumerateNotNullOrReturnEmpty(_destToSourceMap)
+			                           .Select(k => new VerticesPair<TKey>(k.Value, k.Key))
+			                           .GetEnumerator();
+		}
+
+		/// <inheritdoc />
+		[Pure]
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return GetEnumerator();
+		}
+	}
+
 	/// <summary>
 	/// The vertex search map that is result of graph search algorithm.
 	/// <seealso cref="IGraphSearch"/>
@@ -122,6 +315,78 @@ namespace QuickAccess.DataStructures.Graphs.Algorithms
 					v => symbolToIndexConverter.GetIndexOf(v.Source)));
 		}
 
+		/// <summary>Creates the vertex search map from the given path.</summary>
+		/// <remarks>
+		/// If the given path is empty the source vertex key will be set to default value.
+		/// </remarks>
+		/// <typeparam name="TKey">The type of the vertex key.</typeparam>
+		/// <param name="path">The path.</param>
+		/// <param name="vertexKeyComparer">The vertex key comparer.</param>
+		/// <returns>Search map created from the specified path.</returns>
+		public static VertexSearchMap<TKey> CreateFromPath<TKey>(IEnumerable<TKey> path, IEqualityComparer<TKey> vertexKeyComparer = null)
+		{
+			TKey src = default;
+			TKey sourceVertex = default;
+			var cmp = vertexKeyComparer ?? EqualityComparer<TKey>.Default;
+			Dictionary<TKey, TKey> map = null;
+
+			foreach (var dest in path)
+			{
+				if (map == null)
+				{  // first path item (source vertex)
+					sourceVertex = dest;
+					src = dest;
+					map = new Dictionary<TKey, TKey>(cmp);
+					continue;
+				}
+
+				map.Add(dest, src);
+				src = dest;
+			}
+
+			if (map?.Count == 0)
+			{
+				throw new ArgumentException("The specified path is wrong. Path must be empty or must contain more than one vertex.", nameof(path));
+			}
+
+			return new VertexSearchMap<TKey>(sourceVertex, map);
+		}
+
+		/// <summary>Creates the vertex search map from the given reversed path.</summary>
+		/// <remarks>
+		/// If the given reversed path is empty the source vertex key will be set to default value.
+		/// </remarks>
+		/// <typeparam name="TKey">The type of the vertex key.</typeparam>
+		/// <param name="reversedPath">The reversed path.</param>
+		/// <param name="vertexKeyComparer">The vertex key comparer.</param>
+		/// <returns>Search map created from the specified path.</returns>
+		public static VertexSearchMap<TKey> CreateFromReversedPath<TKey>(IEnumerable<TKey> reversedPath, IEqualityComparer<TKey> vertexKeyComparer = null)
+		{
+			TKey dst = default;
+			var cmp = vertexKeyComparer ?? EqualityComparer<TKey>.Default;
+			Dictionary<TKey, TKey> map = null;
+
+			foreach (var src in reversedPath)
+			{
+				if (map == null)
+				{// first reversed path item (last path vertex)
+					dst = src;
+					map = new Dictionary<TKey, TKey>(cmp);
+					continue;
+				}
+
+				map.Add(dst, src);
+				dst = src;
+			}
+
+			if (map?.Count == 0)
+			{
+				throw new ArgumentException("The specified path is wrong. Path must be empty or must contain more than one vertex.", nameof(reversedPath));
+			}
+
+			return new VertexSearchMap<TKey>(dst, map);
+		}
+
 		/// <summary>
 		///     Gets the regular path from the <see cref="VertexSearchMap{TKey}.SourceVertex" /> to the given
 		///     <paramref name="destinationVertex" />.
@@ -141,168 +406,4 @@ namespace QuickAccess.DataStructures.Graphs.Algorithms
 		}
 	}
 
-	/// <summary>
-	///     The graph search map for specified source vertex.
-	///     It exposes operations that returns path to the given destination vertex.
-	///     <seealso cref="BreadthFirstSearch" />
-	/// </summary>
-	/// <typeparam name="TKey">The type of the vertex key (index/symbol).</typeparam>
-	public struct VertexSearchMap<TKey> : IEnumerable<VerticesPair<TKey>>
-	{
-		private readonly Dictionary<TKey, TKey> _destToSourceMap;
-
-		/// <summary>Gets the source vertex (starting position).</summary>
-		/// <value>The source vertex.</value>
-		[Pure]
-		public TKey SourceVertex { get; }
-
-		/// <summary>Initializes a new instance of the <see cref="VertexSearchMap{TKey}" /> structure.</summary>
-		/// <param name="sourceVertex">The source vertex (starting position).</param>
-		/// <param name="destToSourceMap">The destination to source map.</param>
-		public VertexSearchMap(TKey sourceVertex, Dictionary<TKey, TKey> destToSourceMap)
-		{
-			SourceVertex = sourceVertex;
-			_destToSourceMap = destToSourceMap;
-		}
-
-		/// <summary>
-		///     Determines whether the map is empty (<see cref="SourceVertex" /> doesn't contain any adjacent vertices or is
-		///     not defined.
-		/// </summary>
-		/// <returns><c>true</c> if this map is empty; otherwise, <c>false</c>.</returns>
-		[Pure]
-		public bool IsEmpty => _destToSourceMap == null || _destToSourceMap.Count <= 0;
-
-		/// <summary>
-		///     Determines whether the graph contains the path from the <see cref="SourceVertex" /> to the given
-		///     <paramref name="destinationVertex" />.
-		/// </summary>
-		/// <param name="destinationVertex">The destination vertex.</param>
-		/// <returns><c>true</c> if it has path to the specified destination; otherwise, <c>false</c>.</returns>
-		[Pure]
-		public bool HasPathTo(TKey destinationVertex)
-		{
-			return _destToSourceMap?.ContainsKey(destinationVertex) ?? false;
-		}
-
-		/// <summary>Gets the indexes of all vertices that the <see cref="SourceVertex" /> has path to.</summary>
-		/// <value>The destination vertices.</value>
-		[Pure]
-		public IEnumerable<TKey> DestVertices => EnumerableExtensions.EnumerateNotNullOrReturnEmpty(_destToSourceMap?.Keys);
-
-		/// <summary>Determines whether the map contains specified regular path.</summary>
-		/// <param name="path">The path.</param>
-		/// <returns>
-		///   <c>true</c> if the map contains specified path; otherwise, <c>false</c>.</returns>
-		[Pure]
-		public bool ContainsPath(IEnumerable<TKey> path)
-		{
-			var count = 0;
-			TKey expectedSourceVertex = default;
-			foreach (var destVertex in path)
-			{
-				++count;
-				if (count == 1)
-				{
-					expectedSourceVertex = destVertex;
-					continue;
-				}
-
-				if (!_destToSourceMap.TryGetValue(destVertex, out var sourceVertex))
-				{
-					return false;
-				}
-
-				if (!_destToSourceMap.Comparer.Equals(expectedSourceVertex, sourceVertex))
-				{
-					return false;
-				}
-
-				expectedSourceVertex = destVertex;
-			}
-
-			return count != 1;
-		}
-
-		/// <summary>Determines whether the map contains specified reversed path.</summary>
-		/// <param name="reversedPath">The reversed path.</param>
-		/// <returns>
-		///   <c>true</c> if the map contains specified reversed path; otherwise, <c>false</c>.</returns>
-		[Pure]
-		public bool ContainsReversedPath(IEnumerable<TKey> reversedPath)
-		{
-			var count = 0;
-			TKey sourceVertex = default;
-			foreach (var destVertex in reversedPath)
-			{
-				if (count < 0)
-				{
-					return false;
-				}
-
-				++count;
-
-				if (count > 1 && !_destToSourceMap.Comparer.Equals(destVertex, sourceVertex))
-				{
-					return false;
-				}
-
-				if (!_destToSourceMap.TryGetValue(destVertex, out sourceVertex))
-				{
-					count = -1;
-				}							
-			}
-
-			return count != 1;
-		}
-
-		/// <summary>
-		///     Gets the reversed (starting from destination vertex) path from the <see cref="SourceVertex" /> to the
-		///     <paramref name="destinationVertex" />.
-		///     Getting of reversed path is more optimal than getting of regular path from source to destination.
-		/// </summary>
-		/// <param name="destinationVertex">The destination vertex.</param>
-		/// <returns>Reversed path from source to destination vertex represented as sequence of vertices.</returns>
-		/// <seealso cref="VertexSearchMap.GetPathTo{TKey}" />
-		[Pure]
-		public IEnumerable<TKey> GetReversedPathTo(TKey destinationVertex)
-		{
-			if (_destToSourceMap == null || !_destToSourceMap.TryGetValue(destinationVertex, out var src))
-			{
-				yield break;
-			}
-
-			yield return destinationVertex;
-			yield return src;
-
-			var cmp = Comparer;
-			while (!cmp.Equals(src, SourceVertex))
-			{
-				src = _destToSourceMap[src];
-				yield return src;
-			}
-		}
-
-		/// <summary>Gets the vertex key comparer.</summary>
-		/// <value>The comparer.</value>
-		[Pure]
-		public IEqualityComparer<TKey> Comparer => _destToSourceMap?.Comparer ?? EqualityComparer<TKey>.Default;
-
-		/// <summary>Returns an enumerator that iterates through all edges of the map.</summary>
-		/// <returns>An enumerator that can be used to iterate through the collection.</returns>
-		[Pure]
-		public IEnumerator<VerticesPair<TKey>> GetEnumerator()
-		{
-			return EnumerableExtensions.EnumerateNotNullOrReturnEmpty(_destToSourceMap)
-			                           .Select(k => new VerticesPair<TKey>(k.Value, k.Key))
-			                           .GetEnumerator();
-		}
-
-		/// <inheritdoc />
-		[Pure]
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return GetEnumerator();
-		}
-	}
 }
