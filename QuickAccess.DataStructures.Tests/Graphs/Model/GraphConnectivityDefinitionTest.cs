@@ -175,7 +175,7 @@ namespace QuickAccess.DataStructures.Tests.Graphs.Model
 
 			// Assert
 			Assert.IsFalse(res);
-			Assert.AreEqual(default, data);
+			Assert.AreEqual(0, data);
 		}
 
 		[TestMethod]

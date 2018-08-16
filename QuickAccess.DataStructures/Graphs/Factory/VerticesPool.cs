@@ -51,33 +51,30 @@ namespace QuickAccess.DataStructures.Graphs.Factory
 	/// </summary>
 	public static class VerticesPool
 	{
-		/// <summary>The pool types count</summary>
-		internal const int FixedCapacityEdgeCount = 7;
-
-		
+			
 		public static IVerticesPool<TEdgeData> Create<TEdgeData>(int totalCapacity)
 		{
-			return new VerticesPool<TEdgeData>(totalCapacity);
+			return new VerticesPool<TEdgeData>(totalCapacity, VerticesPoolCapacityType.TotalPoolCapacity);
 		}
 
 		public static IVerticesPool<TEdgeData> CreateWithCapacityPerVertexType<TEdgeData>(int capacityPerVertexType)
 		{
-			return new VerticesPool<TEdgeData>(capacityPerVertexType*FixedCapacityEdgeCount);
+			return new VerticesPool<TEdgeData>(capacityPerVertexType, VerticesPoolCapacityType.CapacityPerVertexType);
 		}
 
 		public static IVerticesPool<TEdgeData> CreateSynchronized<TEdgeData>(int totalCapacity, object synchRoot = null)
 		{
-			return new SynchronizedVerticesPool<TEdgeData>(new VerticesPool<TEdgeData>(totalCapacity), synchRoot);
+			return new SynchronizedVerticesPool<TEdgeData>(new VerticesPool<TEdgeData>(totalCapacity, VerticesPoolCapacityType.TotalPoolCapacity), synchRoot);
 		}
 
 		public static IVerticesPool<TEdgeData> CreateSynchronizedWithCapacityPerVertexType<TEdgeData>(int capacityPerVertexType, object synchRoot = null)
 		{
-			return new SynchronizedVerticesPool<TEdgeData>(new VerticesPool<TEdgeData>(capacityPerVertexType*FixedCapacityEdgeCount), synchRoot);
+			return new SynchronizedVerticesPool<TEdgeData>(new VerticesPool<TEdgeData>(capacityPerVertexType, VerticesPoolCapacityType.CapacityPerVertexType), synchRoot);
 		}
 
 		public static IVerticesPool<TEdgeData> CreateWithNoPool<TEdgeData>()
 		{
-			return new VerticesPool<TEdgeData>(0);
+			return new VerticesPool<TEdgeData>(0, VerticesPoolCapacityType.TotalPoolCapacity);
 		}
 	}
 
@@ -90,13 +87,14 @@ namespace QuickAccess.DataStructures.Graphs.Factory
 	{
 		private readonly InternalPoolBase<TEdgeData> _pool;
 
-		/// <summary>Initializes a new instance of the <see cref="VerticesPool{TEdgeData}"/> class.</summary>
+		/// <summary>Initializes a new instance of the <see cref="VerticesPool{TEdgeData}" /> class.</summary>
 		/// <param name="capacity">The total capacity.</param>
-		public VerticesPool(int capacity)
+		/// <param name="capacityType">Type of the capacity.</param>
+		public VerticesPool(int capacity, VerticesPoolCapacityType capacityType)
 		{
 			_pool = EmptyValue.IsEmptyValueType<TEdgeData>() ? 
-				(InternalPoolBase<TEdgeData>)(object)new InternalEmptyValueEdgePool(capacity) :				
-				new InternalPool(capacity);
+				(InternalPoolBase<TEdgeData>)(object)new InternalEmptyValueEdgePool(capacity, capacityType) :				
+				new InternalPool(capacity, capacityType);
 		}
 
 		/// <inheritdoc />
@@ -200,6 +198,21 @@ namespace QuickAccess.DataStructures.Graphs.Factory
 		{
 			public abstract void Clear();
 
+
+			protected int GetCapacityPerVertexType(int capacity, VerticesPoolCapacityType capacityType, int numberOfPools)
+			{
+				if (capacity <= 0)
+				{
+					return 0;
+				}
+
+				if (capacityType == VerticesPoolCapacityType.CapacityPerVertexType)
+				{
+					return capacity;
+				}
+
+				return Math.Max(1, capacity / numberOfPools);
+			}
 		}
 
 		private sealed class InternalEmptyValueEdgePool : InternalPoolBase<EmptyValue>
@@ -208,12 +221,13 @@ namespace QuickAccess.DataStructures.Graphs.Factory
 
 			private bool _hasCapacity;
 
-			
+			private const int FixedCapacityEdgeCount = 7;
 
-
-			public InternalEmptyValueEdgePool(int capacity)
+			public InternalEmptyValueEdgePool(int capacity, VerticesPoolCapacityType poolCapacityType)
 			{
-				if (capacity <= 0)
+				var singleCapacity = GetCapacityPerVertexType(capacity, poolCapacityType, FixedCapacityEdgeCount);
+
+				if (singleCapacity == 0)
 				{
 					_hasCapacity = false;
 					return;
@@ -221,9 +235,9 @@ namespace QuickAccess.DataStructures.Graphs.Factory
 
 				_hasCapacity = true;
 
-				var singleCapacity = Math.Max(1, capacity / VerticesPool.FixedCapacityEdgeCount);
+			
 
-				_poolPerType = new List<PoolableVertexAdjacency>[VerticesPool.FixedCapacityEdgeCount];
+				_poolPerType = new List<PoolableVertexAdjacency>[FixedCapacityEdgeCount];
 
 				for (var idx = 0; idx < _poolPerType.Length; idx++)
 				{
@@ -237,8 +251,7 @@ namespace QuickAccess.DataStructures.Graphs.Factory
 			private PoolableVertexAdjacency Create(int count)
 			{
 				switch (count)
-				{
-				
+				{				
 					case 1 : return new VertexAdjacency1Edge();
 					case 2 : return new VertexAdjacency2Edges();
 					case 3 : return new VertexAdjacency3Edges();
@@ -252,7 +265,7 @@ namespace QuickAccess.DataStructures.Graphs.Factory
 
 			private PoolableVertexAdjacency GetFromPool(int count)
 			{
-				if (_poolPerType == null || count > VerticesPool.FixedCapacityEdgeCount)
+				if (_poolPerType == null || count > FixedCapacityEdgeCount)
 				{
 					return null;
 				}
@@ -291,7 +304,7 @@ namespace QuickAccess.DataStructures.Graphs.Factory
 			/// <inheritdoc />
 			public override bool ProvidesFixedCapacity(int edgesCount)
 			{
-				return edgesCount <= VerticesPool.FixedCapacityEdgeCount;
+				return edgesCount <= FixedCapacityEdgeCount;
 			}
 
 			/// <inheritdoc />
@@ -317,7 +330,7 @@ namespace QuickAccess.DataStructures.Graphs.Factory
 					pool.Add(adj);
 				}
 
-				_hasCapacity = _poolPerType.All(p => p.Count < p.Capacity);
+				_hasCapacity = _poolPerType.Any(p => p.Count < p.Capacity);
 
 				return _hasCapacity;
 			}
@@ -337,13 +350,15 @@ namespace QuickAccess.DataStructures.Graphs.Factory
 			private readonly List<PoolableVertexAdjacency<TEdgeData>>[] _poolPerType;
 
 			private bool _hasCapacity;
-
+			private const int FixedCapacityEdgeCount = 7;
 			
 
 
-			public InternalPool(int capacity)
+			public InternalPool(int capacity, VerticesPoolCapacityType capacityType)
 			{
-				if (capacity <= 0)
+				var singleCapacity = GetCapacityPerVertexType(capacity, capacityType, FixedCapacityEdgeCount);
+
+				if (singleCapacity == 0)
 				{
 					_hasCapacity = false;
 					return;
@@ -351,9 +366,9 @@ namespace QuickAccess.DataStructures.Graphs.Factory
 
 				_hasCapacity = true;
 
-				var singleCapacity = Math.Max(1, capacity / VerticesPool.FixedCapacityEdgeCount);
+			
 
-				_poolPerType = new List<PoolableVertexAdjacency<TEdgeData>>[VerticesPool.FixedCapacityEdgeCount];
+				_poolPerType = new List<PoolableVertexAdjacency<TEdgeData>>[FixedCapacityEdgeCount];
 
 				for (var idx = 0; idx < _poolPerType.Length; idx++)
 				{
@@ -383,7 +398,7 @@ namespace QuickAccess.DataStructures.Graphs.Factory
 
 			private PoolableVertexAdjacency<TEdgeData> GetFromPool(int count)
 			{
-				if (_poolPerType == null || count > VerticesPool.FixedCapacityEdgeCount)
+				if (_poolPerType == null || count > FixedCapacityEdgeCount)
 				{
 					return null;
 				}
@@ -422,7 +437,7 @@ namespace QuickAccess.DataStructures.Graphs.Factory
 			/// <inheritdoc />
 			public override bool ProvidesFixedCapacity(int edgesCount)
 			{
-				return edgesCount <= VerticesPool.FixedCapacityEdgeCount;
+				return edgesCount <= FixedCapacityEdgeCount;
 			}
 
 			/// <inheritdoc />
@@ -448,7 +463,7 @@ namespace QuickAccess.DataStructures.Graphs.Factory
 					pool.Add(instance);
 				}
 
-				_hasCapacity = _poolPerType.All(p => p.Count < p.Capacity);
+				_hasCapacity = _poolPerType.Any(p => p.Count < p.Capacity);
 
 				return _hasCapacity;
 			}

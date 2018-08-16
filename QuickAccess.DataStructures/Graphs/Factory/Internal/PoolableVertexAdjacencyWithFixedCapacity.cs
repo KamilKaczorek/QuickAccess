@@ -257,6 +257,11 @@ namespace QuickAccess.DataStructures.Graphs.Factory.Internal
 		                             EmptyValue edgeData,
 		                             out PoolableVertexAdjacency<EmptyValue> final)
 		{
+			if (destVertexIndex < 0)
+			{
+				throw new ArgumentOutOfRangeException(nameof(destVertexIndex));
+			}
+
 			if (ContainsEdgeToIndex(destVertexIndex))
 			{
 				final = this;
@@ -264,9 +269,22 @@ namespace QuickAccess.DataStructures.Graphs.Factory.Internal
 			}
 
 			final = pool.GetInstance(
-				AdjacentIndexes.Append(destVertexIndex).Select(idx => AdjacentEdge.Create(idx)), EdgesCount + 1);
+				GetValidatedAdjacentIndexes().Append(destVertexIndex).Select(idx => AdjacentEdge.Create(idx)), EdgesCount + 1);
 			pool.ReturnInstance(this);
 			return true;
+		}
+
+		private IEnumerable<int> GetValidatedAdjacentIndexes()
+		{
+			foreach (var adjacentIndex in AdjacentIndexes)
+			{
+				if (adjacentIndex < 0)
+				{
+					throw new InvalidOperationException("Vertex instance is not initialized.");
+				}
+
+				yield return adjacentIndex;
+			}
 		}
 
 		/// <inheritdoc />
@@ -274,6 +292,11 @@ namespace QuickAccess.DataStructures.Graphs.Factory.Internal
 		                                int destVertexIndex,
 		                                out PoolableVertexAdjacency<EmptyValue> final)
 		{
+			if (destVertexIndex < 0)
+			{
+				throw new ArgumentOutOfRangeException(nameof(destVertexIndex));
+			}
+
 			if (!ContainsEdgeToIndex(destVertexIndex))
 			{
 				final = default;
@@ -281,7 +304,7 @@ namespace QuickAccess.DataStructures.Graphs.Factory.Internal
 			}
 
 			final = pool.GetInstance(
-				AdjacentIndexes.Where(idx => idx != destVertexIndex).Select(idx => AdjacentEdge.Create(idx)), EdgesCount - 1);
+				GetValidatedAdjacentIndexes().Where(idx => idx != destVertexIndex).Select(idx => AdjacentEdge.Create(idx)), EdgesCount - 1);
 			pool.ReturnInstance(this);
 			return true;
 		}
