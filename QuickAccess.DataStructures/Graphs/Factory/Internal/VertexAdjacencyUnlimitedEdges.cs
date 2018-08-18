@@ -63,7 +63,7 @@ namespace QuickAccess.DataStructures.Graphs.Factory.Internal
 		public override int MaxCapacity => ReplaceableVertexAdjacency.UnlimitedCapacity;
 
 		/// <inheritdoc />
-		public override bool AddEdge(ReplaceableVertexFactoryInterface<TEdgeData> pool, int destVertexIndex, TEdgeData edgeData, out ReplaceableVertexAdjacency<TEdgeData> final)
+		public override bool AddEdge(ReplaceableVertexFactoryInterface<TEdgeData> vertexFactory, int destVertexIndex, TEdgeData edgeData, out ReplaceableVertexAdjacency<TEdgeData> final)
 		{
 			if (_adj == null)
 			{
@@ -79,7 +79,7 @@ namespace QuickAccess.DataStructures.Graphs.Factory.Internal
 		}
 
 		/// <inheritdoc />
-		public override bool RemoveEdge(ReplaceableVertexFactoryInterface<TEdgeData> pool, int destVertexIndex, out ReplaceableVertexAdjacency<TEdgeData> final)
+		public override bool RemoveEdge(ReplaceableVertexFactoryInterface<TEdgeData> vertexFactory, int destVertexIndex, out ReplaceableVertexAdjacency<TEdgeData> final)
 		{
 			if (_adj == null || !_adj.Remove(destVertexIndex))
 			{
@@ -87,13 +87,13 @@ namespace QuickAccess.DataStructures.Graphs.Factory.Internal
 				return false;
 			}
 
-			if (!pool.ProvidesFixedCapacity(_adj.Count))
+			if (!vertexFactory.ProvidesFixedCapacity(_adj.Count))
 			{
 				final = this;
 				return true;
 			}
 
-			final = pool.GetInstance(_adj.Select(AdjacentEdge.Create), _adj.Count);
+			final = vertexFactory.GetInstance(_adj.Select(AdjacentEdge.Create), _adj.Count);
 			return true;
 		}
 
@@ -192,7 +192,7 @@ namespace QuickAccess.DataStructures.Graphs.Factory.Internal
 		public override int MaxCapacity => UnlimitedCapacity;
 
 		/// <inheritdoc />
-		public override bool AddEdge(ReplaceableVertexFactoryInterface<EmptyValue> pool,
+		public override bool AddEdge(ReplaceableVertexFactoryInterface<EmptyValue> vertexFactory,
 		                             int destVertexIndex,
 		                             EmptyValue edgeData,
 		                             out ReplaceableVertexAdjacency<EmptyValue> final)
@@ -204,7 +204,7 @@ namespace QuickAccess.DataStructures.Graphs.Factory.Internal
 
 
 		/// <inheritdoc />
-		public override bool RemoveEdge(ReplaceableVertexFactoryInterface<EmptyValue> pool,
+		public override bool RemoveEdge(ReplaceableVertexFactoryInterface<EmptyValue> vertexFactory,
 		                                int destVertexIndex,
 		                                out ReplaceableVertexAdjacency<EmptyValue> final)
 		{
@@ -214,13 +214,13 @@ namespace QuickAccess.DataStructures.Graphs.Factory.Internal
 				return false;
 			}
 
-			if (!pool.ProvidesFixedCapacity(_adj.Count))
+			if (!vertexFactory.ProvidesFixedCapacity(_adj.Count))
 			{
 				final = this;
 				return true;
 			}
 
-			final = pool.GetInstance(_adj.Select(idx => AdjacentEdge.Create(idx)), _adj.Count);
+			final = vertexFactory.GetInstance(_adj.Select(idx => AdjacentEdge.Create(idx)), _adj.Count);
 			return true;
 		}
 

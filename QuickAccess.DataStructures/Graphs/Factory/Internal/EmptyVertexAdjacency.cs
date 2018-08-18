@@ -66,17 +66,17 @@ namespace QuickAccess.DataStructures.Graphs.Factory.Internal
 		public override int MaxCapacity => 0;
 
 		/// <inheritdoc />
-		public override bool AddEdge(ReplaceableVertexFactoryInterface<TEdgeData> pool,
+		public override bool AddEdge(ReplaceableVertexFactoryInterface<TEdgeData> vertexFactory,
 		                             int destVertexIndex,
 		                             TEdgeData edgeData,
 		                             out ReplaceableVertexAdjacency<TEdgeData> final)
 		{
-			final = pool.GetInstance(EnumerableExtensions.Enumerate(AdjacentEdge.Create(destVertexIndex, edgeData)), 1);
+			final = vertexFactory.GetInstance(EnumerableExtensions.Enumerate(AdjacentEdge.Create(destVertexIndex, edgeData)), 1);
 			return true;
 		}
 
 		/// <inheritdoc />
-		public override bool RemoveEdge(ReplaceableVertexFactoryInterface<TEdgeData> pool, int destVertexIndex, out ReplaceableVertexAdjacency<TEdgeData> final)
+		public override bool RemoveEdge(ReplaceableVertexFactoryInterface<TEdgeData> vertexFactory, int destVertexIndex, out ReplaceableVertexAdjacency<TEdgeData> final)
 		{
 			final = this;
 			return false;

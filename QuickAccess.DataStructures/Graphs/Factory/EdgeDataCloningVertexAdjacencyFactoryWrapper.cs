@@ -49,7 +49,7 @@ namespace QuickAccess.DataStructures.Graphs.Factory
 	/// It is useful in conjunction with graph clone and compact operations.
 	/// </summary>
 	/// <typeparam name="TEdgeData">The type of the edge data.</typeparam>
-	/// <seealso cref="QuickAccess.DataStructures.Graphs.Pool.IVertexAdjacencyFactory{TEdgeData}" />
+	/// <seealso cref="Factory.IVertexAdjacencyFactory{TEdgeData}" />
 	public sealed class EdgeDataCloningVertexAdjacencyFactoryWrapper<TEdgeData> : IVertexAdjacencyFactory<TEdgeData>
 	{
 		private readonly Func<AdjacentEdge<TEdgeData>, TEdgeData> _copyEdgeDataCallback;

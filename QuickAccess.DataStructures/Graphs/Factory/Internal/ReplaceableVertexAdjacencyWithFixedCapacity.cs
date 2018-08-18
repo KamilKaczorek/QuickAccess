@@ -103,7 +103,7 @@ namespace QuickAccess.DataStructures.Graphs.Factory.Internal
 		}
 
 		/// <inheritdoc />
-		public override bool AddEdge(ReplaceableVertexFactoryInterface<TEdgeData> pool,
+		public override bool AddEdge(ReplaceableVertexFactoryInterface<TEdgeData> vertexFactory,
 		                             int destVertexIndex,
 		                             TEdgeData edgeData,
 		                             out ReplaceableVertexAdjacency<TEdgeData> final)
@@ -114,13 +114,13 @@ namespace QuickAccess.DataStructures.Graphs.Factory.Internal
 				return false;
 			}
 
-			final = pool.GetInstance(
+			final = vertexFactory.GetInstance(
 				this.Append(AdjacentEdge.Create(destVertexIndex, edgeData)), EdgesCount + 1);
 			return true;
 		}
 
 		/// <inheritdoc />
-		public override bool RemoveEdge(ReplaceableVertexFactoryInterface<TEdgeData> pool,
+		public override bool RemoveEdge(ReplaceableVertexFactoryInterface<TEdgeData> vertexFactory,
 		                                int destVertexIndex,
 		                                out ReplaceableVertexAdjacency<TEdgeData> final)
 		{
@@ -130,7 +130,7 @@ namespace QuickAccess.DataStructures.Graphs.Factory.Internal
 				return false;
 			}
 
-			final = pool.GetInstance(
+			final = vertexFactory.GetInstance(
 				this.Where(a => a.Destination != destVertexIndex), EdgesCount - 1);
 			return true;
 		}
@@ -250,7 +250,7 @@ namespace QuickAccess.DataStructures.Graphs.Factory.Internal
 		}
 
 		/// <inheritdoc />
-		public override bool AddEdge(ReplaceableVertexFactoryInterface<EmptyValue> pool,
+		public override bool AddEdge(ReplaceableVertexFactoryInterface<EmptyValue> vertexFactory,
 		                             int destVertexIndex,
 		                             EmptyValue edgeData,
 		                             out ReplaceableVertexAdjacency<EmptyValue> final)
@@ -266,7 +266,7 @@ namespace QuickAccess.DataStructures.Graphs.Factory.Internal
 				return false;
 			}
 
-			final = pool.GetInstance(
+			final = vertexFactory.GetInstance(
 				GetValidatedAdjacentIndexes().Append(destVertexIndex).Select(idx => AdjacentEdge.Create(idx)), EdgesCount + 1);
 			return true;
 		}
@@ -285,7 +285,7 @@ namespace QuickAccess.DataStructures.Graphs.Factory.Internal
 		}
 
 		/// <inheritdoc />
-		public override bool RemoveEdge(ReplaceableVertexFactoryInterface<EmptyValue> pool,
+		public override bool RemoveEdge(ReplaceableVertexFactoryInterface<EmptyValue> vertexFactory,
 		                                int destVertexIndex,
 		                                out ReplaceableVertexAdjacency<EmptyValue> final)
 		{
@@ -300,7 +300,7 @@ namespace QuickAccess.DataStructures.Graphs.Factory.Internal
 				return false;
 			}
 
-			final = pool.GetInstance(
+			final = vertexFactory.GetInstance(
 				GetValidatedAdjacentIndexes().Where(idx => idx != destVertexIndex).Select(idx => AdjacentEdge.Create(idx)), EdgesCount - 1);
 			return true;
 		}

@@ -53,7 +53,7 @@ namespace QuickAccess.DataStructures.Graphs.Factory.Internal
 	///         E.g. <see cref="VertexAdjacency1Edge{TEdgeData}" /> can store exactly one edge, adding another edge to this
 	///         vertex will
 	///         result in creating <see cref="VertexAdjacencyUnlimitedEdges{TEdgeData}" /> and returning single vertex instance
-	///         to the pool.
+	///         to the vertexFactory.
 	///         This behavior allows to provide optimal vertex data structure for reading access.
 	///     </remarks>
 	///     <seealso cref="ReplaceableVertexFactoryInterface{TEdgeData}" />
@@ -78,16 +78,16 @@ namespace QuickAccess.DataStructures.Graphs.Factory.Internal
 		///     If the maximal capacity of the current vertex is not enough, it will replace the <paramref name="final" /> vertex
 		///     by a new one with sufficient capacity and will copy all edges to the new vertex instance, returning the current
 		///     instance
-		///     to the specified <paramref name="pool" />.
+		///     to the specified <paramref name="vertexFactory" />.
 		/// </summary>
-		/// <param name="pool"></param>
+		/// <param name="vertexFactory"></param>
 		/// <param name="destVertexIndex">Index of the destination vertex.</param>
 		/// <param name="edgeData">The edge data.</param>
 		/// <param name="final">The reference to the target vertex, can be replaced in case of to small capacity.</param>
 		/// <returns>
 		///     <c>true</c> if new edge was added (the number of edges increased).
 		/// </returns>
-		public abstract bool AddEdge(ReplaceableVertexFactoryInterface<TEdgeData> pool,
+		public abstract bool AddEdge(ReplaceableVertexFactoryInterface<TEdgeData> vertexFactory,
 		                             int destVertexIndex,
 		                             TEdgeData edgeData,
 		                             out ReplaceableVertexAdjacency<TEdgeData> final);
@@ -103,19 +103,19 @@ namespace QuickAccess.DataStructures.Graphs.Factory.Internal
 		///     If it is possible to replace the current vertex by more optimal then the <paramref name="final" /> will contain
 		///     reference to the new vertex.
 		/// </summary>
-		/// <param name="pool"></param>
+		/// <param name="vertexFactory"></param>
 		/// <param name="destVertexIndex">Index of the destination vertex.</param>
 		/// <param name="final">The reference to the target vertex, can be replaced in case of optimization.</param>
 		/// <returns>
 		///     <c>true</c> if the edge was found and removed from the vertex; otherwise <c>false</c>.
 		/// </returns>
-		public abstract bool RemoveEdge(ReplaceableVertexFactoryInterface<TEdgeData> pool,
+		public abstract bool RemoveEdge(ReplaceableVertexFactoryInterface<TEdgeData> vertexFactory,
 		                                int destVertexIndex,
 		                                out ReplaceableVertexAdjacency<TEdgeData> final);
 
 		/// <summary>
 		///     Resets this instance.
-		///     It is called by the vertices pool when the instance is returned to the pool.
+		///     It is called by the vertices vertexFactory when the instance is returned to the vertexFactory.
 		/// </summary>
 		public abstract void Reset();
 	}
@@ -128,7 +128,7 @@ namespace QuickAccess.DataStructures.Graphs.Factory.Internal
 	///         E.g. <see cref="VertexAdjacency1Edge{TEdgeData}" /> can store exactly one edge, adding another edge to this
 	///         vertex will
 	///         result in creating <see cref="VertexAdjacencyUnlimitedEdges{TEdgeData}" /> and returning single vertex instance
-	///         to the pool.
+	///         to the vertexFactory.
 	///         This behavior allows to provide optimal vertex data structure for reading access.
 	///     </remarks>
 	///     <seealso cref="ReplaceableVertexFactoryInterface{TEdgeData}" />
