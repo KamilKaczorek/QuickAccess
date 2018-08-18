@@ -48,6 +48,9 @@ namespace QuickAccess.DataStructures.Graphs.Model
 	///     and the edges contain data.
 	///     The index of the first vertex is equal to zero, indexes of subsequent vertices are successive natural numbers.
 	///     The interface is implemented as an abstract class to increase performance.
+	/// <remarks>
+	/// Please note that the VertexAdjacency instance can be replaced during the graph modification.
+	/// </remarks>
 	/// </summary>
 	public abstract class VertexAdjacency<TEdgeData> : IReadOnlyCollection<AdjacentEdge<TEdgeData>>
 	{

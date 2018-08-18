@@ -48,11 +48,17 @@ namespace QuickAccess.DataStructures.Graphs.Model
 	///     Interface of a graph connectivity definition defined as abstract class for better performance.
 	///     It is provided by the <see cref="IReadOnlyGraph{TEdgeData}" />.
 	///     It defines the contract to access vertices adjacency definition for graph search algorithms.
+	/// <remarks>
+	/// Please note that the VertexAdjacency instance can be replaced during the graph modification.
+	/// </remarks>
 	/// </summary>
 	/// <typeparam name="TEdgeData">The type of the edge data.</typeparam>
 	public abstract class GraphConnectivityDefinition<TEdgeData> : IReadOnlyList<VertexAdjacency<TEdgeData>>
 	{
 		/// <inheritdoc />
+		/// <remarks>
+		/// Please note that the VertexAdjacency instance can be replaced during the graph modification.
+		/// </remarks>
 		public abstract IEnumerator<VertexAdjacency<TEdgeData>> GetEnumerator();
 
 		/// <inheritdoc />
@@ -65,6 +71,9 @@ namespace QuickAccess.DataStructures.Graphs.Model
 		public abstract int Count { get; }
 
 		/// <inheritdoc />
+		/// <remarks>
+		/// Please note that the VertexAdjacency instance can be replaced during the graph modification.
+		/// </remarks>
 		/// <exception cref="System.IndexOutOfRangeException">Thrown when <paramref name="index"/> is out of the proper range.</exception>
 		public abstract VertexAdjacency<TEdgeData> this[int index] { get; }
 
@@ -224,6 +233,9 @@ namespace QuickAccess.DataStructures.Graphs.Model
 		/// <summary>
 		///     Tries to get the vertex at the specified index.
 		/// </summary>
+		/// <remarks>
+		/// Please note that the VertexAdjacency instance can be replaced during the graph modification.
+		/// </remarks>
 		/// <typeparam name="TEdgeData">The type of the edge data.</typeparam>
 		/// <param name="index">The vertex index.</param>
 		/// <param name="vertex">The vertex at specified index.</param>
