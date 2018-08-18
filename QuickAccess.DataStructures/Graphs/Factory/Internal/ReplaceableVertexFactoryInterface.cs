@@ -43,13 +43,13 @@ using QuickAccess.DataStructures.Graphs.Model;
 namespace QuickAccess.DataStructures.Graphs.Factory.Internal
 {
 	/// <summary>
-	/// The interface in form of an abstract class (performance) of a factory of poolable vertex instances.
-	/// The interface is defined to pass the vertex factory to <see cref="PoolableVertexAdjacency{TEdgeData}.AddEdge"/>/
-	/// <see cref="PoolableVertexAdjacency{TEdgeData}.RemoveEdge"/> operation
-	/// For more details refer to <see cref="PoolableVertexAdjacency{TEdgeData}"/>.
+	/// The interface in form of an abstract class (performance) of a factory of replaceable vertex instances.
+	/// The interface is defined to pass the vertex factory to <see cref="ReplaceableVertexAdjacency{TEdgeData}.AddEdge"/>/
+	/// <see cref="ReplaceableVertexAdjacency{TEdgeData}.RemoveEdge"/> operation
+	/// For more details refer to <see cref="ReplaceableVertexAdjacency{TEdgeData}"/>.
 	/// </summary>
 	/// <typeparam name="TEdgeData">The type of the edge data.</typeparam>
-	internal abstract class PoolableVertexFactoryInterface<TEdgeData>
+	internal abstract class ReplaceableVertexFactoryInterface<TEdgeData>
 	{
 		/// <summary>
 		/// Gets the empty vertex instance.
@@ -57,7 +57,7 @@ namespace QuickAccess.DataStructures.Graphs.Factory.Internal
 		/// <value>
 		/// The empty vertex.
 		/// </value>
-		public abstract PoolableVertexAdjacency<TEdgeData> Empty { get; }
+		public abstract ReplaceableVertexAdjacency<TEdgeData> Empty { get; }
 
 		/// <summary>
 		/// Gets the vertex instance with specified edges.
@@ -65,20 +65,13 @@ namespace QuickAccess.DataStructures.Graphs.Factory.Internal
 		/// <param name="adjacentEdges">The adjacent edges.</param>
 		/// <param name="count">The number of edges.</param>
 		/// <returns>The vertex instance with edges specified by parameters.</returns>
-		public abstract PoolableVertexAdjacency<TEdgeData> GetInstance(IEnumerable<AdjacentEdge<TEdgeData>> adjacentEdges, int count);
+		public abstract ReplaceableVertexAdjacency<TEdgeData> GetInstance(IEnumerable<AdjacentEdge<TEdgeData>> adjacentEdges, int count);
 
 		/// <summary>
 		/// Determines whether it provides specific vertex adjacency type with fixed edges capacity for the specified count of edges. 
 		/// </summary>
 		/// <param name="edgesCount">The edges count.</param>
 		/// <returns><c>true</c> if provides specific fixed capacity type; otherwise, <c>false</c>.</returns>
-		public abstract bool ProvidesFixedCapacity(int edgesCount);
-
-		/// <summary>
-		/// Returns the specified instance to the pool.
-		/// </summary>
-		/// <param name="instance">The instance to return.</param>
-		/// <returns><c>true</c> if the pool has space to take more instances; otherwise, <c>false</c> - the pool is full.</returns>
-		public abstract bool ReturnInstance(PoolableVertexAdjacency<TEdgeData> instance);
+		public abstract bool ProvidesFixedCapacity(int edgesCount);		
 	}
 }

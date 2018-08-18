@@ -49,8 +49,8 @@ namespace QuickAccess.DataStructures.Graphs.Factory.Internal
 	/// enumeration and contains operations execution time.
 	/// </summary>
 	/// <typeparam name="TEdgeData">The type of the edge data.</typeparam>
-	/// <seealso cref="PoolableVertexAdjacency{TEdgeData}" />
-	internal sealed class VertexAdjacency4Edges<TEdgeData> : PoolableVertexAdjacencyWithFixedCapacity<TEdgeData>
+	/// <seealso cref="ReplaceableVertexAdjacency{TEdgeData}" />
+	internal sealed class VertexAdjacency4Edges<TEdgeData> : ReplaceableVertexAdjacencyWithFixedCapacity<TEdgeData>
 	{
 		private int _destVertexIndex1;
 		private int _destVertexIndex2;
@@ -134,8 +134,8 @@ namespace QuickAccess.DataStructures.Graphs.Factory.Internal
 	/// <see cref="HashSet{T}"/>/<see cref="Dictionary{TKey,TValue}"/> based structure, when it comes to adjacency 
 	/// enumeration and contains operations execution time.
 	/// </summary>
-	/// <seealso cref="PoolableVertexAdjacency{TEdgeData}" />
-	internal sealed class VertexAdjacency4Edges : PoolableVertexAdjacencyWithFixedCapacity
+	/// <seealso cref="ReplaceableVertexAdjacency{TEdgeData}" />
+	internal sealed class VertexAdjacency4Edges : ReplaceableVertexAdjacencyWithFixedCapacity
 	{
 		private int _destVertexIndex1;
 		private int _destVertexIndex2;

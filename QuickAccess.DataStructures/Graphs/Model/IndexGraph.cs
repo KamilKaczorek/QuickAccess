@@ -72,7 +72,7 @@ namespace QuickAccess.DataStructures.Graphs.Model
 			var specifiedVerticesCount = adjacency.GetIndexOfLastNotEmptyVertex() + 1;
 			capacity = Math.Max(capacity, specifiedVerticesCount);
 
-			_vertexModifier = vertexModifier ?? VerticesPool.CreateWithCapacityPerVertexType<TEdgeData>(1);
+			_vertexModifier = vertexModifier ?? new VertexAdjacencyFactory<TEdgeData>();
 			_edgesCounter = new GraphEdgesCounter();
 
 			var source = new List<VertexAdjacency<TEdgeData>>(capacity);
@@ -90,7 +90,7 @@ namespace QuickAccess.DataStructures.Graphs.Model
 		/// <param name="capacity">The vertices capacity.</param>
 		public IndexGraph(int initialVerticesCount = 0, int capacity = 0, IVertexAdjacencyModifier<TEdgeData> vertexModifier = null)
 		{
-			_vertexModifier = vertexModifier ?? VerticesPool.CreateWithCapacityPerVertexType<TEdgeData>(1);
+			_vertexModifier = vertexModifier ?? new VertexAdjacencyFactory<TEdgeData>();
 			_edgesCounter = new GraphEdgesCounter();
 			_vertices = new DefaultTailList<VertexAdjacency<TEdgeData>>(
 				_vertexModifier.Empty, initialVerticesCount, capacity);
@@ -255,11 +255,6 @@ namespace QuickAccess.DataStructures.Graphs.Model
 			}
 
 			var count = _vertices.Count;
-
-			if (_vertexModifier is IVerticesPool<TEdgeData> pool)
-			{
-				pool.ReturnRange(_vertices);
-			}
 
 			_edgesCounter.Reset();
 

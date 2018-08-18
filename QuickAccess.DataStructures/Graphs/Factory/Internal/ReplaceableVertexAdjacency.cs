@@ -46,22 +46,20 @@ using QuickAccess.DataStructures.Graphs.Model;
 namespace QuickAccess.DataStructures.Graphs.Factory.Internal
 {
 	/// <summary>
-	///     The base abstract class of poolable vertex.
+	///     The base abstract class of replaceable vertex.
 	///     <remarks>
-	///         The poolable vertex instance is capable to store specified number of edges.
+	///         The replaceable vertex instance is capable to store specified number of edges.
 	///         It is possible that adding or removing an edge will result in creating of new vertex instance.
 	///         E.g. <see cref="VertexAdjacency1Edge{TEdgeData}" /> can store exactly one edge, adding another edge to this
 	///         vertex will
 	///         result in creating <see cref="VertexAdjacencyUnlimitedEdges{TEdgeData}" /> and returning single vertex instance
 	///         to the pool.
 	///         This behavior allows to provide optimal vertex data structure for reading access.
-	///         While a vertex pool reduces the GC operations during defining a graph and decreases the cost of new vertex
-	///         instance activation.
 	///     </remarks>
-	///     <seealso cref="PoolableVertexFactoryInterface{TEdgeData}" />
+	///     <seealso cref="ReplaceableVertexFactoryInterface{TEdgeData}" />
 	/// </summary>
 	/// <typeparam name="TEdgeData">The type of the edge data.</typeparam>
-	internal abstract class PoolableVertexAdjacency<TEdgeData> : VertexAdjacency<TEdgeData>
+	internal abstract class ReplaceableVertexAdjacency<TEdgeData> : VertexAdjacency<TEdgeData>
 	{
 		/// <summary>The unlimited capacity.</summary>
 		public const int UnlimitedCapacity = int.MaxValue;
@@ -89,10 +87,10 @@ namespace QuickAccess.DataStructures.Graphs.Factory.Internal
 		/// <returns>
 		///     <c>true</c> if new edge was added (the number of edges increased).
 		/// </returns>
-		public abstract bool AddEdge(PoolableVertexFactoryInterface<TEdgeData> pool,
+		public abstract bool AddEdge(ReplaceableVertexFactoryInterface<TEdgeData> pool,
 		                             int destVertexIndex,
 		                             TEdgeData edgeData,
-		                             out PoolableVertexAdjacency<TEdgeData> final);
+		                             out ReplaceableVertexAdjacency<TEdgeData> final);
 
 		/// <summary>
 		///     Initializes the vertex with specified adjacent edges.
@@ -111,9 +109,9 @@ namespace QuickAccess.DataStructures.Graphs.Factory.Internal
 		/// <returns>
 		///     <c>true</c> if the edge was found and removed from the vertex; otherwise <c>false</c>.
 		/// </returns>
-		public abstract bool RemoveEdge(PoolableVertexFactoryInterface<TEdgeData> pool,
+		public abstract bool RemoveEdge(ReplaceableVertexFactoryInterface<TEdgeData> pool,
 		                                int destVertexIndex,
-		                                out PoolableVertexAdjacency<TEdgeData> final);
+		                                out ReplaceableVertexAdjacency<TEdgeData> final);
 
 		/// <summary>
 		///     Resets this instance.
@@ -123,22 +121,20 @@ namespace QuickAccess.DataStructures.Graphs.Factory.Internal
 	}
 
 	/// <summary>
-	///     The base abstract class of poolable vertex with empty edges.
+	///     The base abstract class of replaceable vertex with empty edges.
 	///     <remarks>
-	///         The poolable vertex instance is capable to store specified number of edges.
+	///         The replaceable vertex instance is capable to store specified number of edges.
 	///         It is possible that adding or removing an edge will result in creating of new vertex instance.
 	///         E.g. <see cref="VertexAdjacency1Edge{TEdgeData}" /> can store exactly one edge, adding another edge to this
 	///         vertex will
 	///         result in creating <see cref="VertexAdjacencyUnlimitedEdges{TEdgeData}" /> and returning single vertex instance
 	///         to the pool.
 	///         This behavior allows to provide optimal vertex data structure for reading access.
-	///         While a vertex pool reduces the GC operations during defining a graph and decreases the cost of new vertex
-	///         instance activation.
 	///     </remarks>
-	///     <seealso cref="PoolableVertexFactoryInterface{TEdgeData}" />
+	///     <seealso cref="ReplaceableVertexFactoryInterface{TEdgeData}" />
 	///		<seealso cref="EmptyValue"/>
 	/// </summary>
-	internal abstract class PoolableVertexAdjacency : PoolableVertexAdjacency<EmptyValue>
+	internal abstract class ReplaceableVertexAdjacency : ReplaceableVertexAdjacency<EmptyValue>
 	{
 		/// <inheritdoc />
 		public override IEnumerator<AdjacentEdge<EmptyValue>> GetEnumerator()

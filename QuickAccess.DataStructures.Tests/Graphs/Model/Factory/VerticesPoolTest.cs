@@ -51,7 +51,7 @@ using QuickAccess.DataStructures.Graphs.Model;
 namespace QuickAccess.DataStructures.Tests.Graphs.Model.Factory
 {
 
-	public class VerticesPoolTest<TEdgeData>
+	public class VerticesFactoryTest<TEdgeData>
 	{
 
 		private IEnumerable<AdjacentEdge<TEdgeData>> TakeAdjacentEdges(int count)
@@ -59,17 +59,28 @@ namespace QuickAccess.DataStructures.Tests.Graphs.Model.Factory
 			return Enumerable.Range(0, count).Select(idx => new AdjacentEdge<TEdgeData>(idx, default));
 		}
 
-		private VerticesPool<TEdgeData> CreatePool(int totalCapacity)
+		private VertexAdjacencyFactory<TEdgeData>[] CreateReplaceableAndNotReplFactory()
 		{
-			return new VerticesPool<TEdgeData>(totalCapacity, VerticesPoolCapacityType.TotalPoolCapacity);
+			return new[] {CreateReplaceableFactory(), CreateNotReplaceableFactory()};
+		}
+
+		private VertexAdjacencyFactory<TEdgeData> CreateReplaceableFactory()
+		{
+			// ReSharper disable once RedundantArgumentDefaultValue
+			return new VertexAdjacencyFactory<TEdgeData>(true);
+		}
+
+		private VertexAdjacencyFactory<TEdgeData> CreateNotReplaceableFactory()
+		{
+			return new VertexAdjacencyFactory<TEdgeData>(false);
 		}
 
 		[TestMethod]
-		public void ON_get_Empty_SHOULD_Return_Always_Same_Singleton_Instance_From_Each_Pool_Instance()
+		public void ON_get_Empty_WHEN_Replaceable_SHOULD_Return_Always_Same_Singleton_Instance_From_Each_Factory_Instance()
 		{
 			// Arrange:
-			var uut1 = CreatePool(10);
-			var uut2 = CreatePool(0);
+			var uut1 = CreateReplaceableFactory();
+			var uut2 = CreateReplaceableFactory();
 
 			// Act:
 			var e1 = uut1.Empty;
@@ -85,7 +96,7 @@ namespace QuickAccess.DataStructures.Tests.Graphs.Model.Factory
 		public void ON_get_Empty_SHOULD_Return_Empty_Not_Null_Instance()
 		{
 			// Arrange:
-			var uut = CreatePool(10);
+			var uut = CreateReplaceableFactory();
 
 			// Act:
 			var res = uut.Empty;
@@ -96,11 +107,11 @@ namespace QuickAccess.DataStructures.Tests.Graphs.Model.Factory
 		}
 
 		[TestMethod]
-		public void ON_GetInstance_WHEN_Count_Zero_SHOULD_Return_Always_Same_Singleton_Empty_Instance_From_Each_Pool_Instance()
+		public void ON_GetInstance_WHEN_Replaceable_AND_RepleCount_Zero_SHOULD_Return_Always_Same_Singleton_Empty_Instance_From_Each_Factory_Instance()
 		{
 			// Arrange:
-			var uut1 = CreatePool(10);
-			var uut2 = CreatePool(0);
+			var uut1 = CreateReplaceableFactory();
+			var uut2 = CreateReplaceableFactory();
 
 			// Act:
 			var e1 = uut1.GetInstance(null, 0);
@@ -117,7 +128,7 @@ namespace QuickAccess.DataStructures.Tests.Graphs.Model.Factory
 		public void ON_AddEdge_WHEN_Vertex_Empty_SHOULD_Return_True()
 		{
 			// Arrange:
-			var uut = CreatePool(10);
+			var uut = CreateReplaceableFactory();
 			var v = uut.Empty;
 			// Act:
 			var res = uut.AddEdge(20, default, ref v);
@@ -127,10 +138,10 @@ namespace QuickAccess.DataStructures.Tests.Graphs.Model.Factory
 		}
 
 		[TestMethod]
-		public void ON_AddEdge_WHEN_Vertex_Empty_SHOULD_Replace_Vertex_Instance()
+		public void ON_AddEdge_WHEN_Replaceable_AND_Vertex_Empty_SHOULD_Replace_Vertex_Instance()
 		{
 			// Arrange:
-			var uut = CreatePool(10);
+			var uut = CreateReplaceableFactory();
 			var v = uut.Empty;
 			var prev = v;
 			// Act:
@@ -141,10 +152,10 @@ namespace QuickAccess.DataStructures.Tests.Graphs.Model.Factory
 		}
 
 		[TestMethod]
-		public void ON_AddEdge_WHEN_Vertex_Count_From_1_To_7_SHOULD_Replace_Vertex_Instance()
+		public void ON_AddEdge_WHEN_Replaceable_AND_Vertex_Count_From_1_To_7_SHOULD_Replace_Vertex_Instance()
 		{
 			// Arrange:
-			var uut = CreatePool(10);
+			var uut = CreateReplaceableFactory();
 			for (var count = 1; count <= 7; count++)
 			{
 				var v = uut.GetInstance(TakeAdjacentEdges(count), count);
@@ -158,10 +169,10 @@ namespace QuickAccess.DataStructures.Tests.Graphs.Model.Factory
 		}
 
 		[TestMethod]
-		public void ON_RemoveEdge_WHEN_Vertex_Count_From_1_To_8_SHOULD_Replace_Vertex_Instance()
+		public void ON_RemoveEdge_WHEN_Replaceable_Vertex_Count_From_1_To_8_SHOULD_Replace_Vertex_Instance()
 		{
 			// Arrange:
-			var uut = CreatePool(10);
+			var uut = CreateReplaceableFactory();
 			for (var count = 1; count <= 8; count++)
 			{
 				var v = uut.GetInstance(TakeAdjacentEdges(count), count);
@@ -178,16 +189,18 @@ namespace QuickAccess.DataStructures.Tests.Graphs.Model.Factory
 		public void ON_RemoveEdge_WHEN_Contains_Edge_SHOULD_Return_True_And_Vertex_With_Decreased_Count()
 		{
 			// Arrange:
-			var uut = CreatePool(7);
-			for (var expectedCount = 0; expectedCount <= 10; expectedCount++)
+			foreach (var uut in CreateReplaceableAndNotReplFactory())
 			{
-				var v = uut.GetInstance(TakeAdjacentEdges(expectedCount+1), expectedCount+1);
-				// Act:
-				var res = uut.RemoveEdge(0, ref v);
+				for (var expectedCount = 0; expectedCount <= 10; expectedCount++)
+				{
+					var v = uut.GetInstance(TakeAdjacentEdges(expectedCount + 1), expectedCount + 1);
+					// Act:
+					var res = uut.RemoveEdge(0, ref v);
 
-				// Assert:
-				Assert.IsTrue(res);
-				Assert.AreEqual(expectedCount, v.Count);
+					// Assert:
+					Assert.IsTrue(res);
+					Assert.AreEqual(expectedCount, v.Count);
+				}
 			}
 		}
 
@@ -195,123 +208,31 @@ namespace QuickAccess.DataStructures.Tests.Graphs.Model.Factory
 		public void ON_RemoveEdge_WHEN_Does_Not_Contain_Edge_SHOULD_Return_False_And_Vertex_With_Same_Count()
 		{
 			// Arrange:
-			var uut = CreatePool(7);
-			for (var expectedCount = 0; expectedCount <= 10; expectedCount++)
+			foreach (var uut in CreateReplaceableAndNotReplFactory())
 			{
-				var v = uut.GetInstance(TakeAdjacentEdges(expectedCount), expectedCount);
-				// Act:
-				var res = uut.RemoveEdge(1000, ref v);
+				for (var expectedCount = 0; expectedCount <= 10; expectedCount++)
+				{
+					var v = uut.GetInstance(TakeAdjacentEdges(expectedCount), expectedCount);
+					// Act:
+					var res = uut.RemoveEdge(1000, ref v);
 
-				// Assert:
-				Assert.IsFalse(res);
-				Assert.AreEqual(expectedCount, v.Count);
+					// Assert:
+					Assert.IsFalse(res);
+					Assert.AreEqual(expectedCount, v.Count);
+				}
 			}
 		}
 
-		[TestMethod]
-		public void ON_GetInstance_WHEN_Vertex_Count_From_1_To_7_AND_Vertices_Returned_SHOULD_Return_Instance_From_The_Pool()
-		{
-			// Arrange:
-			var uut = CreatePool(7);
-			var returned = new VertexAdjacency<TEdgeData>[7];
-			for (var count = 1; count <= 7; count++)
-			{
-				returned[count - 1] = uut.GetInstance(TakeAdjacentEdges(count), count);				
-			}
+		
 
-			uut.ReturnRange(returned);
-
-			for (var count = 1; count <= 7; count++)
-			{
-				
-				// Act:
-				var v = uut.GetInstance(TakeAdjacentEdges(count), count);
-
-				// Assert:
-				Assert.AreSame(returned[count-1], v);
-			}
-		}
+		
+		
 
 		[TestMethod]
-		public void ON_GetInstance_WHEN_GetInstance_Already_Invoked_Once_SHOULD_NOT_Return_Same_Instance_Twice()
+		public void ON_AddEdge_WHEN_Replaceable_AND_Vertex_Count_From_Higher_Than_7_SHOULD_NOT_Replace_Vertex_Instance()
 		{
 			// Arrange:
-			var uut = CreatePool(7);
-			var returned = new VertexAdjacency<TEdgeData>[7];
-			for (var count = 1; count <= 7; count++)
-			{
-				returned[count - 1] = uut.GetInstance(TakeAdjacentEdges(count), count);				
-			}
-
-			uut.ReturnRange(returned);
-
-			for (var count = 1; count <= 7; count++)
-			{
-				// Act:
-				var v = uut.GetInstance(TakeAdjacentEdges(count), count);
-				var other = uut.GetInstance(TakeAdjacentEdges(count), count);
-
-				// Assert:
-				Assert.AreNotSame(v, other);
-				Assert.AreNotSame(returned[count-1], other);
-			}
-		}
-
-		[TestMethod]
-		public void ON_GetInstance_WHEN_Pool_Capacity_0_SHOULD_Not_Return_Instance_From_The_Pool()
-		{
-			// Arrange:
-			var uut = CreatePool(0);
-			var returned = new VertexAdjacency<TEdgeData>[7];
-			for (var count = 1; count <= 7; count++)
-			{
-				returned[count - 1] = uut.GetInstance(TakeAdjacentEdges(count), count);				
-			}
-
-			uut.ReturnRange(returned);
-
-			for (var count = 1; count <= 7; count++)
-			{
-				
-				// Act:
-				var v = uut.GetInstance(TakeAdjacentEdges(count), count);
-
-				// Assert:
-				Assert.AreNotSame(returned[count-1], v);
-			}
-		}
-
-		[TestMethod]
-		public void ON_GetInstance_WHEN_Pool_Clear_Invoked_SHOULD_Not_Return_Instance_From_The_Pool()
-		{
-			// Arrange:
-			var uut = CreatePool(10);
-			var returned = new VertexAdjacency<TEdgeData>[7];
-			for (var count = 1; count <= 7; count++)
-			{
-				returned[count - 1] = uut.GetInstance(TakeAdjacentEdges(count), count);				
-			}
-
-			uut.ReturnRange(returned);
-
-
-			for (var count = 1; count <= 7; count++)
-			{
-				
-				// Act:
-				uut.Clear();
-				var v = uut.GetInstance(TakeAdjacentEdges(count), count);
-
-				// Assert:
-				Assert.AreNotSame(returned[count-1], v);
-			}
-		}
-
-		[TestMethod]
-		public void ON_AddEdge_WHEN_Vertex_Count_From_Higher_Than_7_SHOULD_NOT_Replace_Vertex_Instance()
-		{
-			// Arrange:
-			var uut = CreatePool(10);
+			var uut = CreateReplaceableFactory();
 			
 			var v = uut.GetInstance(TakeAdjacentEdges(8), 8);
 			var prev = v;
@@ -333,53 +254,57 @@ namespace QuickAccess.DataStructures.Tests.Graphs.Model.Factory
 		public void ON_AddEdge_WHEN_Adj_Vertex_Not_Yet_Added_SHOULD_Return_True_And_Vertex_With_Increased_Count_By_One()
 		{
 			// Arrange:
-			var uut = CreatePool(10);
-			var v = uut.Empty;
-
-			for (int expectedCount = 1, adj = 0; expectedCount <= 10; ++expectedCount, ++adj)
+			foreach (var uut in CreateReplaceableAndNotReplFactory())
 			{
-				// Act:
-				var res = uut.AddEdge(adj, default, ref v);
+				var v = uut.Empty;
 
-				// Assert:
-				Assert.IsTrue(res);
-				Assert.AreEqual(expectedCount, v.Count);
-			}				
+				for (int expectedCount = 1, adj = 0; expectedCount <= 10; ++expectedCount, ++adj)
+				{
+					// Act:
+					var res = uut.AddEdge(adj, default, ref v);
+
+					// Assert:
+					Assert.IsTrue(res);
+					Assert.AreEqual(expectedCount, v.Count);
+				}
+			}
 		}
 
 		[TestMethod]
 		public void ON_AddEdge_WHEN_Adj_Vertex_Already_Added_SHOULD_Return_False_And_Same_Vertex_Instance_With_Not_Changed_Count()
 		{
 			// Arrange:
-			var uut = CreatePool(10);
-
-			for (var expectedCount = 1; expectedCount <= 10; ++expectedCount)
+			foreach (var uut in CreateReplaceableAndNotReplFactory())
 			{
-				// Arrange:
-				var adj = TakeAdjacentEdges(expectedCount).ToArray();
-				var v = uut.GetInstance(adj, expectedCount);
-				var prev = v;
-				// Act:
-				var res = uut.AddEdge(adj.First().Destination, default, ref v);
 
-				// Assert:
-				Assert.IsFalse(res);
-				Assert.AreSame(prev, v);
-				Assert.AreEqual(expectedCount, v.Count);
-			}				
+				for (var expectedCount = 1; expectedCount <= 10; ++expectedCount)
+				{
+					// Arrange:
+					var adj = TakeAdjacentEdges(expectedCount).ToArray();
+					var v = uut.GetInstance(adj, expectedCount);
+					var prev = v;
+					// Act:
+					var res = uut.AddEdge(adj.First().Destination, default, ref v);
+
+					// Assert:
+					Assert.IsFalse(res);
+					Assert.AreSame(prev, v);
+					Assert.AreEqual(expectedCount, v.Count);
+				}
+			}
 		}
 
 		#if DEBUG
 		[TestMethod]
-		public void ON_GetInstance_WHEN_Count_From_1_To_7_SHOULD_Return_Instance_With_Fixed_Capacity()
+		public void ON_GetInstance_WHEN_Replaceable_AND_Count_From_1_To_7_SHOULD_Return_Instance_With_Fixed_Capacity()
 		{
 			// Arrange:
-			var uut1 = CreatePool(10);
+			var uut1 = CreateReplaceableFactory();
 
 			for (var count = 1; count <= 7; count++)
 			{
 				// Act:
-				var v = (PoolableVertexAdjacency<TEdgeData>)uut1.GetInstance(TakeAdjacentEdges(count), count);
+				var v = (ReplaceableVertexAdjacency<TEdgeData>)uut1.GetInstance(TakeAdjacentEdges(count), count);
 
 				// Assert:
 				Assert.AreEqual(count, v.MaxCapacity);
@@ -387,10 +312,10 @@ namespace QuickAccess.DataStructures.Tests.Graphs.Model.Factory
 		}
 
 		[TestMethod]
-		public void ON_AddEdge_WHEN_Vertex_Count_From_0_To_6_SHOULD_Return_Instance_With_Fixed_Capacity()
+		public void ON_AddEdge_WHEN_Replaceable_AND_Vertex_Count_From_0_To_6_SHOULD_Return_Instance_With_Fixed_Capacity()
 		{
 			// Arrange:
-			var uut = CreatePool(10);
+			var uut = CreateReplaceableFactory();
 			for (var count = 0; count <= 6; count++)
 			{
 				var v = uut.GetInstance(TakeAdjacentEdges(count), count);			
@@ -399,22 +324,22 @@ namespace QuickAccess.DataStructures.Tests.Graphs.Model.Factory
 
 				// Assert:
 				Assert.IsTrue(res);
-				Assert.AreEqual(count+1, ((PoolableVertexAdjacency<TEdgeData>)v).MaxCapacity);
+				Assert.AreEqual(count+1, ((ReplaceableVertexAdjacency<TEdgeData>)v).MaxCapacity);
 			}
 		}
 
 		[TestMethod]
-		public void ON_GetInstance_WHEN_Count_Higher_Than_7_SHOULD_Return_Instance_With_Unlimited_Capacity()
+		public void ON_GetInstance_WHEN_Replaceable_AND_Count_Higher_Than_7_SHOULD_Return_Instance_With_Unlimited_Capacity()
 		{
 			// Arrange:
-			var uut1 = CreatePool(10);
+			var uut1 = CreateReplaceableFactory();
 
-			var unlimited = PoolableVertexAdjacency<TEdgeData>.UnlimitedCapacity;
+			var unlimited = ReplaceableVertexAdjacency<TEdgeData>.UnlimitedCapacity;
 			
 			// Act:
-			var v8 = (PoolableVertexAdjacency<TEdgeData>)uut1.GetInstance(TakeAdjacentEdges(8), 8);
-			var v9 = (PoolableVertexAdjacency<TEdgeData>)uut1.GetInstance(TakeAdjacentEdges(9), 9);
-			var v100 = (PoolableVertexAdjacency<TEdgeData>)uut1.GetInstance(TakeAdjacentEdges(100), 100);
+			var v8 = (ReplaceableVertexAdjacency<TEdgeData>)uut1.GetInstance(TakeAdjacentEdges(8), 8);
+			var v9 = (ReplaceableVertexAdjacency<TEdgeData>)uut1.GetInstance(TakeAdjacentEdges(9), 9);
+			var v100 = (ReplaceableVertexAdjacency<TEdgeData>)uut1.GetInstance(TakeAdjacentEdges(100), 100);
 			
 
 			// Assert:
@@ -427,14 +352,14 @@ namespace QuickAccess.DataStructures.Tests.Graphs.Model.Factory
 
 	[TestClass]
 	// ReSharper disable once InconsistentNaming
-	public class VerticesPoolTest_WHEN_TEdgeDataIsEmptyValue : VerticesPoolTest<EmptyValue>
+	public class VerticesFactoryTest_WHEN_TEdgeDataIsEmptyValue : VerticesFactoryTest<EmptyValue>
 	{
 		
 	}
 
 	[TestClass]
 	// ReSharper disable once InconsistentNaming
-	public class VerticesPoolTest_WHEN_TEdgeDataIsString : VerticesPoolTest<string>
+	public class VerticesFactoryTest_WHEN_TEdgeDataIsString : VerticesFactoryTest<string>
 	{
 		
 	}

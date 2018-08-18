@@ -37,18 +37,26 @@
 
 #endregion
 
+using System.Collections.Generic;
+using QuickAccess.DataStructures.Graphs.Model;
+
 namespace QuickAccess.DataStructures.Graphs.Factory
 {
 	/// <summary>
-	///     The type of the capacity of <see cref="IVerticesPool{TEdgeData}" /> instance.
-	/// <seealso cref="VerticesPool{TEdgeData}"/>
+	///     Extension methods of <see cref="IVertexAdjacencyFactory{TEdgeData}" />
 	/// </summary>
-	public enum VerticesPoolCapacityType
+	public static class VertexAdjacencyFactoryExtensions
 	{
-		/// <summary>The capacity value is specified for total items in the pool</summary>
-		TotalPoolCapacity = 0,
-
-		/// <summary>The capacity is specified per vertex type.</summary>
-		CapacityPerVertexType
+		/// <summary>
+		///     Gets the new instance of vertex initialized with specified edges.
+		/// </summary>
+		/// <param name="source">The source of extension.</param>
+		/// <param name="edgesTo">The collection with edges..</param>
+		/// <returns>Vertex instance.</returns>
+		public static VertexAdjacency<TEdgeData> GetInstance<TEdgeData>(this IVertexAdjacencyFactory<TEdgeData> source,
+		                                                                IReadOnlyCollection<AdjacentEdge<TEdgeData>> edgesTo)
+		{
+			return source.GetInstance(edgesTo, edgesTo.Count);
+		}
 	}
 }

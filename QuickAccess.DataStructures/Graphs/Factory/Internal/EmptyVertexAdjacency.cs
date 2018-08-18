@@ -49,8 +49,8 @@ namespace QuickAccess.DataStructures.Graphs.Factory.Internal
 	/// Empty vertex adjacency.
 	/// </summary>
 	/// <typeparam name="TEdgeData">The type of the edge data.</typeparam>
-	/// <seealso cref="PoolableVertexAdjacency{TEdgeData}" />
-	internal sealed class EmptyVertexAdjacency<TEdgeData> : PoolableVertexAdjacency<TEdgeData>
+	/// <seealso cref="ReplaceableVertexAdjacency{TEdgeData}" />
+	internal sealed class EmptyVertexAdjacency<TEdgeData> : ReplaceableVertexAdjacency<TEdgeData>
 	{
 		public static readonly EmptyVertexAdjacency<TEdgeData> Instance = new EmptyVertexAdjacency<TEdgeData>();
 
@@ -66,17 +66,17 @@ namespace QuickAccess.DataStructures.Graphs.Factory.Internal
 		public override int MaxCapacity => 0;
 
 		/// <inheritdoc />
-		public override bool AddEdge(PoolableVertexFactoryInterface<TEdgeData> pool,
+		public override bool AddEdge(ReplaceableVertexFactoryInterface<TEdgeData> pool,
 		                             int destVertexIndex,
 		                             TEdgeData edgeData,
-		                             out PoolableVertexAdjacency<TEdgeData> final)
+		                             out ReplaceableVertexAdjacency<TEdgeData> final)
 		{
 			final = pool.GetInstance(EnumerableExtensions.Enumerate(AdjacentEdge.Create(destVertexIndex, edgeData)), 1);
 			return true;
 		}
 
 		/// <inheritdoc />
-		public override bool RemoveEdge(PoolableVertexFactoryInterface<TEdgeData> pool, int destVertexIndex, out PoolableVertexAdjacency<TEdgeData> final)
+		public override bool RemoveEdge(ReplaceableVertexFactoryInterface<TEdgeData> pool, int destVertexIndex, out ReplaceableVertexAdjacency<TEdgeData> final)
 		{
 			final = this;
 			return false;

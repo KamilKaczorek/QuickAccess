@@ -52,8 +52,8 @@ namespace QuickAccess.DataStructures.Graphs.Factory.Internal
 	/// enumeration and contains operations execution time.
 	/// </summary>
 	/// <typeparam name="TEdgeData">The type of the edge data.</typeparam>
-	/// <seealso cref="PoolableVertexAdjacency{TEdgeData}" />
-	internal abstract class PoolableVertexAdjacencyWithFixedCapacity<TEdgeData> : PoolableVertexAdjacency<TEdgeData>
+	/// <seealso cref="ReplaceableVertexAdjacency{TEdgeData}" />
+	internal abstract class ReplaceableVertexAdjacencyWithFixedCapacity<TEdgeData> : ReplaceableVertexAdjacency<TEdgeData>
 	{
 		/// <inheritdoc />
 		public override int MaxCapacity => EdgesCount;
@@ -103,10 +103,10 @@ namespace QuickAccess.DataStructures.Graphs.Factory.Internal
 		}
 
 		/// <inheritdoc />
-		public override bool AddEdge(PoolableVertexFactoryInterface<TEdgeData> pool,
+		public override bool AddEdge(ReplaceableVertexFactoryInterface<TEdgeData> pool,
 		                             int destVertexIndex,
 		                             TEdgeData edgeData,
-		                             out PoolableVertexAdjacency<TEdgeData> final)
+		                             out ReplaceableVertexAdjacency<TEdgeData> final)
 		{
 			if (ContainsEdgeToIndex(destVertexIndex))
 			{
@@ -116,14 +116,13 @@ namespace QuickAccess.DataStructures.Graphs.Factory.Internal
 
 			final = pool.GetInstance(
 				this.Append(AdjacentEdge.Create(destVertexIndex, edgeData)), EdgesCount + 1);
-			pool.ReturnInstance(this);
 			return true;
 		}
 
 		/// <inheritdoc />
-		public override bool RemoveEdge(PoolableVertexFactoryInterface<TEdgeData> pool,
+		public override bool RemoveEdge(ReplaceableVertexFactoryInterface<TEdgeData> pool,
 		                                int destVertexIndex,
-		                                out PoolableVertexAdjacency<TEdgeData> final)
+		                                out ReplaceableVertexAdjacency<TEdgeData> final)
 		{
 			if (!ContainsEdgeToIndex(destVertexIndex))
 			{
@@ -133,7 +132,6 @@ namespace QuickAccess.DataStructures.Graphs.Factory.Internal
 
 			final = pool.GetInstance(
 				this.Where(a => a.Destination != destVertexIndex), EdgesCount - 1);
-			pool.ReturnInstance(this);
 			return true;
 		}
 
@@ -190,8 +188,8 @@ namespace QuickAccess.DataStructures.Graphs.Factory.Internal
 	/// <see cref="HashSet{T}"/>/<see cref="Dictionary{TKey,TValue}"/> based structure, when it comes to adjacency 
 	/// enumeration and contains operations execution time.
 	/// </summary>
-	/// <seealso cref="PoolableVertexAdjacency" />
-	internal abstract class PoolableVertexAdjacencyWithFixedCapacity : PoolableVertexAdjacency
+	/// <seealso cref="ReplaceableVertexAdjacency" />
+	internal abstract class ReplaceableVertexAdjacencyWithFixedCapacity : ReplaceableVertexAdjacency
 	{
 		/// <inheritdoc />
 		public override int MaxCapacity => EdgesCount;
@@ -252,10 +250,10 @@ namespace QuickAccess.DataStructures.Graphs.Factory.Internal
 		}
 
 		/// <inheritdoc />
-		public override bool AddEdge(PoolableVertexFactoryInterface<EmptyValue> pool,
+		public override bool AddEdge(ReplaceableVertexFactoryInterface<EmptyValue> pool,
 		                             int destVertexIndex,
 		                             EmptyValue edgeData,
-		                             out PoolableVertexAdjacency<EmptyValue> final)
+		                             out ReplaceableVertexAdjacency<EmptyValue> final)
 		{
 			if (destVertexIndex < 0)
 			{
@@ -270,7 +268,6 @@ namespace QuickAccess.DataStructures.Graphs.Factory.Internal
 
 			final = pool.GetInstance(
 				GetValidatedAdjacentIndexes().Append(destVertexIndex).Select(idx => AdjacentEdge.Create(idx)), EdgesCount + 1);
-			pool.ReturnInstance(this);
 			return true;
 		}
 
@@ -288,9 +285,9 @@ namespace QuickAccess.DataStructures.Graphs.Factory.Internal
 		}
 
 		/// <inheritdoc />
-		public override bool RemoveEdge(PoolableVertexFactoryInterface<EmptyValue> pool,
+		public override bool RemoveEdge(ReplaceableVertexFactoryInterface<EmptyValue> pool,
 		                                int destVertexIndex,
-		                                out PoolableVertexAdjacency<EmptyValue> final)
+		                                out ReplaceableVertexAdjacency<EmptyValue> final)
 		{
 			if (destVertexIndex < 0)
 			{
@@ -305,7 +302,6 @@ namespace QuickAccess.DataStructures.Graphs.Factory.Internal
 
 			final = pool.GetInstance(
 				GetValidatedAdjacentIndexes().Where(idx => idx != destVertexIndex).Select(idx => AdjacentEdge.Create(idx)), EdgesCount - 1);
-			pool.ReturnInstance(this);
 			return true;
 		}
 

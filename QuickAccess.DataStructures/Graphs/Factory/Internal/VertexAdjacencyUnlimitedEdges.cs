@@ -49,8 +49,8 @@ namespace QuickAccess.DataStructures.Graphs.Factory.Internal
 	/// <seealso cref="VertexAdjacency7Edges{TEdgeData}"/>
 	/// </summary>
 	/// <typeparam name="TEdgeData">The type of the edge data.</typeparam>
-	/// <seealso cref="PoolableVertexAdjacency{TEdgeData}" />
-	internal sealed class VertexAdjacencyUnlimitedEdges<TEdgeData> : PoolableVertexAdjacency<TEdgeData>
+	/// <seealso cref="ReplaceableVertexAdjacency{TEdgeData}" />
+	internal sealed class VertexAdjacencyUnlimitedEdges<TEdgeData> : ReplaceableVertexAdjacency<TEdgeData>
 	{
 		private Dictionary<int, TEdgeData> _adj;
 
@@ -60,10 +60,10 @@ namespace QuickAccess.DataStructures.Graphs.Factory.Internal
 
 
 		/// <inheritdoc />
-		public override int MaxCapacity => PoolableVertexAdjacency.UnlimitedCapacity;
+		public override int MaxCapacity => ReplaceableVertexAdjacency.UnlimitedCapacity;
 
 		/// <inheritdoc />
-		public override bool AddEdge(PoolableVertexFactoryInterface<TEdgeData> pool, int destVertexIndex, TEdgeData edgeData, out PoolableVertexAdjacency<TEdgeData> final)
+		public override bool AddEdge(ReplaceableVertexFactoryInterface<TEdgeData> pool, int destVertexIndex, TEdgeData edgeData, out ReplaceableVertexAdjacency<TEdgeData> final)
 		{
 			if (_adj == null)
 			{
@@ -79,7 +79,7 @@ namespace QuickAccess.DataStructures.Graphs.Factory.Internal
 		}
 
 		/// <inheritdoc />
-		public override bool RemoveEdge(PoolableVertexFactoryInterface<TEdgeData> pool, int destVertexIndex, out PoolableVertexAdjacency<TEdgeData> final)
+		public override bool RemoveEdge(ReplaceableVertexFactoryInterface<TEdgeData> pool, int destVertexIndex, out ReplaceableVertexAdjacency<TEdgeData> final)
 		{
 			if (_adj == null || !_adj.Remove(destVertexIndex))
 			{
@@ -94,7 +94,6 @@ namespace QuickAccess.DataStructures.Graphs.Factory.Internal
 			}
 
 			final = pool.GetInstance(_adj.Select(AdjacentEdge.Create), _adj.Count);
-			pool.ReturnInstance(this);
 			return true;
 		}
 
@@ -161,8 +160,8 @@ namespace QuickAccess.DataStructures.Graphs.Factory.Internal
 	/// Hash set based vertex adjacency with unlimited capacity used when number of edges > 7.
 	/// <seealso cref="VertexAdjacency7Edges"/>
 	/// </summary>
-	/// <seealso cref="PoolableVertexAdjacency{TEdgeData}" />
-	internal sealed class VertexAdjacencyUnlimitedEdges : PoolableVertexAdjacency
+	/// <seealso cref="ReplaceableVertexAdjacency{TEdgeData}" />
+	internal sealed class VertexAdjacencyUnlimitedEdges : ReplaceableVertexAdjacency
 	{
 		private readonly HashSet<int> _adj;
 
@@ -193,10 +192,10 @@ namespace QuickAccess.DataStructures.Graphs.Factory.Internal
 		public override int MaxCapacity => UnlimitedCapacity;
 
 		/// <inheritdoc />
-		public override bool AddEdge(PoolableVertexFactoryInterface<EmptyValue> pool,
+		public override bool AddEdge(ReplaceableVertexFactoryInterface<EmptyValue> pool,
 		                             int destVertexIndex,
 		                             EmptyValue edgeData,
-		                             out PoolableVertexAdjacency<EmptyValue> final)
+		                             out ReplaceableVertexAdjacency<EmptyValue> final)
 		{
 			final = this;
 			return _adj.Add(destVertexIndex);
@@ -205,9 +204,9 @@ namespace QuickAccess.DataStructures.Graphs.Factory.Internal
 
 
 		/// <inheritdoc />
-		public override bool RemoveEdge(PoolableVertexFactoryInterface<EmptyValue> pool,
+		public override bool RemoveEdge(ReplaceableVertexFactoryInterface<EmptyValue> pool,
 		                                int destVertexIndex,
-		                                out PoolableVertexAdjacency<EmptyValue> final)
+		                                out ReplaceableVertexAdjacency<EmptyValue> final)
 		{
 			if (!_adj.Remove(destVertexIndex))
 			{
@@ -222,7 +221,6 @@ namespace QuickAccess.DataStructures.Graphs.Factory.Internal
 			}
 
 			final = pool.GetInstance(_adj.Select(idx => AdjacentEdge.Create(idx)), _adj.Count);
-			pool.ReturnInstance(this);
 			return true;
 		}
 

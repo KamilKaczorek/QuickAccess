@@ -136,14 +136,14 @@ namespace QuickAccess.DataStructures.Graphs.Model
 
 			if (verticesFactory == null)
 			{
-				verticesFactory = VerticesPool.Create<TTargetEdgeData>(0);
+				verticesFactory = new VertexAdjacencyFactory<TTargetEdgeData>();
 			}
 
 			if (targetEdgeDataSelector == null)
 			{
 				if (EmptyValue.IsEmptyValueType<TTargetEdgeData>())
 				{
-					targetEdgeDataSelector = prev => (TTargetEdgeData) (object) EmptyValue.Value;
+					targetEdgeDataSelector = _ => (TTargetEdgeData) (object) EmptyValue.Value;
 				}
 				else
 				{
@@ -211,7 +211,7 @@ namespace QuickAccess.DataStructures.Graphs.Model
 			var map = oldVertices.SortWithReindexingResult(VertexAdjacencyComparer<TEdgeData>.Default);
 
 			var cloned = Create(oldVertices,
-				new ReindexedVertexAdjacencyFactoryWrapper<TEdgeData>(map, verticesFactory ?? VerticesPool.Create<TEdgeData>(0)), d => d,
+				new ReindexedVertexAdjacencyFactoryWrapper<TEdgeData>(map, verticesFactory ?? new VertexAdjacencyFactory<TEdgeData>()), d => d,
 				sharedVerticesInstances, vertexEqualityComparer);
 
 			return map.ToReindexedDataResult(cloned);
