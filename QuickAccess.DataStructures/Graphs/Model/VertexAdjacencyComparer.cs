@@ -37,6 +37,7 @@
 
 #endregion
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using QuickAccess.DataStructures.Common;
@@ -48,24 +49,24 @@ namespace QuickAccess.DataStructures.Graphs.Model
 	/// </summary>
 	public static class VertexAdjacencyComparer
 	{
-
 		/// <summary>Gets the empty edge vertex comparer.</summary>
 		/// <value>The empty edge vertex comparer.</value>
-		public static VertexAdjacencyComparer<EmptyValue> EmptyEdgeComparer => VertexAdjacencyComparer<EmptyValue>.Default;
+		public static VertexAdjacencyComparer<EmptyValue> EmptyEdgeComparer => VertexAdjacencyComparer<EmptyValue>.DefaultWithHighestNumberOfEdgesFirst;
 
 		/// <summary>Creates the vertex comparer with specified equality comparer of edge data.</summary>
 		/// <typeparam name="TEdgeData">The type of the edge data.</typeparam>
 		/// <param name="edgeDataEqualityComparer">The equality comparer of edge data, if <c>null</c> default comparer will be used.</param>
+		/// <param name="comparisonType">Type of the comparison.</param>
 		/// <returns>Comparer instance.</returns>
 		public static VertexAdjacencyComparer<TEdgeData> Create<TEdgeData>(
-			IEqualityComparer<TEdgeData> edgeDataEqualityComparer)
+			IEqualityComparer<TEdgeData> edgeDataEqualityComparer, VertexComparisonType comparisonType)
 		{
 			if (edgeDataEqualityComparer == null || EmptyValue.IsEmptyValueType<TEdgeData>())
 			{
-				return VertexAdjacencyComparer<TEdgeData>.Default;
+				return VertexAdjacencyComparer<TEdgeData>.GetDefault(comparisonType);
 			}
 
-			return new VertexAdjacencyComparer<TEdgeData>(edgeDataEqualityComparer);
+			return new VertexAdjacencyComparer<TEdgeData>(edgeDataEqualityComparer, comparisonType);
 		}		
 	}
 
@@ -76,13 +77,43 @@ namespace QuickAccess.DataStructures.Graphs.Model
 	public sealed class VertexAdjacencyComparer<TEdgeData>
 		: IEqualityComparer<VertexAdjacency<TEdgeData>>, IComparer<VertexAdjacency<TEdgeData>>
 	{
-		public static readonly VertexAdjacencyComparer<TEdgeData> Default = new VertexAdjacencyComparer<TEdgeData>(null);
+		/// <summary>The default comparer that treats vertex with higher number of edges as smaller.</summary>
+		public static readonly VertexAdjacencyComparer<TEdgeData> DefaultWithHighestNumberOfEdgesFirst = new VertexAdjacencyComparer<TEdgeData>(null, VertexComparisonType.HighestNumberOfEdgesFirst);
+
+		/// <summary>The default comparer that treats vertex with lower number of edges as smaller.</summary>
+		public static readonly VertexAdjacencyComparer<TEdgeData> DefaultWithLowestNumberOfEdgesFirst = new VertexAdjacencyComparer<TEdgeData>(null, VertexComparisonType.LowestNumberOfEdgesFirst);
+
+		/// <summary>Gets the default comparer with specified comparison type.</summary>
+		/// <param name="comparisonType">Type of the comparison.</param>
+		/// <returns>Default comparer instance.</returns>
+		/// <exception cref="ArgumentOutOfRangeException">comparisonType - null</exception>
+		public static VertexAdjacencyComparer<TEdgeData> GetDefault(VertexComparisonType comparisonType)
+		{
+			switch (comparisonType)
+			{
+				case VertexComparisonType.HighestNumberOfEdgesFirst:
+					return DefaultWithHighestNumberOfEdgesFirst;
+				case VertexComparisonType.LowestNumberOfEdgesFirst:
+					return DefaultWithLowestNumberOfEdgesFirst;
+				default:
+					throw new ArgumentOutOfRangeException(nameof(comparisonType), comparisonType, null);
+			}
+		}
+
+		/// <summary>The edge data equality comparer.</summary>
 		public readonly IEqualityComparer<TEdgeData> EdgeDataEqualityComparer;
 
-		/// <summary>Initializes a new instance of the <see cref="VertexAdjacencyComparer{TEdgeData}"/> class.</summary>
+		/// <summary>Gets the type of the comparison.</summary>
+		/// <value>The type of the comparison.</value>
+		public VertexComparisonType ComparisonType { get; }
+
+		/// <summary>Initializes a new instance of the <see cref="VertexAdjacencyComparer{TEdgeData}" /> class.</summary>
 		/// <param name="edgeDataEqualityComparer">The edge data equality comparer.</param>
-		public VertexAdjacencyComparer(IEqualityComparer<TEdgeData> edgeDataEqualityComparer)
+		/// <param name="comparisonType">Type of the vertex comparison.</param>
+		public VertexAdjacencyComparer(IEqualityComparer<TEdgeData> edgeDataEqualityComparer, VertexComparisonType comparisonType)
 		{
+			ComparisonType = comparisonType;
+
 			if (EmptyValue.IsEmptyValueType<TEdgeData>())
 			{
 				return;
@@ -99,7 +130,7 @@ namespace QuickAccess.DataStructures.Graphs.Model
 		/// - when both instances have the same number of edges - returns the comparison of hash codes 
 		///		(calculated with <see cref="GetHashCode"/> method).
 		/// <remarks>
-		/// This method is used by <see cref="GraphConnectivityDefinition.ToCompacted{TEdgeData}"/> method to build optimized
+		/// This method is used by <see cref="GraphConnectivityDefinitionFactory.CreateCompacted{TEdgeData}"/> method to build optimized
 		/// graph connectivity structure.
 		/// </remarks>
 		/// </summary>
@@ -118,10 +149,15 @@ namespace QuickAccess.DataStructures.Graphs.Model
 				return x == null ? 1 : -1;
 			}
 
-			var cmp = y.EdgesCount.CompareTo(x.EdgesCount);
+			var cmp = x.EdgesCount.CompareTo(y.EdgesCount);
 
 			if (cmp != 0)
 			{
+				if (ComparisonType == VertexComparisonType.HighestNumberOfEdgesFirst)
+				{
+					return -1*cmp;
+				}
+
 				return cmp;
 			}
 
@@ -142,7 +178,7 @@ namespace QuickAccess.DataStructures.Graphs.Model
 		/// Two edges are equal if destination vertices are equal and execution of <see cref=" IEqualityComparer{T}.Equals(T,T)"/> 
 		/// method for edges data of <see cref="EdgeDataEqualityComparer"/> returns <c>true</c>.
 		/// <remarks>
-		/// This method is used in conjunction with the <see cref="GraphConnectivityDefinition.ToCompactedWithSharedVertexInstances{TEdgeData}(GraphConnectivityDefinition{TEdgeData},IEqualityComparer{TEdgeData},Factory.IVertexAdjacencyFactory{TEdgeData})"/>
+		/// This method is used in conjunction with the <see cref="GraphConnectivityDefinitionFactory.CreateCompacted{TEdgeData}"/>
 		/// to reuse vertex instance for equivalent vertices.
 		/// </remarks>
 		/// </summary>

@@ -165,7 +165,7 @@ namespace QuickAccess.DataStructures.Graphs.Model
 
 			var oldToNewVertexInstanceMap = sharedVerticesInstances
 				? new Dictionary<VertexAdjacency<TSrcEdgeData>, VertexAdjacency<TTargetEdgeData>>(
-					vertexEqualityComparer ?? VertexAdjacencyComparer<TSrcEdgeData>.Default)
+					vertexEqualityComparer ?? VertexAdjacencyComparer<TSrcEdgeData>.DefaultWithHighestNumberOfEdgesFirst)
 				: null;
 
 			for (var idx = 0; idx < destItemsCount; idx++)
@@ -208,7 +208,7 @@ namespace QuickAccess.DataStructures.Graphs.Model
 		{
 			var oldVertices = source.ToArray();
 
-			var map = oldVertices.SortWithReindexingResult(VertexAdjacencyComparer<TEdgeData>.Default);
+			var map = oldVertices.SortWithReindexingResult(VertexAdjacencyComparer<TEdgeData>.DefaultWithHighestNumberOfEdgesFirst);
 
 			var cloned = Create(oldVertices,
 				new ReindexedVertexAdjacencyFactoryWrapper<TEdgeData>(map, verticesFactory ?? new VertexAdjacencyFactory<TEdgeData>()), d => d,
@@ -438,7 +438,7 @@ namespace QuickAccess.DataStructures.Graphs.Model
 
 					if(!IsIncluded(destVertexIndex, data))
 					{
-						throw new KeyNotFoundException("Specified edge at ({_currentIndex},{destVertexIndex}) was filtered out.");
+						throw new KeyNotFoundException($"Specified edge at ({_currentIndex},{destVertexIndex}) was filtered out.");
 					}
 
 					return data;

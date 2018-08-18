@@ -93,7 +93,7 @@ namespace QuickAccess.DataStructures.Graphs.Model
 		/// <summary>Determines whether the specified map contains specified symbol.</summary>
 		/// <param name="symbol">The symbol.</param>
 		/// <returns><c>true</c> if the specified map contains symbol; otherwise, <c>false</c>.</returns>
-		bool Contains(TSymbol symbol);
+		bool ContainsSymbol(TSymbol symbol);
 
 		/// <summary>
 		/// Determines whether it contains the symbol definition for the specified index.

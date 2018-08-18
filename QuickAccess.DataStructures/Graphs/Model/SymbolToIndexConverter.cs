@@ -159,7 +159,7 @@ namespace QuickAccess.DataStructures.Graphs.Model
 		}
 
 		/// <inheritdoc />
-		public bool Contains(TSymbol symbol)
+		public bool ContainsSymbol(TSymbol symbol)
 		{
 			return _symbolToIndexMap.ContainsKey(symbol);
 		}

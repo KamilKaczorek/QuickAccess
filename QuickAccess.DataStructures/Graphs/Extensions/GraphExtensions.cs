@@ -1065,7 +1065,7 @@ namespace QuickAccess.DataStructures.Graphs.Extensions
 			IVertexAdjacencyFactory<TEdgeData> verticesFactory = null)
 		{
 			return ConnectivityDefinitionFactory.CreateCompacted(source, verticesFactory, true,
-				new VertexAdjacencyComparer<TEdgeData>(edgeDataEqualityComparer));
+				new VertexAdjacencyComparer<TEdgeData>(edgeDataEqualityComparer, VertexComparisonType.HighestNumberOfEdgesFirst));
 		}
 
 		/// <summary>

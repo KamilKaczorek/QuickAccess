@@ -65,7 +65,7 @@
   <ItemGroup>
     <Compile Include="Graphs\Algorithms\BreadthFirstSearchTest.cs" />
     <Compile Include="Graphs\Algorithms\VertexSearchMapTest.cs" />
-    <Compile Include="Graphs\Model\Factory\VerticesPoolTest.cs" />
+    <Compile Include="Graphs\Model\Factory\VerticesFactoryTest.cs" />
     <Compile Include="Graphs\Model\GraphConnectivityDefinitionTest.cs" />
     <Compile Include="Graphs\Integration\SymbolGraphIntergrationTest.cs" />
     <Compile Include="Graphs\Model\TestEdgesFactory.cs" />
