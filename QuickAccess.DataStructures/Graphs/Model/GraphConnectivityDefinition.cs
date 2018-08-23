@@ -164,7 +164,7 @@ namespace QuickAccess.DataStructures.Graphs.Model
 		}
 
 		/// <summary>
-		///     Determines whether there is outgoing edge from the source vertex specified by the index to the destination vertex
+		///     Determines whether there is edge coming out of the source vertex specified by the index to the destination vertex
 		///     specified by the index.
 		/// </summary>
 		/// <param name="sourceVertexIndex">Index of the source vertex.</param>
@@ -256,14 +256,14 @@ namespace QuickAccess.DataStructures.Graphs.Model
 		}
 
 		/// <summary>
-		///     Tries to get the value of the outgoing edge between the vertices represented by the specified indexes.
+		///     Tries to get the value of the directed edge between the vertices represented by the specified indexes.
 		/// </summary>
 		/// <typeparam name="TEdgeData">The type of the edge data.</typeparam>
 		/// <param name="sourceIndex">The index of the source vertex.</param>
 		/// <param name="destIndex">The index of the destination vertex.</param>
 		/// <param name="edgeData">The edge data.</param>
 		/// <returns>
-		///     <c>true</c> if there are vertices defined for the specified indexes and there is outgoing edge between them;
+		///     <c>true</c> if there are vertices defined for the specified indexes and there is directed edge between them;
 		///     otherwise, <c>false</c>.
 		/// </returns>
 		[Pure]
@@ -283,13 +283,13 @@ namespace QuickAccess.DataStructures.Graphs.Model
 		}
 
 		/// <summary>
-		///     Tries to get the value of the outgoing edge between the vertices represented by the specified indexes.
+		///     Tries to get the value of the directed edge between the vertices represented by the specified indexes.
 		/// </summary>
 		/// <typeparam name="TEdgeData">The type of the edge data.</typeparam>
 		/// <param name="verticesPair">The vertices pair.</param>
 		/// <param name="edgeData">The edge data.</param>
 		/// <returns>
-		///     <c>true</c> if there are vertices defined for the specified indexes and there is outgoing edge between them;
+		///     <c>true</c> if there are vertices defined for the specified indexes and there is directed edge between them;
 		///     otherwise, <c>false</c>.
 		/// </returns>
 		[Pure]

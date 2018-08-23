@@ -312,7 +312,7 @@ namespace QuickAccess.DataStructures.Graphs.Extensions
 			return source.AddEdgeRange(adjacentEdges.ToEdges(srcIndex), addEdgePredicate);
 		}
 
-		/// <summary>Adds the outgoing edge to the graph.</summary>
+		/// <summary>Adds the edge coming to the graph.</summary>
 		/// <typeparam name="TSymbol">The type of the symbol.</typeparam>
 		/// <param name="source">The graph editing source.</param>
 		/// <param name="edge">The edge.</param>
@@ -327,7 +327,7 @@ namespace QuickAccess.DataStructures.Graphs.Extensions
 			return source.AddEdge(edge.Source, edge.Destination, default);
 		}
 
-		/// <summary>Adds the outgoing edge to the symbol graph with empty edge value.</summary>
+		/// <summary>Adds the edge coming to the symbol graph with empty edge value.</summary>
 		/// <typeparam name="TSymbol">The type of the symbol.</typeparam>
 		/// <param name="source">The graph editing source.</param>
 		/// <param name="srcVertex">The source vertex.</param>
@@ -593,7 +593,7 @@ namespace QuickAccess.DataStructures.Graphs.Extensions
 		}
 
 		/// <summary>
-		///     Tries to get the value of the outgoing edge between the vertices represented by the specified symbols.
+		///     Tries to get the value of the directed edge between the vertices represented by the specified symbols.
 		/// </summary>
 		/// <typeparam name="TEdgeData">The type of the edge data.</typeparam>
 		/// <typeparam name="TSymbol">The type of the symbol.</typeparam>
@@ -602,7 +602,7 @@ namespace QuickAccess.DataStructures.Graphs.Extensions
 		/// <param name="dstVertex">The symbol of the destination vertex.</param>
 		/// <param name="edgeData">The edge data.</param>
 		/// <returns>
-		///     <c>true</c> if vertices of the given symbols are defined and there is outgoing edge between them; otherwise,
+		///     <c>true</c> if vertices of the given symbols are defined and there is directed edge between them; otherwise,
 		///     <c>false</c>.
 		/// </returns>
 		[Pure]
@@ -757,7 +757,7 @@ namespace QuickAccess.DataStructures.Graphs.Extensions
 		}
 
 		/// <summary>
-		///     Gets the value of the outgoing edge between the vertices represented by the specified symbols.
+		///     Gets the value of the directed edge between the vertices represented by the specified symbols.
 		/// </summary>
 		/// <typeparam name="TEdgeData">The type of the edge data.</typeparam>
 		/// <typeparam name="TSymbol">The type of the symbol.</typeparam>
@@ -886,7 +886,7 @@ namespace QuickAccess.DataStructures.Graphs.Extensions
 		}
 
 		/// <summary>
-		///     Determines whether there is outgoing edge from the source vertex specified by the symbol to the destination vertex
+		///     Determines whether there is edge coming out of the source vertex specified by the symbol to the destination vertex
 		///     specified by the symbol.
 		/// </summary>
 		/// <typeparam name="TEdgeData">The type of the edge data.</typeparam>
@@ -895,7 +895,7 @@ namespace QuickAccess.DataStructures.Graphs.Extensions
 		/// <param name="srcVertex">The symbol of the source vertex.</param>
 		/// <param name="dstVertex">The symbol of the destination vertex.</param>
 		/// <returns>
-		///     <c>true</c> if vertices of the given symbols are defined and there is outgoing edge between them; otherwise,
+		///     <c>true</c> if vertices of the given symbols are defined and there is directed edge between them; otherwise,
 		///     <c>false</c>.
 		/// </returns>
 		[Pure]

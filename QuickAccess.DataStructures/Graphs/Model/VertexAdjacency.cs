@@ -54,8 +54,8 @@ namespace QuickAccess.DataStructures.Graphs.Model
 	/// </summary>
 	public abstract class VertexAdjacency<TEdgeData> : IReadOnlyCollection<AdjacentEdge<TEdgeData>>
 	{
-		/// <summary>Gets the number of outgoing edges from the current vertex.</summary>
-		/// <value>The number of outgoing edges.</value>
+		/// <summary>Gets the number of edges coming out of the current vertex.</summary>
+		/// <value>The number of coming out edges.</value>
 		public abstract int EdgesCount { get; }
 
 		/// <summary>Gets the indexes of the adjacent vertices.</summary>
@@ -66,16 +66,16 @@ namespace QuickAccess.DataStructures.Graphs.Model
 		public int Count => EdgesCount;
 
 		/// <summary>
-		/// Determines whether the current vertex contains outgoing edge to the vertex specified by the given index.
+		/// Determines whether the current vertex contains edge coming to the vertex specified by the given index.
 		/// </summary>
 		/// <param name="destVertexIndex">Index of the destination vertex.</param>
 		/// <returns>
-		/// <c>true</c> if it contains outgoing edge to the vertex specified by the index; otherwise, <c>false</c>.
+		/// <c>true</c> if it contains edge coming to the vertex specified by the index; otherwise, <c>false</c>.
 		/// </returns>
 		public abstract bool ContainsEdgeToIndex(int destVertexIndex);
 
 		/// <summary>
-		/// Gets the data of the edge outgoing from the current vertex to the vertex specified by the given index.
+		/// Gets the data of the edge coming out of the current vertex to the vertex specified by the given index.
 		/// </summary>
 		/// <param name="destVertexIndex">Index of the destination vertex.</param>
 		/// <returns>The value</returns>
@@ -86,7 +86,7 @@ namespace QuickAccess.DataStructures.Graphs.Model
 		public abstract IEnumerator<AdjacentEdge<TEdgeData>> GetEnumerator();
 
 		/// <summary>
-		/// Tries to get the outgoing edge from the current vertex to the vertex specified by the given index.
+		/// Tries to get the edge coming out of the current vertex to the vertex specified by the given index.
 		/// </summary>
 		/// <param name="destVertexIndex">Index of the destination vertex.</param>
 		/// <param name="edgeData">The edge data.</param>

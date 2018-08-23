@@ -49,7 +49,7 @@ namespace QuickAccess.DataStructures.Graphs.Model
 	public interface IGraphSource<in TEdgeData, in TVertexKey> : IFreezable
 	{
 		/// <summary>
-		/// Removes the outgoing edge between the vertices specified by the given indexes.
+		/// Removes the directed edge between the vertices specified by the given indexes.
 		/// </summary>
 		/// <param name="srcVertexKey">The source vertex key.</param>
 		/// <param name="destVertexKey">The destination vertex key.</param>
@@ -57,7 +57,7 @@ namespace QuickAccess.DataStructures.Graphs.Model
 		bool RemoveEdge(TVertexKey srcVertexKey, TVertexKey destVertexKey);
 
 		/// <summary>
-		/// Adds the outgoing edge to the graph.
+		/// Adds the edge coming to the graph.
 		/// </summary>
 		/// <param name="srcVertexKey">The source vertex key.</param>
 		/// <param name="destVertexKey">The destination vertex key.</param>
@@ -69,7 +69,7 @@ namespace QuickAccess.DataStructures.Graphs.Model
 		bool AddEdge(TVertexKey srcVertexKey, TVertexKey destVertexKey, TEdgeData edgeData);
 
 		/// <summary>
-		/// Removes all edges outgoing from the source vertex specified by the key.
+		/// Removes all edges coming out of the source vertex specified by the key.
 		/// </summary>
 		/// <param name="srcVertexKey">The source vertex key.</param>
 		/// <returns>The number of removed edges.</returns>
