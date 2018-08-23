@@ -39,6 +39,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 
 namespace QuickAccess.DataStructures.Graphs.Model
 {
@@ -131,6 +132,7 @@ namespace QuickAccess.DataStructures.Graphs.Model
 		}
 
 		/// <inheritdoc />
+		[Pure]
 		public bool IsFrozen => _indexGraphSource.IsFrozen;
 
 		/// <inheritdoc />
@@ -150,6 +152,7 @@ namespace QuickAccess.DataStructures.Graphs.Model
 		}
 
 		/// <inheritdoc />
+		[Pure]
 		public bool IsReadOnly => IsFrozen;
 
 		/// <inheritdoc />
@@ -157,6 +160,7 @@ namespace QuickAccess.DataStructures.Graphs.Model
 			_indexGraphSource.Connectivity;
 
 		/// <inheritdoc />
+		[Pure]
 		public ISymbolToIndexReadOnlyConverter<TSymbol> SymbolToIndexConverter => _symbolToIndexConverter;
 
 		private int GetIndexIfNotFrozen(TSymbol symbol)

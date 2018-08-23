@@ -39,6 +39,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using QuickAccess.DataStructures.Common;
 
@@ -101,10 +102,12 @@ namespace QuickAccess.DataStructures.Graphs.Model
 		}
 
 		/// <summary>The edge data equality comparer.</summary>
-		public readonly IEqualityComparer<TEdgeData> EdgeDataEqualityComparer;
+		[Pure]
+		public IEqualityComparer<TEdgeData> EdgeDataEqualityComparer {get;}
 
 		/// <summary>Gets the type of the comparison.</summary>
 		/// <value>The type of the comparison.</value>
+		[Pure]
 		public VertexComparisonType ComparisonType { get; }
 
 		/// <summary>Initializes a new instance of the <see cref="VertexAdjacencyComparer{TEdgeData}" /> class.</summary>
@@ -137,6 +140,7 @@ namespace QuickAccess.DataStructures.Graphs.Model
 		/// <param name="x">The first vertex.</param>
 		/// <param name="y">The second vertex.</param>
 		/// <returns>Comparison result.</returns>
+		[Pure]
 		public int Compare(VertexAdjacency<TEdgeData> x, VertexAdjacency<TEdgeData> y)
 		{
 			if (ReferenceEquals(x, y))
@@ -185,12 +189,14 @@ namespace QuickAccess.DataStructures.Graphs.Model
 		/// <param name="x">The first vertex to compare.</param>
 		/// <param name="y">The second vertex to compare.</param>
 		/// <returns><c>true</c> if the specified vertices are equal; otherwise, <c>false</c>.</returns>
+		[Pure]
 		public bool Equals(VertexAdjacency<TEdgeData> x, VertexAdjacency<TEdgeData> y)
 		{
 			return x.IsEquivalent(y, EdgeDataEqualityComparer);
 		}
 
 		/// <inheritdoc />
+		[Pure]
 		public int GetHashCode(VertexAdjacency<TEdgeData> obj)
 		{
 			unchecked

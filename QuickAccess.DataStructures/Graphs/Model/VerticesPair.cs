@@ -142,6 +142,7 @@ namespace QuickAccess.DataStructures.Graphs.Model
 		}
 
 		/// <inheritdoc />
+		[Pure]
 		public override string ToString()
 		{
 			return $"{Source} → {Destination}";

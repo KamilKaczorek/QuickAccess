@@ -39,6 +39,7 @@
 
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 
 namespace QuickAccess.DataStructures.Graphs.Model
 {
@@ -56,13 +57,16 @@ namespace QuickAccess.DataStructures.Graphs.Model
 	{
 		/// <summary>Gets the number of edges coming out of the current vertex.</summary>
 		/// <value>The number of coming out edges.</value>
+		[Pure]
 		public abstract int EdgesCount { get; }
 
 		/// <summary>Gets the indexes of the adjacent vertices.</summary>
 		/// <value>The indexes of adjacent vertices.</value>
+		[Pure]
 		public abstract IEnumerable<int> AdjacentIndexes { get; }
 
 		/// <summary>Gets the number of edges, is equivalent to the <see cref="EdgesCount"/> property.</summary>
+		[Pure]
 		public int Count => EdgesCount;
 
 		/// <summary>
@@ -72,6 +76,7 @@ namespace QuickAccess.DataStructures.Graphs.Model
 		/// <returns>
 		/// <c>true</c> if it contains edge coming to the vertex specified by the index; otherwise, <c>false</c>.
 		/// </returns>
+		[Pure]
 		public abstract bool ContainsEdgeToIndex(int destVertexIndex);
 
 		/// <summary>
@@ -79,10 +84,12 @@ namespace QuickAccess.DataStructures.Graphs.Model
 		/// </summary>
 		/// <param name="destVertexIndex">Index of the destination vertex.</param>
 		/// <returns>The value</returns>
+		[Pure]
 		public abstract TEdgeData GetEdgeToIndex(int destVertexIndex);
 
 		/// <summary>Returns an enumerator that iterates through the adjacent edges of the current vertex.</summary>
 		/// <returns>An enumerator that can be used to iterate through the adjacent edges.</returns>
+		[Pure]
 		public abstract IEnumerator<AdjacentEdge<TEdgeData>> GetEnumerator();
 
 		/// <summary>
@@ -91,6 +98,7 @@ namespace QuickAccess.DataStructures.Graphs.Model
 		/// <param name="destVertexIndex">Index of the destination vertex.</param>
 		/// <param name="edgeData">The edge data.</param>
 		/// <returns><c>true</c> if the edge between current and destination vertex exists; otherwise, <c>false</c>.</returns>
+		[Pure]
 		public abstract bool TryGetEdgeToIndex(int destVertexIndex, out TEdgeData edgeData);
 	
 		
@@ -98,6 +106,7 @@ namespace QuickAccess.DataStructures.Graphs.Model
 		/// <returns>
 		/// An <see cref="T:System.Collections.IEnumerator"></see> object that can be used to iterate through the collection.
 		/// </returns>
+		[Pure]
 		IEnumerator IEnumerable.GetEnumerator()
 		{
 			return GetEnumerator();

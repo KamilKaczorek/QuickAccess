@@ -38,6 +38,7 @@
 #endregion
 
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using QuickAccess.DataStructures.Graphs.Extensions;
 
 namespace QuickAccess.DataStructures.Graphs.Model
@@ -56,6 +57,7 @@ namespace QuickAccess.DataStructures.Graphs.Model
 		/// <value>
 		///     The symbol comparer.
 		/// </value>
+		[Pure]
 		IEqualityComparer<TSymbol> Comparer { get; }
 
 		/// <summary>
@@ -64,10 +66,12 @@ namespace QuickAccess.DataStructures.Graphs.Model
 		/// <value>
 		/// The count.
 		/// </value>
+		[Pure]
 		int Count { get; }
 
 		/// <summary>Gets the maximal index.</summary>
 		/// <value>The maximal index.</value>
+		[Pure]
 		int MaxIndex { get; }
 
 		/// <summary>Gets the index of the symbol specified by parameter.</summary>
@@ -80,6 +84,7 @@ namespace QuickAccess.DataStructures.Graphs.Model
 		/// The index value or <c>-1</c> if the <paramref name="validate" /> is set to <c>false</c> and the index is not defined for the specified symbol.
 		/// </returns>
 		/// <exception cref="KeyNotFoundException">Thrown when the <paramref name="validate"/> is <c>true</c> and the index is not defined for the specified symbol.</exception>
+		[Pure]
 		int GetIndexOf(TSymbol symbol, bool validate = false);
 
 		/// <summary>
@@ -88,11 +93,13 @@ namespace QuickAccess.DataStructures.Graphs.Model
 		/// <param name="index">The index.</param>
 		/// <returns>The symbol at the specified index.</returns>
 		/// <exception cref="KeyNotFoundException">Thrown when symbol is not defined for the specified index.</exception>
+		[Pure]
 		TSymbol GetSymbolAt(int index);
 
 		/// <summary>Determines whether the specified map contains specified symbol.</summary>
 		/// <param name="symbol">The symbol.</param>
 		/// <returns><c>true</c> if the specified map contains symbol; otherwise, <c>false</c>.</returns>
+		[Pure]
 		bool ContainsSymbol(TSymbol symbol);
 
 		/// <summary>
@@ -102,6 +109,7 @@ namespace QuickAccess.DataStructures.Graphs.Model
 		/// <returns>
 		///   <c>true</c> if contains the defined symbol at specified index; otherwise, <c>false</c>.
 		/// </returns>
+		[Pure]
 		bool ContainsSymbolAt(int index);
 
 		/// <summary>
@@ -110,6 +118,7 @@ namespace QuickAccess.DataStructures.Graphs.Model
 		/// <param name="index">The index.</param>
 		/// <param name="symbol">The symbol.</param>
 		/// <returns><c>true</c> if contains the defined symbol at specified index; otherwise, <c>false</c>.</returns>
+		[Pure]
 		bool TryGetSymbolAt(int index, out TSymbol symbol);
 	}
 }

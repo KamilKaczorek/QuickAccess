@@ -38,6 +38,7 @@
 #endregion
 
 using System;
+using System.Diagnostics.Contracts;
 
 namespace QuickAccess.DataStructures.Graphs.Model
 {
@@ -62,6 +63,7 @@ namespace QuickAccess.DataStructures.Graphs.Model
 
 		/// <summary>Gets a value indicating whether this instance is read only.</summary>
 		/// <value><c>true</c> if this instance is read only; otherwise, <c>false</c>.</value>
+		[Pure]
 		bool IsReadOnly { get; }
 
 		/// <summary>
@@ -70,6 +72,7 @@ namespace QuickAccess.DataStructures.Graphs.Model
 		/// <value>
 		///     The connectivity definition.
 		/// </value>
+		[Pure]
 		GraphConnectivityDefinition<TEdgeData> Connectivity { get; }
 	}
 
@@ -89,6 +92,7 @@ namespace QuickAccess.DataStructures.Graphs.Model
 		/// <value>
 		///     The symbol to index converter.
 		/// </value>
+		[Pure]
 		ISymbolToIndexReadOnlyConverter<TSymbol> SymbolToIndexConverter { get; }
 	}
 }

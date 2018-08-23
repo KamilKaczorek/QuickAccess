@@ -40,6 +40,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using QuickAccess.DataStructures.Common;
 using QuickAccess.DataStructures.Graphs.Extensions;
@@ -115,9 +116,11 @@ namespace QuickAccess.DataStructures.Graphs.Model
 		private event EventHandler<GraphConnectivityChangedEventArgs> InternalChanged;
 
 		/// <inheritdoc />
+		[Pure]
 		public bool IsReadOnly => IsFrozen;
 
 		/// <inheritdoc />
+		[Pure]
 		public GraphConnectivityDefinition<TEdgeData> Connectivity { get; }
 
 		/// <inheritdoc />
@@ -244,6 +247,7 @@ namespace QuickAccess.DataStructures.Graphs.Model
 		}
 
 		/// <inheritdoc />
+		[Pure]
 		public bool IsFrozen => _vertexModifier == null;
 
 		/// <inheritdoc />
