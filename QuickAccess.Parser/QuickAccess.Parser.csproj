@@ -9,4 +9,8 @@
     <ProjectReference Include="..\QuickAccess.DataStructures\QuickAccess.DataStructures.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="ParserBuilder\" />
+  </ItemGroup>
+
 </Project>

@@ -37,7 +37,7 @@
 
 #endregion
 
-
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -59,25 +59,28 @@ namespace QuickAccess.Parser
         public int SourcePosition { get; }
 
         /// <inheritdoc />
-        public int Length { get; }
+        public int Count { get; }
 
-        /// <summary>
-        /// Initializes the new instance of the <see cref="ISourceCodeFragment" /> type.
-        /// </summary>
-        /// <param name="parent">The source code parent.</param>
-        /// <param name="offset">The absolute source code offset, where the fragment starts.</param>
-        /// <param name="length">The length of the source code fragment.</param>
-        public SourceCodeFragment(IParsingContextStreamParent parent, int offset, int length)
+		///<inheritdoc />
+		public char this[int index] => index < Count && index >= 0 ? _parent[index + SourcePosition] : throw new IndexOutOfRangeException();
+
+		/// <summary>
+		/// Initializes the new instance of the <see cref="ISourceCodeFragment" /> type.
+		/// </summary>
+		/// <param name="parent">The source code parent.</param>
+		/// <param name="offset">The absolute source code offset, where the fragment starts.</param>
+		/// <param name="length">The length of the source code fragment.</param>
+		public SourceCodeFragment(IParsingContextStreamParent parent, int offset, int length)
         {
             _cachedValue = null;
             _parent = parent;
             SourcePosition = offset;
-            Length = length;
+            Count = length;
         }
 
         public IEnumerator<char> GetEnumerator()
         {
-            for (var idx = 0; idx < Length; idx++)
+            for (var idx = 0; idx < Count; idx++)
             {
                 yield return _parent[idx + SourcePosition];
             }
@@ -95,9 +98,9 @@ namespace QuickAccess.Parser
 
         public override string ToString()
         {
-            return Length <= 0
+            return Count <= 0
                 ? string.Empty
-                : (_cachedValue ?? (_cachedValue = _parent.GetString(SourcePosition, Length)));
+                : (_cachedValue ?? (_cachedValue = _parent.GetString(SourcePosition, Count)));
         }
     }
 }

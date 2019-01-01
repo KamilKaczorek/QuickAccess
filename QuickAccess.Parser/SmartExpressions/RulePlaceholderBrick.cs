@@ -1,9 +1,8 @@
 ﻿#region LICENSE [BSD-2-Clause]
-
 // This code is distributed under the BSD-2-Clause license.
 // =====================================================================
 // 
-// Copyright ©2018 by Kamil Piotr Kaczorek
+// Copyright ©2019 by Kamil Piotr Kaczorek
 // All rights reserved.
 // 
 // Redistribution and use in source and binary forms, with or without modification, 
@@ -34,27 +33,67 @@
 // Author: Kamil Piotr Kaczorek
 // http://kamil.scienceontheweb.net
 // e-mail: kamil.piotr.kaczorek@gmail.com
-
 #endregion
 
-
+using System;
 using System.Collections.Generic;
 
-namespace QuickAccess.Parser
+namespace QuickAccess.Parser.SmartExpressions
 {
-    /// <summary>
-    /// The interface of the source code fragment.
-    /// <seealso cref="ISourceCode"/>
-    /// </summary>
-    /// <seealso cref="IEnumerable{T}" />
-    public interface ISourceCodeFragment : IReadOnlyList<char>
-    {
-        /// <summary>
-        /// Gets the absolute offset of a fragment within a source code.
-        /// </summary>
-        /// <value>
-        /// The source position.
-        /// </value>
-        int SourcePosition { get; }
-    }
+	public class RulePlaceholderBrick : ParsingBrick
+	{
+		public string RuleName { get; }
+		private readonly SingleTimeSetValue<Tuple<ParsingBrick, bool>> _rule = 
+			SingleTimeSetValue.Create<Tuple<ParsingBrick, bool>>();
+		public ParsingBrick Content => _rule.IsSet ? _rule.Value.Item1 : null;
+		public bool IsRecursion => _rule.IsSet && _rule.Value.Item2;
+
+		public RulePlaceholderBrick(string ruleName)
+		{
+			RuleName = ruleName;
+		}
+
+		/// <inheritdoc />
+		protected override void ApplyRuleDefinition(string name, ParsingBrick content, bool recursion)
+		{
+			if (name == RuleName)
+			{
+				_rule.TrySet(content, recursion);
+			}
+		}
+
+		/// <inheritdoc />
+		public override bool Equals(ParsingBrick other)
+		{
+			if (IsEmpty && (other?.IsEmpty ?? false))
+			{
+				return true;
+			}
+
+			return other is RulePlaceholderBrick cb && RuleName.Equals(cb.RuleName);
+		}
+
+		/// <inheritdoc />
+		public override string ExpressionId => IsRecursion ? $"RULE${RuleName}$" : Content?.ExpressionId;
+
+		/// <param name="usedGroupNames"></param>
+		/// <inheritdoc />
+		public override string ToRegularExpressionString(Dictionary<string, int> usedGroupNames)
+		{
+			if (!_rule.IsSet)
+			{
+				throw new InvalidOperationException($"Rule is not defined for this placeholder. Rule name={RuleName}");
+			}
+
+			return IsRecursion ? $"(?&{RuleName})" : Content.ToRegularExpressionString(usedGroupNames);
+		}
+
+		public override bool ProvidesRegularExpression => Content?.ProvidesRegularExpression ?? IsRecursion;
+
+		/// <inheritdoc />
+		public override string ToString()
+		{
+			return IsRecursion ? RuleName : Content?.ToString() ?? RuleName;
+		}
+	}
 }

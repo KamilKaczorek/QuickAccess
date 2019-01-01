@@ -1,9 +1,8 @@
 ﻿#region LICENSE [BSD-2-Clause]
-
 // This code is distributed under the BSD-2-Clause license.
 // =====================================================================
 // 
-// Copyright ©2018 by Kamil Piotr Kaczorek
+// Copyright ©2019 by Kamil Piotr Kaczorek
 // All rights reserved.
 // 
 // Redistribution and use in source and binary forms, with or without modification, 
@@ -34,27 +33,81 @@
 // Author: Kamil Piotr Kaczorek
 // http://kamil.scienceontheweb.net
 // e-mail: kamil.piotr.kaczorek@gmail.com
-
 #endregion
-
 
 using System.Collections.Generic;
 
-namespace QuickAccess.Parser
+namespace QuickAccess.Parser.SmartExpressions
 {
-    /// <summary>
-    /// The interface of the source code fragment.
-    /// <seealso cref="ISourceCode"/>
-    /// </summary>
-    /// <seealso cref="IEnumerable{T}" />
-    public interface ISourceCodeFragment : IReadOnlyList<char>
-    {
-        /// <summary>
-        /// Gets the absolute offset of a fragment within a source code.
-        /// </summary>
-        /// <value>
-        /// The source position.
-        /// </value>
-        int SourcePosition { get; }
-    }
+	public class CapturingGroupBrick : ParsingBrick
+	{
+		public string GroupName { get; }
+		public ParsingBrick Content { get; }
+
+		/// <inheritdoc />
+		public override bool IsEmpty => Content.IsEmpty;
+
+		public CapturingGroupBrick(ParsingBrick content, string groupName)
+		{
+			Content = content;
+			GroupName = groupName;
+			ApplyRuleDefinition(Content, GroupName, Content, true);
+		}
+
+		/// <inheritdoc />
+		protected override void ApplyRuleDefinition(string name, ParsingBrick content, bool recursion)
+		{
+			if (name == GroupName)
+			{
+				return;
+			}
+
+			ApplyRuleDefinition(Content, name, content, recursion);
+		}
+
+		/// <inheritdoc />
+		public override string ExpressionId => Content.ExpressionId;
+
+		public override string ToRegularExpressionString(Dictionary<string, int> usedGroupNames)
+		{
+			var groupName = GroupName;
+			if (!string.IsNullOrEmpty(GroupName) && usedGroupNames != null)
+			{
+
+				if (!usedGroupNames.TryGetValue(GroupName, out var counter))
+				{
+					counter = 0;
+				}
+				else
+				{
+					groupName += $"_{counter}";
+				}
+				
+				++counter;
+				usedGroupNames[GroupName] = counter;
+
+			}
+			
+			return string.IsNullOrEmpty(GroupName) ? $"({Content.ToRegularExpressionString(usedGroupNames)})" : $"(?<{groupName}>{Content.ToRegularExpressionString(usedGroupNames)})";
+		}
+
+		/// <inheritdoc />
+		public override bool Equals(ParsingBrick other)
+		{
+			if (IsEmpty && (other?.IsEmpty ?? false))
+			{
+				return true;
+			}
+
+			return other is CapturingGroupBrick cb && cb.GroupName == GroupName && cb.Content.Equals(Content);
+		}
+
+
+
+		/// <inheritdoc />
+		public override string ToString()
+		{
+			return $"{GroupName} ::= {Content}";
+		}
+	}
 }

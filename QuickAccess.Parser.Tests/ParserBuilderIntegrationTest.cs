@@ -1,5 +1,4 @@
 ﻿#region LICENSE [BSD-2-Clause]
-
 // This code is distributed under the BSD-2-Clause license.
 // =====================================================================
 // 
@@ -34,47 +33,64 @@
 // Author: Kamil Piotr Kaczorek
 // http://kamil.scienceontheweb.net
 // e-mail: kamil.piotr.kaczorek@gmail.com
-
 #endregion
 
 using System;
+using System.CodeDom;
+using System.Collections.Generic;
+using System.Diagnostics.Contracts;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Text;
+using System.Text.RegularExpressions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using QuickAccess.Parser.SmartExpressions;
 
 namespace QuickAccess.Parser.Tests
 {
+
 	[TestClass]
-	public class MathExpressionCompilerIntegrationTest
+	public class ParserBuilderIntegrationTest
 	{
 		[TestMethod]
-		public void ON_Compile_WHEN_Expression_Is_Correct_SHOULD_Return_Executable_Expression_Node_That_Gives_Proper_Result()
+		public void Test()
 		{
-			// Arrange
-			var sourceCode = "sin(90*PI/180.0)*2^(1+1)*-1e-1";
-			var compiler = new MathExpressionCompiler(CharComparer.CaseSensitive, new MathExpressionParserFactory());
-			compiler.DefineOperator<double>("+", (x, y) => x + y, 0);
-			compiler.DefineOperator<double>("-", (x, y) => x - y, 0);
-			compiler.DefineOperator<double>("*", (x, y) => x * y, 10);
-			compiler.DefineOperator<double>("/", (x, y) => x / y, 10);
-			compiler.DefineOperator<double>("^", Math.Pow, 20);
-			compiler.DefineOperator<double>("+", x => x);
-			compiler.DefineOperator<double>("-", x => -x);
-			compiler.DefineFunction<double>("pow", Math.Pow);
-			compiler.DefineFunction<double>("sin", Math.Sin);
-			compiler.DefineFunction<double>("cos", Math.Cos);
-			compiler.DefineFunction<double>("ceiling", Math.Ceiling);
-			compiler.DefineFunction<double>("floor", Math.Floor);
-			compiler.DefineFunction<double>("abs", Math.Abs);
-			compiler.DefineVariable("PI", () => Math.PI);
+			
+			var d = 2.2;
+			var name = (SX.Letter + (SX.Digit | SX.Letter).ZeroOrMore()) / "Name";
+			var intNumber = SX.Digit.OneOrMore() / "Integer";
+			var floatNumber = (intNumber + "." + intNumber) / "Float";
+			var whiteSpace = (" ".Exact() / "Space" | "\t".Exact() / "Tab").OneOrMore() / "WhiteSpace";
+			var optWs = (" ".Exact() / "Space" | "\t".Exact() / "Tab").ZeroOrMore();
+			var functionArg = (floatNumber | intNumber | name) / "FunctionArg";
+			var functionArgList = (functionArg & ("," & SX.Current).ZeroOrMore()) / "FunctionArgList";
+			var functionInvocation = (name & "(" & ~functionArgList & ")" & ';') / "FunctionInvocation";
 
-			var source = new StringSourceCode(new ParsingContextStreamFactory(), new SourceCodeFragmentFactory(), sourceCode);
-			// Act
-			var res = compiler.Compile(source);
-			// Assert
-			Assert.IsNotNull(res);
-			var error = source.GetError();
-			Assert.IsNull(error);
-			var calcRes = (double) res.Execute();
-			Assert.AreEqual(-0.4, calcRes, 0.0000001);
+		
+
+
+			functionInvocation.ApplyCustomRule(SX.WhiteSpace.RuleName, whiteSpace);
+			functionInvocation.ApplyCustomRule(SX.OptionalWhiteSpace.RuleName, optWs);
+			functionInvocation.ApplyCustomRule(SX.Digit.RuleName, SX.Start | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '0');
+			functionInvocation.ApplyCustomRule(SX.Letter.RuleName, SX.Start | 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i' | 'j');
+
+			var gn = new Dictionary<string, int>();
+
+			var nregex = functionArg.ToRegularExpressionString(gn);
+			var regex = functionInvocation.ToRegularExpressionString(gn);
+			Console.WriteLine(regex);
+
+			// * anything
+			// + nothing
+			// - positive lookahead			
+			// ^ white space
+			// 
+			// Parsing
+			// Syntactic validation
+			// Tree build
+			// Semantic validation
+			// Compilation
+
 		}
 	}
 }

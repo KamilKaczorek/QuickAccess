@@ -347,12 +347,12 @@ namespace QuickAccess.Parser
 
         public static bool Equals(this ISourceCodeFragment source, string text, IEqualityComparer<char> charComparer = null)
         {
-            if (source.Length <= 0 && string.IsNullOrEmpty(text))
+            if (source.Count <= 0 && string.IsNullOrEmpty(text))
             {
                 return true;
             }
 
-            if (source.Length != text.Length)
+            if (source.Count != text.Length)
             {
                 return false;
             }
@@ -379,7 +379,9 @@ namespace QuickAccess.Parser
 
         private sealed class EmptyParsedFragment : ISourceCodeFragment
         {
-            public int Length => 0;
+			public char this[int index] => throw new IndexOutOfRangeException($"Source code fragment is empty - can't access {index} character.");
+
+			public int Count => 0;
 
             public int SourcePosition => -1;
 

@@ -1,9 +1,8 @@
 ﻿#region LICENSE [BSD-2-Clause]
-
 // This code is distributed under the BSD-2-Clause license.
 // =====================================================================
 // 
-// Copyright ©2018 by Kamil Piotr Kaczorek
+// Copyright ©2019 by Kamil Piotr Kaczorek
 // All rights reserved.
 // 
 // Redistribution and use in source and binary forms, with or without modification, 
@@ -34,27 +33,78 @@
 // Author: Kamil Piotr Kaczorek
 // http://kamil.scienceontheweb.net
 // e-mail: kamil.piotr.kaczorek@gmail.com
-
 #endregion
 
-
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
-namespace QuickAccess.Parser
+namespace QuickAccess.Parser.SmartExpressions
 {
-    /// <summary>
-    /// The interface of the source code fragment.
-    /// <seealso cref="ISourceCode"/>
-    /// </summary>
-    /// <seealso cref="IEnumerable{T}" />
-    public interface ISourceCodeFragment : IReadOnlyList<char>
-    {
-        /// <summary>
-        /// Gets the absolute offset of a fragment within a source code.
-        /// </summary>
-        /// <value>
-        /// The source position.
-        /// </value>
-        int SourcePosition { get; }
-    }
+	public class TextMatchingBrick : ParsingBrick
+	{
+		public string Text { get; }
+
+		private static readonly HashSet<char> SpecialRegexCharacters = new HashSet<char>{'\\','^','$','.','|','?','*','+','(',')','{','}'};
+
+		public static bool IsRegexSpecial(char ch)
+		{
+			return SpecialRegexCharacters.Contains(ch);
+		}
+
+		public static bool IsRegexSpecialOrTab(char ch)
+		{
+			return SpecialRegexCharacters.Contains(ch) || ch == '\t';
+		}
+
+		/// <inheritdoc />
+		public override bool IsEmpty => string.IsNullOrEmpty(Text);
+
+		public TextMatchingBrick(string text)
+		{
+			Text = text;
+		}
+
+		/// <inheritdoc />
+		public override bool Equals(ParsingBrick other)
+		{
+			if (IsEmpty && (other?.IsEmpty ?? false))
+			{
+				return true;
+			}
+
+			return other is TextMatchingBrick cb && Text.Equals(cb.Text);
+		}
+
+		/// <inheritdoc />
+		protected override void ApplyRuleDefinition(string name, ParsingBrick content, bool recursion)
+		{
+		}
+
+		public static string CharToRegex(char ch)
+		{
+			return IsRegexSpecial(ch) ? $@"\{ch}" : ch == '\t' ? @"\t" : ch.ToString();
+		}
+
+		/// <inheritdoc />
+		public override string ExpressionId => $"TEXT${ToRegularExpressionString(null)}";
+
+		/// <param name="usedGroupNames"></param>
+		/// <inheritdoc />
+		public override string ToRegularExpressionString(Dictionary<string, int> usedGroupNames)
+		{
+			var specialCount = Text.Count(IsRegexSpecialOrTab);
+			var sb = new StringBuilder(specialCount+Text.Length);
+
+			foreach (var ch in Text)
+			{
+				sb.Append(CharToRegex(ch));
+			}
+
+			return sb.ToString();
+		}
+
+		/// <inheritdoc />
+		public override bool ProvidesRegularExpression => true;
+	}
 }

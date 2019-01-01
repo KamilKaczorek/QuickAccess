@@ -1,9 +1,8 @@
 ﻿#region LICENSE [BSD-2-Clause]
-
 // This code is distributed under the BSD-2-Clause license.
 // =====================================================================
 // 
-// Copyright ©2018 by Kamil Piotr Kaczorek
+// Copyright ©2019 by Kamil Piotr Kaczorek
 // All rights reserved.
 // 
 // Redistribution and use in source and binary forms, with or without modification, 
@@ -29,52 +28,63 @@
 // 
 // =====================================================================
 // 
-// Project: QuickAccess.Parser.Tests
+// Project: QuickAccess.Parser
 // 
 // Author: Kamil Piotr Kaczorek
 // http://kamil.scienceontheweb.net
 // e-mail: kamil.piotr.kaczorek@gmail.com
-
 #endregion
 
-using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Collections.Generic;
 
-namespace QuickAccess.Parser.Tests
+namespace QuickAccess.Parser.SmartExpressions
 {
-	[TestClass]
-	public class MathExpressionCompilerIntegrationTest
+	public sealed class EmptyParsingBrick : ParsingBrick
 	{
-		[TestMethod]
-		public void ON_Compile_WHEN_Expression_Is_Correct_SHOULD_Return_Executable_Expression_Node_That_Gives_Proper_Result()
-		{
-			// Arrange
-			var sourceCode = "sin(90*PI/180.0)*2^(1+1)*-1e-1";
-			var compiler = new MathExpressionCompiler(CharComparer.CaseSensitive, new MathExpressionParserFactory());
-			compiler.DefineOperator<double>("+", (x, y) => x + y, 0);
-			compiler.DefineOperator<double>("-", (x, y) => x - y, 0);
-			compiler.DefineOperator<double>("*", (x, y) => x * y, 10);
-			compiler.DefineOperator<double>("/", (x, y) => x / y, 10);
-			compiler.DefineOperator<double>("^", Math.Pow, 20);
-			compiler.DefineOperator<double>("+", x => x);
-			compiler.DefineOperator<double>("-", x => -x);
-			compiler.DefineFunction<double>("pow", Math.Pow);
-			compiler.DefineFunction<double>("sin", Math.Sin);
-			compiler.DefineFunction<double>("cos", Math.Cos);
-			compiler.DefineFunction<double>("ceiling", Math.Ceiling);
-			compiler.DefineFunction<double>("floor", Math.Floor);
-			compiler.DefineFunction<double>("abs", Math.Abs);
-			compiler.DefineVariable("PI", () => Math.PI);
+		public static readonly EmptyParsingBrick Instance = new EmptyParsingBrick();
 
-			var source = new StringSourceCode(new ParsingContextStreamFactory(), new SourceCodeFragmentFactory(), sourceCode);
-			// Act
-			var res = compiler.Compile(source);
-			// Assert
-			Assert.IsNotNull(res);
-			var error = source.GetError();
-			Assert.IsNull(error);
-			var calcRes = (double) res.Execute();
-			Assert.AreEqual(-0.4, calcRes, 0.0000001);
+		private EmptyParsingBrick()
+		{
 		}
+
+		/// <inheritdoc />
+		protected override void ApplyRuleDefinition(string name, ParsingBrick content, bool recursion)
+		{
+		}
+
+		/// <inheritdoc />
+		public override string ExpressionId => string.Empty;
+
+		/// <param name="usedGroupNames"></param>
+		/// <inheritdoc />
+		public override string ToRegularExpressionString(Dictionary<string, int> usedGroupNames)
+		{
+			return string.Empty;
+		}
+
+		/// <inheritdoc />
+		public override bool Equals(ParsingBrick other)
+		{
+			if (ReferenceEquals(other, this))
+			{
+				return true;
+			}
+
+			if (ReferenceEquals(other, null))
+			{
+				return false;
+			}
+
+			return other.Equals(this);
+		}
+
+		/// <inheritdoc />
+		public override string ToString()
+		{
+			return string.Empty;
+		}
+
+		/// <inheritdoc />
+		public override bool IsEmpty => true;
 	}
 }
