@@ -39,7 +39,7 @@
 
 using System.Collections.Generic;
 
-namespace QuickAccess.Parser
+namespace QuickAccess.Parser.ValueExpressionTypes
 {
 	public interface IValueCompilerDefinition
 	{

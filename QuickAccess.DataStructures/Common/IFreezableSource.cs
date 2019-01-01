@@ -28,83 +28,28 @@
 // 
 // =====================================================================
 // 
-// Project: QuickAccess.Parser
+// Project: QuickAccess.DataStructures
 // 
 // Author: Kamil Piotr Kaczorek
 // http://kamil.scienceontheweb.net
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
-
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace QuickAccess.Parser.SmartExpressions
+namespace QuickAccess.DataStructures.Common
 {
-	public class TextMatchingBrick : ParsingBrick
+	/// <summary>
+	///     The interface of the freezable object.
+	///     Freezable object became frozen when <see cref="Freeze" /> operation is called and stays frozen (read-only) till the
+	///     end of its lifetime.
+	/// <seealso cref="IFreezable"/>
+	/// </summary>
+	public interface IFreezableSource : IFreezable
 	{
-		public string Text { get; }
-
-		private static readonly HashSet<char> SpecialRegexCharacters = new HashSet<char>{'\\','^','$','.','|','?','*','+','(',')','{','}'};
-
-		public static bool IsRegexSpecial(char ch)
-		{
-			return SpecialRegexCharacters.Contains(ch);
-		}
-
-		public static bool IsRegexSpecialOrTab(char ch)
-		{
-			return SpecialRegexCharacters.Contains(ch) || ch == '\t';
-		}
-
-		/// <inheritdoc />
-		public override bool IsEmpty => string.IsNullOrEmpty(Text);
-
-		public TextMatchingBrick(string text)
-		{
-			Text = text;
-		}
-
-		/// <inheritdoc />
-		public override bool Equals(ParsingBrick other)
-		{
-			if (IsEmpty && (other?.IsEmpty ?? false))
-			{
-				return true;
-			}
-
-			return other is TextMatchingBrick cb && Text.Equals(cb.Text);
-		}
-
-		/// <inheritdoc />
-		protected override void ApplyRuleDefinition(string name, ParsingBrick content, bool recursion)
-		{
-		}
-
-		public static string CharToRegex(char ch)
-		{
-			return IsRegexSpecial(ch) ? $@"\{ch}" : ch == '\t' ? @"\t" : ch.ToString();
-		}
-
-		/// <inheritdoc />
-		public override string ExpressionId => $"TEXT${ToRegularExpressionString(null)}";
-
-		/// <param name="usedGroupNames"></param>
-		/// <inheritdoc />
-		public override string ToRegularExpressionString(Dictionary<string, int> usedGroupNames)
-		{
-			var specialCount = Text.Count(IsRegexSpecialOrTab);
-			var sb = new StringBuilder(specialCount+Text.Length);
-
-			foreach (var ch in Text)
-			{
-				sb.Append(CharToRegex(ch));
-			}
-
-			return sb.ToString();
-		}
-
-		/// <inheritdoc />
-		public override bool ProvidesRegularExpression => true;
+		/// <summary>
+		///     Freezes the object from editing, since object is frozen each editing operation will throw
+		///     <see cref="System.Data.ReadOnlyException" /> exception.
+		///     When object is frozen once, it stays frozen till the end of its lifetime.
+		///     <seealso cref="IFreezable.IsFrozen" />
+		/// </summary>
+		void Freeze();
 	}
 }

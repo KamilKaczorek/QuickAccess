@@ -34,21 +34,17 @@
 // http://kamil.scienceontheweb.net
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
-
-using System;
-
-namespace QuickAccess.Parser.SmartExpressions
+namespace QuickAccess.DataStructures.Algebra
 {
-	[Flags]
-	public enum ConcatenationOperator
+	public enum BinaryOperator
 	{
-		Mul = 0x000100,
-		Div = 0x000200,
-		Mod = 0x000400,
-		Add = 0x001000,
-		Sub = 0x002000,
-		And = 0x010000,
-		XOr = 0x020000,
-		Or =  0x040000
+		Mul = BinaryOperators.Mul,
+		Div = BinaryOperators.Div,
+		Mod = BinaryOperators.Mod,
+		Sum = BinaryOperators.Sum,
+		Sub = BinaryOperators.Sub,
+		And = BinaryOperators.And,
+		XOr = BinaryOperators.XOr,
+		Or =  BinaryOperators.Or
 	}
 }

@@ -34,50 +34,21 @@
 // http://kamil.scienceontheweb.net
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
-namespace QuickAccess.Parser.SmartExpressions
+
+using System;
+
+namespace QuickAccess.Parser.SmartExpressions.Bricks
 {
-	public sealed class StartParsingExpression
+	[Flags]
+	public enum StandardCharactersRanges
 	{
-		public static readonly StartParsingExpression Instance = new StartParsingExpression();
-
-		private StartParsingExpression()
-		{
-
-		}
-
-		public static ParsingBrick operator &(StartParsingExpression left, ParsingBrick right)
-		{
-			return SX.BrickAlgebra.EvaluateOperatorResult(BinaryOperator.Add, SX.OptionalWhiteSpace, right);
-		}
-
-		public static ParsingBrick operator +(StartParsingExpression left, ParsingBrick right)
-		{
-			return right;
-		}
-
-		public static ParsingBrick operator -(StartParsingExpression left, ParsingBrick right)
-		{
-			return SX.BrickAlgebra.EvaluateOperatorResult(UnaryOperator.SingleMinus, right);
-		}
-
-		public static ParsingBrick operator *(StartParsingExpression left, ParsingBrick right)
-		{
-			return SX.BrickAlgebra.EvaluateOperatorResult(BinaryOperator.Add, SX.Anything, right);
-		}
-
-		public static ParsingBrick operator |(StartParsingExpression left, ParsingBrick right)
-		{
-			return right;
-		}
-
-		public static ParsingBrick operator ^(StartParsingExpression left, ParsingBrick right)
-		{
-			return SX.BrickAlgebra.EvaluateOperatorResult(BinaryOperator.Add, SX.WhiteSpace, right);
-		}
-
-		public static ParsingBrick operator %(StartParsingExpression left, ParsingBrick right)
-		{
-			return SX.BrickAlgebra.EvaluateOperatorResult(BinaryOperator.Add, SX.CustomSequence, right);
-		}
+		None = 0,
+		UpperLetter = 0x01,
+		LowerLetter = 0x02,
+		Digit = 0x04,
+		Underscore = 0x10,
+		Letter = UpperLetter | LowerLetter,
+		LetterOrDigit = Letter | Digit,
+		WordCharacter = LetterOrDigit | Underscore
 	}
 }

@@ -39,7 +39,7 @@
 
 using System;
 
-namespace QuickAccess.Parser
+namespace QuickAccess.Parser.ValueExpressionTypes
 {
 	public sealed class ParsedValue
 	{

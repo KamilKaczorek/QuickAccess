@@ -1,9 +1,8 @@
 ﻿#region LICENSE [BSD-2-Clause]
-
 // This code is distributed under the BSD-2-Clause license.
 // =====================================================================
 // 
-// Copyright ©2018 by Kamil Piotr Kaczorek
+// Copyright ©2019 by Kamil Piotr Kaczorek
 // All rights reserved.
 // 
 // Redistribution and use in source and binary forms, with or without modification, 
@@ -34,17 +33,46 @@
 // Author: Kamil Piotr Kaczorek
 // http://kamil.scienceontheweb.net
 // e-mail: kamil.piotr.kaczorek@gmail.com
-
 #endregion
 
-using System.Collections.Generic;
+using System.Linq;
 
-namespace QuickAccess.Parser.ValueExpressionTypes
+namespace QuickAccess.Parser.SmartExpressions.Bricks
 {
-	public interface IValueTypeDefinition
+	public sealed class ConcatenationBrick : CompositeSmartExpressionBrick
 	{
-		IEnumerable<string> SupportedTypesIds { get; }
-		bool Supports(string typeId);
-		ParsedValue TryParse(ISourceCode src);
+		/// <inheritdoc />
+		protected override string RegularExpressionSeparator => string.Empty;
+
+		public override string ExpressionId => string.Join(string.Empty, Bricks.Select(b => b.ExpressionId));
+
+		public ConcatenationBrick(ISmartExpressionAlgebra algebra, SmartExpressionBrick b1, SmartExpressionBrick b2)
+			: base(algebra, b1, b2, CanMakeFlat)
+		{
+			
+		}
+
+		public ConcatenationBrick(ISmartExpressionAlgebra algebra, SmartExpressionBrick b1, SmartExpressionBrick b2, SmartExpressionBrick b3)
+			: base(algebra, b1, b2, b3, CanMakeFlat)
+		{
+			
+		}
+
+		public ConcatenationBrick(ISmartExpressionAlgebra algebra, SmartExpressionBrick[] bricks)
+			: base(algebra, bricks, CanMakeFlat)
+		{
+			
+		}
+
+		private static bool CanMakeFlat(CompositeSmartExpressionBrick cb)
+		{
+			return cb is ConcatenationBrick;
+		}
+
+		/// <inheritdoc />
+		public override string ToString()
+		{
+			return string.Join("", Bricks.Select(b => b.ToString()));
+		}
 	}
 }

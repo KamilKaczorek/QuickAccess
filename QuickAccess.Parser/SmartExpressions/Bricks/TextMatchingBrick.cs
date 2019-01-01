@@ -1,9 +1,8 @@
 ﻿#region LICENSE [BSD-2-Clause]
-
 // This code is distributed under the BSD-2-Clause license.
 // =====================================================================
 // 
-// Copyright ©2018 by Kamil Piotr Kaczorek
+// Copyright ©2019 by Kamil Piotr Kaczorek
 // All rights reserved.
 // 
 // Redistribution and use in source and binary forms, with or without modification, 
@@ -34,46 +33,79 @@
 // Author: Kamil Piotr Kaczorek
 // http://kamil.scienceontheweb.net
 // e-mail: kamil.piotr.kaczorek@gmail.com
-
 #endregion
 
-using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
-namespace QuickAccess.Parser.ValueExpressionTypes
+namespace QuickAccess.Parser.SmartExpressions.Bricks
 {
-	public sealed class ValuesCompiler
-		: IValueCompiler,
-		  IValueParser
+	public sealed class TextMatchingBrick : SmartExpressionBrick
 	{
-		/// <inheritdoc />
-		public ICompiledValue Compile(ParsedValue parsedValue)
+		public string Text { get; }
+
+		private static readonly HashSet<char> SpecialRegexCharacters = new HashSet<char>{'\\','^','$','.','|','?','*','+','(',')','{','}'};
+
+		public static bool IsRegexSpecial(char ch)
 		{
-			throw new NotImplementedException();
+			return SpecialRegexCharacters.Contains(ch);
+		}
+
+		public static bool IsRegexSpecialOrTab(char ch)
+		{
+			return SpecialRegexCharacters.Contains(ch) || ch == '\t';
 		}
 
 		/// <inheritdoc />
-		public ICompiledValue Compile(ParsedValue parsedValue, string valueTypeId)
+		public override bool IsEmpty => string.IsNullOrEmpty(Text);
+
+		public TextMatchingBrick(ISmartExpressionAlgebra algebra, string text)
+			: base(algebra)
 		{
-			throw new NotImplementedException();
+			Text = text;
 		}
 
 		/// <inheritdoc />
-		public ParsedValue TryParse(ISourceCode src)
+		public override bool Equals(SmartExpressionBrick other)
 		{
-			throw new NotImplementedException();
+			if (IsEmpty && (other?.IsEmpty ?? false))
+			{
+				return true;
+			}
+
+			return other is TextMatchingBrick cb && Text.Equals(cb.Text);
 		}
 
 		/// <inheritdoc />
-		public ParsedValue TryParse(ISourceCode src, string valueTypeId)
+		protected override void ApplyRuleDefinition(string name, SmartExpressionBrick content, bool recursion)
 		{
-			throw new NotImplementedException();
+		}
+
+		public static string CharToRegex(char ch)
+		{
+			return IsRegexSpecial(ch) ? $@"\{ch}" : ch == '\t' ? @"\t" : ch.ToString();
 		}
 
 		/// <inheritdoc />
-		public ParsedValue TryParse(ISourceCode src, IEnumerable<string> valueTypesIds)
+		public override string ExpressionId => $"TEXT${ToRegularExpressionString(null)}";
+
+		/// <param name="usedGroupNames"></param>
+		/// <inheritdoc />
+		public override string ToRegularExpressionString(Dictionary<string, int> usedGroupNames)
 		{
-			throw new NotImplementedException();
+			var specialCount = Text.Count(IsRegexSpecialOrTab);
+			var sb = new StringBuilder(specialCount+Text.Length);
+
+			foreach (var ch in Text)
+			{
+				sb.Append(CharToRegex(ch));
+			}
+
+			return sb.ToString();
 		}
+
+		/// <inheritdoc />
+		public override bool ProvidesRegularExpression => true;
 	}
 }

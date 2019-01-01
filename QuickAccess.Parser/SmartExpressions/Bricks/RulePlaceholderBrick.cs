@@ -35,41 +35,78 @@
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
 
+using System;
 using System.Collections.Generic;
+using QuickAccess.DataStructures.Algebra;
+using QuickAccess.DataStructures.Common;
 
-namespace QuickAccess.Parser.SmartExpressions
+namespace QuickAccess.Parser.SmartExpressions.Bricks
 {
-	public class CharBrick : ParsingBrick
+	public sealed class RulePlaceholderBrick : SmartExpressionBrick
 	{
-		public char Character { get; }
+		private readonly IFreezableValue<Tuple<SmartExpressionBrick, bool>> _rule;
 
-		public CharBrick(char character)
+		public string RuleName { get; }
+		/// <inheritdoc />
+		public override string Name => RuleName;
+		public SmartExpressionBrick Content => _rule.IsSet ? _rule.Value.Item1 : null;
+		public bool IsRecursion => _rule.IsSet && _rule.Value.Item2;
+
+		public RulePlaceholderBrick(ISmartExpressionAlgebra algebra, string ruleName)
+		: base(algebra)
 		{
-			Character = character;
+			RuleName = ruleName;
+			_rule = LimitedNumberOfTimesSetValue.CreateNotSet<Tuple<SmartExpressionBrick, bool>>(1);
+		}
+
+		public RulePlaceholderBrick(ISmartExpressionAlgebra algebra, string ruleName, SmartExpressionBrick defaultRule)
+		: base(algebra.GetAlgebra(defaultRule))
+		{
+			RuleName = ruleName;
+			_rule = LimitedNumberOfTimesSetValue.CreateSet(Tuple.Create(defaultRule, false), 1);
 		}
 
 		/// <inheritdoc />
-		protected override void ApplyRuleDefinition(string name, ParsingBrick content, bool recursion)
+		protected override void ApplyRuleDefinition(string name, SmartExpressionBrick content, bool recursion)
 		{
+			if (name == RuleName)
+			{
+				_rule.TrySet(content, recursion);
+			}
 		}
 
 		/// <inheritdoc />
-		public override bool Equals(ParsingBrick other)
+		public override bool Equals(SmartExpressionBrick other)
 		{
-			return other is CharBrick cb && Character.Equals(cb.Character);
+			if (IsEmpty && (other?.IsEmpty ?? false))
+			{
+				return true;
+			}
+
+			return other is RulePlaceholderBrick cb && RuleName.Equals(cb.RuleName);
 		}
 
 		/// <inheritdoc />
-		public override string ExpressionId => $"CHARACTER${ToRegularExpressionString(null)}";
+		public override string ExpressionId => IsRecursion ? $"RULE${RuleName}$" : Content?.ExpressionId;
 
 		/// <param name="usedGroupNames"></param>
 		/// <inheritdoc />
 		public override string ToRegularExpressionString(Dictionary<string, int> usedGroupNames)
 		{
-			return TextMatchingBrick.CharToRegex(Character);
+			if (!_rule.IsSet)
+			{
+				throw new InvalidOperationException($"Rule is not defined for this placeholder. Rule name={RuleName}");
+			}
+
+			return IsRecursion ? $"(?&{RuleName})" : Content.ToRegularExpressionString(usedGroupNames);
 		}
 
+		public override bool ProvidesRegularExpression => Content?.ProvidesRegularExpression ?? IsRecursion;
+
 		/// <inheritdoc />
-		public override bool ProvidesRegularExpression => true;
+		public override string ToString()
+		{
+			return IsRecursion ? RuleName : Content?.ToString() ?? RuleName;
+		}
 	}
 }

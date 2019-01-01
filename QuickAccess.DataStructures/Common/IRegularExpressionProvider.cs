@@ -1,9 +1,8 @@
 ﻿#region LICENSE [BSD-2-Clause]
-
 // This code is distributed under the BSD-2-Clause license.
 // =====================================================================
 // 
-// Copyright ©2018 by Kamil Piotr Kaczorek
+// Copyright ©2019 by Kamil Piotr Kaczorek
 // All rights reserved.
 // 
 // Redistribution and use in source and binary forms, with or without modification, 
@@ -34,17 +33,15 @@
 // Author: Kamil Piotr Kaczorek
 // http://kamil.scienceontheweb.net
 // e-mail: kamil.piotr.kaczorek@gmail.com
-
 #endregion
 
 using System.Collections.Generic;
 
-namespace QuickAccess.Parser.ValueExpressionTypes
+namespace QuickAccess.DataStructures.Common
 {
-	public interface IValueTypeDefinition
+	public interface IRegularExpressionProvider
 	{
-		IEnumerable<string> SupportedTypesIds { get; }
-		bool Supports(string typeId);
-		ParsedValue TryParse(ISourceCode src);
+		string ToRegularExpressionString(Dictionary<string, int> usedGroupNames);
+		bool ProvidesRegularExpression { get; }
 	}
 }

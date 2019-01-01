@@ -34,19 +34,12 @@
 // http://kamil.scienceontheweb.net
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
-
-using System;
-
-namespace QuickAccess.Parser.SmartExpressions
+namespace QuickAccess.DataStructures.Common
 {
-	[Flags]
-	public enum UnaryOperators
+	public interface IFreezableValue<T> : IReadOnlyFreezableValue<T>
 	{
-		DoublePlus = 0x01,
-		DoubleMinus = 0x02,
-		SinglePlus = 0x04,
-		SingleMinus =  0x08,
-		LogicalNot = 0x10,
-		BinaryNot = 0x20
+		bool IsSynchronized { get; }
+		void Set(T value);
+		bool TrySet(T value);
 	}
 }

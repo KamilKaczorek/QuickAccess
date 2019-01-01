@@ -34,12 +34,58 @@
 // http://kamil.scienceontheweb.net
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
-namespace QuickAccess.Parser.SmartExpressions
+
+using System.Collections.Generic;
+
+namespace QuickAccess.Parser.SmartExpressions.Bricks
 {
-	public interface IReadOnlyFreezableValue<out T>
+	public sealed class EmptyParsingBrick : SmartExpressionBrick
 	{
-		bool IsSet { get; }
-		T Value { get; }
-		bool IsFrozen { get; }
+		public static readonly EmptyParsingBrick Instance = new EmptyParsingBrick(SX.DefaultAlgebra);
+
+		private EmptyParsingBrick(ISmartExpressionAlgebra algebra)
+		: base(algebra)
+		{
+		}
+
+		/// <inheritdoc />
+		protected override void ApplyRuleDefinition(string name, SmartExpressionBrick content, bool recursion)
+		{
+		}
+
+		/// <inheritdoc />
+		public override string ExpressionId => string.Empty;
+
+		/// <param name="usedGroupNames"></param>
+		/// <inheritdoc />
+		public override string ToRegularExpressionString(Dictionary<string, int> usedGroupNames)
+		{
+			return string.Empty;
+		}
+
+		/// <inheritdoc />
+		public override bool Equals(SmartExpressionBrick other)
+		{
+			if (ReferenceEquals(other, this))
+			{
+				return true;
+			}
+
+			if (ReferenceEquals(other, null))
+			{
+				return false;
+			}
+
+			return other.Equals(this);
+		}
+
+		/// <inheritdoc />
+		public override string ToString()
+		{
+			return string.Empty;
+		}
+
+		/// <inheritdoc />
+		public override bool IsEmpty => true;
 	}
 }

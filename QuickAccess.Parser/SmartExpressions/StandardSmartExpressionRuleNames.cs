@@ -34,46 +34,20 @@
 // http://kamil.scienceontheweb.net
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
-
-using System.Linq;
-
 namespace QuickAccess.Parser.SmartExpressions
 {
-	public class OptionsBrick : CompositeBrick
+	public static class StandardSmartExpressionRuleNames
 	{
-		/// <inheritdoc />
-		protected override string RegularExpressionSeparator => "|";
-
-		public OptionsBrick(ParsingBrick b1, ParsingBrick b2)
-			: base(b1, b2, CanMakeFlat)
-		{
-			
-		}
-
-		public OptionsBrick(ParsingBrick b1, ParsingBrick b2, ParsingBrick b3)
-			: base(b1, b2, b3, CanMakeFlat)
-		{
-			
-		}
-
-		public OptionsBrick(ParsingBrick[] bricks)
-			: base(bricks, CanMakeFlat)
-		{
-			
-		}
-
-		private static bool CanMakeFlat(CompositeBrick cb)
-		{
-			return cb is OptionsBrick;
-		}
-
-		/// <inheritdoc />
-		public override string ToString()
-		{
-			return $"({string.Join("|", Bricks.Select(b => b.ToString()))})";
-		}
-
-		/// <inheritdoc />
-		public override string ExpressionId => $"$OR$({string.Join("$|$", Bricks.Select(b => b.ToString()))})";
+		public const string Anything = "Anything";
+		public const string Empty = "Empty";
+		public const string WhiteSpace = "WhiteSpace";
+		public const string OptionalWhiteSpace = "OptionalWhiteSpace";
+		public const string CustomSequence = "CustomSequence";
+		public const string NextLine = "NextLine";
+		public const string Letter = "Letter";
+		public const string UpperLetter = "UpperLetter";
+		public const string LowerLetter = "LowerLetter";
+		public const string Symbol = "Symbol";
+		public const string Digit = "Digit";
 	}
 }

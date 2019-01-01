@@ -34,11 +34,63 @@
 // http://kamil.scienceontheweb.net
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
-namespace QuickAccess.Parser.SmartExpressions
+
+using System;
+using System.Collections.Generic;
+
+namespace QuickAccess.Parser.SmartExpressions.Bricks
 {
-	public interface IAlgebra<T>
+	public sealed class StandardCharacterRangeBrick : SmartExpressionBrick
 	{
-		T EvaluateOperatorResult(BinaryOperator binaryOperator, T left, T right);
-		T EvaluateOperatorResult(UnaryOperator unaryOperator, T arg);
+		private readonly StandardCharactersRanges _range;
+
+		/// <inheritdoc />
+		public StandardCharacterRangeBrick(ISmartExpressionAlgebra algebra, StandardCharactersRanges letterTypes) : base(algebra)
+		{
+			_range = letterTypes;
+		}
+
+		/// <inheritdoc />
+		protected override void ApplyRuleDefinition(string name, SmartExpressionBrick content, bool recursion)
+		{
+		}
+
+		/// <inheritdoc />
+		public override string ExpressionId => $"${StandardSmartExpressionRuleNames.Letter}";
+
+		/// <inheritdoc />
+		public override bool Equals(SmartExpressionBrick other)
+		{
+			return other is StandardCharacterRangeBrick lb && lb._range == _range;
+		}
+
+		/// <inheritdoc />
+		public override string ToRegularExpressionString(Dictionary<string, int> usedGroupNames)
+		{
+			switch (_range)
+			{
+				case StandardCharactersRanges.None:
+					return @"\W";
+				case StandardCharactersRanges.UpperLetter:
+					return "[A-Z]";
+				case StandardCharactersRanges.LowerLetter:
+					return "[a-z]";
+				case StandardCharactersRanges.Digit:
+					return "[0-9]";
+				case StandardCharactersRanges.Letter:
+					return "[A-Za-z]";
+				case StandardCharactersRanges.LetterOrDigit:
+					return "[A-Za-z0-9]";
+				case StandardCharactersRanges.Underscore:
+					return "_";
+				case StandardCharactersRanges.WordCharacter:
+					return @"\w";
+			}
+
+			throw new InvalidOperationException();
+		}
+
+		/// <inheritdoc />
+		public override bool ProvidesRegularExpression => true;
 	}
 }

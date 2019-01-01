@@ -40,7 +40,7 @@
 using System.Collections.Generic;
 using QuickAccess.DataStructures.MultiDictionaries;
 
-namespace QuickAccess.Parser
+namespace QuickAccess.Parser.ValueExpressionTypes
 {
 	public sealed class ValueConvertersRepository
 	{

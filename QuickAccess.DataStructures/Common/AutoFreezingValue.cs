@@ -28,86 +28,81 @@
 // 
 // =====================================================================
 // 
-// Project: QuickAccess.Parser
+// Project: QuickAccess.DataStructures
 // 
 // Author: Kamil Piotr Kaczorek
 // http://kamil.scienceontheweb.net
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
 
-using System.Collections.Generic;
+using System;
 
-namespace QuickAccess.Parser.SmartExpressions
+namespace QuickAccess.DataStructures.Common
 {
-	public class CapturingGroupBrick : ParsingBrick
+	public sealed class AutoFreezingValue<T> : FreezableValueBase<T>
 	{
-		public string GroupName { get; }
-		public ParsingBrick Content { get; }
+		private Func<T, bool> _canChangeCurrentValuePredicate;
+		private bool _isSet;
 
-		/// <inheritdoc />
-		public override bool IsEmpty => Content.IsEmpty;
-
-		public CapturingGroupBrick(ParsingBrick content, string groupName)
+		internal AutoFreezingValue(Func<T, bool> canChangeCurrentValuePredicate)
 		{
-			Content = content;
-			GroupName = groupName;
-			ApplyRuleDefinition(Content, GroupName, Content, true);
+			_isSet = false;
+			_canChangeCurrentValuePredicate = canChangeCurrentValuePredicate;
+		}
+
+		internal AutoFreezingValue(T value, Func<T, bool> canChangeCurrentValuePredicate)
+		{
+			_isSet = false;
+			Item = value;
+			_canChangeCurrentValuePredicate = (!canChangeCurrentValuePredicate?.Invoke(Item) ?? false) ? null : canChangeCurrentValuePredicate;
 		}
 
 		/// <inheritdoc />
-		protected override void ApplyRuleDefinition(string name, ParsingBrick content, bool recursion)
+		public override bool IsFrozen => _canChangeCurrentValuePredicate == null;
+
+		/// <inheritdoc />
+		public override bool IsSet => _isSet;
+
+		/// <inheritdoc />
+		public override bool TrySet(T value)
 		{
-			if (name == GroupName)
+			if (IsFrozen)
 			{
-				return;
+				return false;
 			}
 
-			ApplyRuleDefinition(Content, name, content, recursion);
-		}
+			_isSet = true;
+			Item = value;
 
-		/// <inheritdoc />
-		public override string ExpressionId => Content.ExpressionId;
-
-		public override string ToRegularExpressionString(Dictionary<string, int> usedGroupNames)
-		{
-			var groupName = GroupName;
-			if (!string.IsNullOrEmpty(GroupName) && usedGroupNames != null)
+			if (!(_canChangeCurrentValuePredicate?.Invoke(Item) ?? false))
 			{
-
-				if (!usedGroupNames.TryGetValue(GroupName, out var counter))
-				{
-					counter = 0;
-				}
-				else
-				{
-					groupName += $"_{counter}";
-				}
-				
-				++counter;
-				usedGroupNames[GroupName] = counter;
-
-			}
-			
-			return string.IsNullOrEmpty(GroupName) ? $"({Content.ToRegularExpressionString(usedGroupNames)})" : $"(?<{groupName}>{Content.ToRegularExpressionString(usedGroupNames)})";
-		}
-
-		/// <inheritdoc />
-		public override bool Equals(ParsingBrick other)
-		{
-			if (IsEmpty && (other?.IsEmpty ?? false))
-			{
-				return true;
+				_canChangeCurrentValuePredicate = null;
 			}
 
-			return other is CapturingGroupBrick cb && cb.GroupName == GroupName && cb.Content.Equals(Content);
+			return true;
 		}
 
-
-
-		/// <inheritdoc />
-		public override string ToString()
+		public static implicit operator T(AutoFreezingValue<T> obj)
 		{
-			return $"{GroupName} ::= {Content}";
+			return obj.Value;
 		}
+	}
+
+	public static class AutoFreezingValue
+	{
+		public static AutoFreezingValue<T> CreateSet<T>(T currentValue, Func<T, bool> canChangeCurrentValuePredicate)
+		{
+			return new AutoFreezingValue<T>(currentValue, canChangeCurrentValuePredicate);
+		}
+
+		public static AutoFreezingValue<T> CreateSetFrozen<T>(T currentValue)
+		{
+			return new AutoFreezingValue<T>(currentValue, null);
+		}
+		
+		public static AutoFreezingValue<T> CreateNotSet<T>(Func<T, bool> canChangeCurrentValuePredicate)
+		{
+			return new AutoFreezingValue<T>(canChangeCurrentValuePredicate);
+		}		
 	}
 }

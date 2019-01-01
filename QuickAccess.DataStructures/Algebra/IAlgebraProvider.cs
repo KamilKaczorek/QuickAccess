@@ -28,18 +28,18 @@
 // 
 // =====================================================================
 // 
-// Project: QuickAccess.Parser
+// Project: QuickAccess.DataStructures
 // 
 // Author: Kamil Piotr Kaczorek
 // http://kamil.scienceontheweb.net
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
-namespace QuickAccess.Parser.SmartExpressions
+namespace QuickAccess.DataStructures.Algebra
 {
-	public interface IFreezableValue<T> : IReadOnlyFreezableValue<T>
+	public interface IAlgebraicDomain<TDomain, out TAlgebra>
+	where TDomain : IAlgebraicDomain<TDomain, TAlgebra>
+	where TAlgebra : IAlgebra<TDomain>
 	{
-		bool IsSynchronized { get; }
-		void Set(T value);
-		bool TrySet(T value);
+		TAlgebra Algebra { get; }
 	}
 }

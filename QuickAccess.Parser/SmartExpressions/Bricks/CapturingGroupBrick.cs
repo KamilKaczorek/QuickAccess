@@ -1,9 +1,8 @@
 ﻿#region LICENSE [BSD-2-Clause]
-
 // This code is distributed under the BSD-2-Clause license.
 // =====================================================================
 // 
-// Copyright ©2018 by Kamil Piotr Kaczorek
+// Copyright ©2019 by Kamil Piotr Kaczorek
 // All rights reserved.
 // 
 // Redistribution and use in source and binary forms, with or without modification, 
@@ -34,46 +33,84 @@
 // Author: Kamil Piotr Kaczorek
 // http://kamil.scienceontheweb.net
 // e-mail: kamil.piotr.kaczorek@gmail.com
-
 #endregion
 
-using System;
 using System.Collections.Generic;
 
-namespace QuickAccess.Parser.ValueExpressionTypes
+namespace QuickAccess.Parser.SmartExpressions.Bricks
 {
-	public sealed class ValuesCompiler
-		: IValueCompiler,
-		  IValueParser
+	public sealed class CapturingGroupBrick : SmartExpressionBrick
 	{
 		/// <inheritdoc />
-		public ICompiledValue Compile(ParsedValue parsedValue)
+		public override string Name => GroupName;
+		public string GroupName { get; }
+		public SmartExpressionBrick Content { get; }
+
+		/// <inheritdoc />
+		public override bool IsEmpty => Content.IsEmpty;
+
+		public CapturingGroupBrick(ISmartExpressionAlgebra algebra, SmartExpressionBrick content, string groupName) 
+			: base(algebra)
 		{
-			throw new NotImplementedException();
+			Content = content;
+			GroupName = groupName;
+			ApplyRuleDefinition(Content, GroupName, Content, true);
 		}
 
 		/// <inheritdoc />
-		public ICompiledValue Compile(ParsedValue parsedValue, string valueTypeId)
+		protected override void ApplyRuleDefinition(string name, SmartExpressionBrick content, bool recursion)
 		{
-			throw new NotImplementedException();
+			if (name == GroupName)
+			{
+				return;
+			}
+
+			ApplyRuleDefinition(Content, name, content, recursion);
 		}
 
 		/// <inheritdoc />
-		public ParsedValue TryParse(ISourceCode src)
+		public override string ExpressionId => Content.ExpressionId;
+
+		public override string ToRegularExpressionString(Dictionary<string, int> usedGroupNames)
 		{
-			throw new NotImplementedException();
+			var groupName = GroupName;
+			if (!string.IsNullOrEmpty(GroupName) && usedGroupNames != null)
+			{
+
+				if (!usedGroupNames.TryGetValue(GroupName, out var counter))
+				{
+					counter = 0;
+				}
+				else
+				{
+					groupName += $"_{counter}";
+				}
+				
+				++counter;
+				usedGroupNames[GroupName] = counter;
+
+			}
+			
+			return string.IsNullOrEmpty(GroupName) ? $"({Content.ToRegularExpressionString(usedGroupNames)})" : $"(?<{groupName}>{Content.ToRegularExpressionString(usedGroupNames)})";
 		}
 
 		/// <inheritdoc />
-		public ParsedValue TryParse(ISourceCode src, string valueTypeId)
+		public override bool Equals(SmartExpressionBrick other)
 		{
-			throw new NotImplementedException();
+			if (IsEmpty && (other?.IsEmpty ?? false))
+			{
+				return true;
+			}
+
+			return other is CapturingGroupBrick cb && cb.GroupName == GroupName && cb.Content.Equals(Content);
 		}
 
+
+
 		/// <inheritdoc />
-		public ParsedValue TryParse(ISourceCode src, IEnumerable<string> valueTypesIds)
+		public override string ToString()
 		{
-			throw new NotImplementedException();
+			return $"{GroupName} ::= {Content}";
 		}
 	}
 }

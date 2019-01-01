@@ -37,7 +37,7 @@
 
 #endregion
 
-namespace QuickAccess.Parser
+namespace QuickAccess.Parser.ValueExpressionTypes
 {
 	public interface ICompiledValue
 	{

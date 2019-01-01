@@ -34,15 +34,21 @@
 // http://kamil.scienceontheweb.net
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
-namespace QuickAccess.Parser.SmartExpressions
+
+using System;
+
+namespace QuickAccess.DataStructures.Algebra
 {
-	public enum UnaryOperator
+	[Flags]
+	public enum BinaryOperators
 	{
-		DoublePlus = 0x01,
-		DoubleMinus = 0x02,
-		SinglePlus = 0x04,
-		SingleMinus =  0x08,
-		LogicalNot = 0x10,
-		BinaryNot = 0x20
+		Mul = 0x000100,
+		Div = 0x000200,
+		Mod = 0x000400,
+		Sum = 0x001000,
+		Sub = 0x002000,
+		And = 0x010000,
+		XOr = 0x020000,
+		Or =  0x040000
 	}
 }

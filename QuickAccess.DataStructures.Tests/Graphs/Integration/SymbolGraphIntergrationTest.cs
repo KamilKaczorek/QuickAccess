@@ -45,8 +45,9 @@ using QuickAccess.DataStructures.Common;
 using QuickAccess.DataStructures.Graphs.Algorithms;
 using QuickAccess.DataStructures.Graphs.Extensions;
 using QuickAccess.DataStructures.Graphs.Model;
+using QuickAccess.DataStructures.Tests.Graphs.Model;
 
-namespace QuickAccess.DataStructures.Tests.Graphs.Model
+namespace QuickAccess.DataStructures.Tests.Graphs.Integration
 {
 	/// <summary>
 	///     The integration tests of <see cref="SymbolGraph{TEdgeData,TSymbol}" /> integrated with

@@ -1,9 +1,8 @@
 ﻿#region LICENSE [BSD-2-Clause]
-
 // This code is distributed under the BSD-2-Clause license.
 // =====================================================================
 // 
-// Copyright ©2018 by Kamil Piotr Kaczorek
+// Copyright ©2019 by Kamil Piotr Kaczorek
 // All rights reserved.
 // 
 // Redistribution and use in source and binary forms, with or without modification, 
@@ -34,17 +33,20 @@
 // Author: Kamil Piotr Kaczorek
 // http://kamil.scienceontheweb.net
 // e-mail: kamil.piotr.kaczorek@gmail.com
-
 #endregion
 
-using System.Collections.Generic;
+using System;
 
-namespace QuickAccess.Parser.ValueExpressionTypes
+namespace QuickAccess.DataStructures.Algebra
 {
-	public interface IValueTypeDefinition
+	[Flags]
+	public enum UnaryOperators
 	{
-		IEnumerable<string> SupportedTypesIds { get; }
-		bool Supports(string typeId);
-		ParsedValue TryParse(ISourceCode src);
+		DoublePlus = 0x01,
+		DoubleMinus = 0x02,
+		SinglePlus = 0x04,
+		SingleMinus =  0x08,
+		LogicalNot = 0x10,
+		BinaryNot = 0x20
 	}
 }

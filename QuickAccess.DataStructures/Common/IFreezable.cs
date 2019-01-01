@@ -41,26 +41,18 @@ namespace QuickAccess.DataStructures.Common
 {
 	/// <summary>
 	///     The interface of the freezable object.
-	///     Freezable object became frozen when <see cref="Freeze" /> operation is called and stays frozen (read-only) till the
+	///     Freezable object became frozen when <see cref="IFreezableSource.Freeze" /> operation is called and stays frozen (read-only) till the
 	///     end of its lifetime.
 	/// </summary>
 	public interface IFreezable
 	{
 		/// <summary>
 		///     Gets a value indicating whether the current object is frozen (editing is not enabled).
-		///     <seealso cref="Freeze" />
+		///     <seealso cref="IFreezableSource.Freeze" />
 		/// </summary>
 		/// <value>
 		///     <c>true</c> if this object is frozen; otherwise, <c>false</c>.
 		/// </value>
 		bool IsFrozen { get; }
-
-		/// <summary>
-		///     Freezes the object from editing, since object is frozen each editing operation will throw
-		///     <see cref="System.Data.ReadOnlyException" /> exception.
-		///     When object is frozen once, it stays frozen till the end of its lifetime.
-		///     <seealso cref="IsFrozen" />
-		/// </summary>
-		void Freeze();
 	}
 }

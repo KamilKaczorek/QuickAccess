@@ -36,12 +36,7 @@
 #endregion
 
 using System;
-using System.CodeDom;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
 using System.Text.RegularExpressions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using QuickAccess.Parser.SmartExpressions;
@@ -53,32 +48,48 @@ namespace QuickAccess.Parser.Tests
 	public class ParserBuilderIntegrationTest
 	{
 		[TestMethod]
-		public void Test()
+		[DataRow("Abc();", true)]
+		[DataRow("abcdefghijklmnopqrstuvwxyz();", true)]
+		[DataRow("ABCDEFGHIJKLMNOPQRSTUVWXYZ();", true)]
+		[DataRow("A1234567890();", true)]
+		[DataRow("Abc1( );", true)]
+		[DataRow("A1(\t);", true)]
+		[DataRow("a123(1234567890);", true)]
+		[DataRow("a1b2c3(55);", true)]
+		[DataRow("def(1234567890.1234567890);", true)]
+		[DataRow("ghi(1,2);", true)]
+		[DataRow("jka(\t1,\t\t 2);", true)]
+		[DataRow("l(\t1,\t\t 2);", true)]
+		[DataRow("Mno(1.2,2.2);", true)]
+		[DataRow("Pqr(1, 2, 3, 4, 5.3, 3123, 321.123);", true)]
+		[DataRow("Abc(1;2);", false)]
+		[DataRow("Abc;", false)]
+		[DataRow("abc(;", false)]
+		[DataRow("def);", false)]
+		[DataRow("123();", false)]
+		public void ON_ToRegularExpressionString_WHEN_FunctionInvocationRegularExpression_SHOULD_ReturnRegexThatParsesGivenExpression(string expression, bool expressionParsed)
 		{
 			
-			var d = 2.2;
-			var name = (SX.Letter + (SX.Digit | SX.Letter).ZeroOrMore()) / "Name";
-			var intNumber = SX.Digit.OneOrMore() / "Integer";
-			var floatNumber = (intNumber + "." + intNumber) / "Float";
-			var whiteSpace = (" ".Exact() / "Space" | "\t".Exact() / "Tab").OneOrMore() / "WhiteSpace";
-			var optWs = (" ".Exact() / "Space" | "\t".Exact() / "Tab").ZeroOrMore();
-			var functionArg = (floatNumber | intNumber | name) / "FunctionArg";
-			var functionArgList = (functionArg & ("," & SX.Current).ZeroOrMore()) / "FunctionArgList";
-			var functionInvocation = (name & "(" & ~functionArgList & ")" & ';') / "FunctionInvocation";
-
-		
+			var name = (SX.Letter + (SX.Digit | SX.Letter).ZeroOrMore()).DefinesRule("Name");
+			var intNumber = SX.Digit.OneOrMore().DefinesRule("Integer");
+			var floatNumber = (intNumber + "." + intNumber).DefinesRule("Float");
+			var whiteSpace = (" ".Exact() | "\t".Exact()).OneOrMore().DefinesRule("WhiteSpace");
+			var optWs = (" ".Exact() | "\t".Exact()).ZeroOrMore();
+			var functionArg = (floatNumber | intNumber | name).DefinesRule("FunctionArg");
+			var functionArgList = (functionArg & ("," & functionArg).ZeroOrMore()).DefinesRule("FunctionArgList");
+			var functionInvocation = (name & "(" & ~functionArgList & ")" & ';').DefinesRule("FunctionInvocation");
 
 
-			functionInvocation.ApplyCustomRule(SX.WhiteSpace.RuleName, whiteSpace);
-			functionInvocation.ApplyCustomRule(SX.OptionalWhiteSpace.RuleName, optWs);
-			functionInvocation.ApplyCustomRule(SX.Digit.RuleName, SX.Start | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '0');
-			functionInvocation.ApplyCustomRule(SX.Letter.RuleName, SX.Start | 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i' | 'j');
 
 			var gn = new Dictionary<string, int>();
+			var regularExpressionString = functionInvocation.ToRegularExpressionString(gn);
 
-			var nregex = functionArg.ToRegularExpressionString(gn);
-			var regex = functionInvocation.ToRegularExpressionString(gn);
-			Console.WriteLine(regex);
+
+			var regex = new Regex(regularExpressionString, RegexOptions.Compiled);
+
+			var res = regex.IsMatch(expression);
+
+			Assert.AreEqual(expressionParsed, res);
 
 			// * anything
 			// + nothing

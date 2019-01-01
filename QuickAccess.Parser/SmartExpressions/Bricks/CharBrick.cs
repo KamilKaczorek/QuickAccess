@@ -35,44 +35,43 @@
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
 
-using System.Linq;
+using System;
+using System.Collections.Generic;
 
-namespace QuickAccess.Parser.SmartExpressions
+namespace QuickAccess.Parser.SmartExpressions.Bricks
 {
-	public class ConcatenationBrick : CompositeBrick
+	public sealed class CharBrick : SmartExpressionBrick
 	{
-		/// <inheritdoc />
-		protected override string RegularExpressionSeparator => string.Empty;
+		public char Character { get; }
 
-		public override string ExpressionId => string.Join(string.Empty, Bricks.Select(b => b.ExpressionId));
-
-		public ConcatenationBrick(ParsingBrick b1, ParsingBrick b2)
-			: base(b1, b2, CanMakeFlat)
+		public CharBrick(ISmartExpressionAlgebra algebra, char character)
+		: base(algebra)
 		{
-			
-		}
-
-		public ConcatenationBrick(ParsingBrick b1, ParsingBrick b2, ParsingBrick b3)
-			: base(b1, b2, b3, CanMakeFlat)
-		{
-			
-		}
-
-		public ConcatenationBrick(ParsingBrick[] bricks)
-			: base(bricks, CanMakeFlat)
-		{
-			
-		}
-
-		private static bool CanMakeFlat(CompositeBrick cb)
-		{
-			return cb is ConcatenationBrick;
+			Character = character;
 		}
 
 		/// <inheritdoc />
-		public override string ToString()
+		protected override void ApplyRuleDefinition(string name, SmartExpressionBrick content, bool recursion)
 		{
-			return string.Join("", Bricks.Select(b => b.ToString()));
 		}
+
+		/// <inheritdoc />
+		public override bool Equals(SmartExpressionBrick other)
+		{
+			return other is CharBrick cb && Character.Equals(cb.Character);
+		}
+
+		/// <inheritdoc />
+		public override string ExpressionId => $"CHARACTER${ToRegularExpressionString(null)}";
+
+		/// <param name="usedGroupNames"></param>
+		/// <inheritdoc />
+		public override string ToRegularExpressionString(Dictionary<string, int> usedGroupNames)
+		{
+			return TextMatchingBrick.CharToRegex(Character);
+		}
+
+		/// <inheritdoc />
+		public override bool ProvidesRegularExpression => true;
 	}
 }

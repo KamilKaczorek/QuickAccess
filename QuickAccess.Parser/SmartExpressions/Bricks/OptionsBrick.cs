@@ -34,21 +34,40 @@
 // http://kamil.scienceontheweb.net
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
-namespace QuickAccess.Parser.SmartExpressions
-{
-	public class ReadOnlyFreezableValue<T> : IReadOnlyFreezableValue<T>
-	{
-		private readonly IReadOnlyFreezableValue<T> _wrapped;
 
-		public ReadOnlyFreezableValue(IReadOnlyFreezableValue<T> wrapped)
+using System.Linq;
+
+namespace QuickAccess.Parser.SmartExpressions.Bricks
+{
+	public sealed class OptionsBrick : CompositeSmartExpressionBrick
+	{
+		/// <inheritdoc />
+		protected override string RegularExpressionSeparator => "|";
+
+		public OptionsBrick(ISmartExpressionAlgebra algebra, SmartExpressionBrick b1, SmartExpressionBrick b2)
+			: base(algebra, b1, b2, CanMakeFlat)
 		{
-			_wrapped = wrapped;
+			
 		}
 
-		public bool IsSet => _wrapped.IsSet;
+		public OptionsBrick(ISmartExpressionAlgebra algebra, SmartExpressionBrick[] bricks)
+			: base(algebra, bricks, CanMakeFlat)
+		{
+			
+		}
 
-		public T Value => _wrapped.Value;
+		private static bool CanMakeFlat(CompositeSmartExpressionBrick cb)
+		{
+			return cb is OptionsBrick;
+		}
 
-		public bool IsFrozen => _wrapped.IsFrozen;
+		/// <inheritdoc />
+		public override string ToString()
+		{
+			return $"({string.Join("|", Bricks.Select(b => b.ToString()))})";
+		}
+
+		/// <inheritdoc />
+		public override string ExpressionId => $"$OR$({string.Join("$|$", Bricks.Select(b => b.ToString()))})";
 	}
 }

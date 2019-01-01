@@ -35,13 +35,28 @@
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
 
-using System.Collections.Generic;
+using QuickAccess.DataStructures.Algebra;
 
 namespace QuickAccess.Parser.SmartExpressions
 {
-	public interface IRegularExpressionProvider
+	public interface ISmartExpressionAlgebra : IAlgebra<SmartExpressionBrick>
 	{
-		string ToRegularExpressionString(Dictionary<string, int> usedGroupNames);
-		bool ProvidesRegularExpression { get; }
+		SmartExpressionBrick CreateQuantifierBrick(SmartExpressionBrick content, long min, long max);
+		SmartExpressionBrick DefineRule(SmartExpressionBrick content, string ruleName);
+		SmartExpressionBrick CreatePlaceholder(string ruleName, SmartExpressionBrick defaultExpression);
+		SmartExpressionBrick Current { get; }
+
+		SmartExpressionBegin Start { get; }
+		SmartExpressionBrick Anything { get; }
+		SmartExpressionBrick Empty { get; }
+		SmartExpressionBrick WhiteSpace { get; }
+		SmartExpressionBrick OptionalWhiteSpace { get; }
+		SmartExpressionBrick CustomSequence { get; }
+		SmartExpressionBrick NextLine { get; }
+		SmartExpressionBrick Letter { get; }
+		SmartExpressionBrick UpperLetter { get; }
+		SmartExpressionBrick LowerLetter { get; }
+		SmartExpressionBrick Symbol { get; }
+		SmartExpressionBrick Digit { get; }
 	}
 }

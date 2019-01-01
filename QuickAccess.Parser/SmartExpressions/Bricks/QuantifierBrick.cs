@@ -37,24 +37,26 @@
 
 using System;
 using System.Collections.Generic;
+using QuickAccess.DataStructures.Algebra;
 
-namespace QuickAccess.Parser.SmartExpressions
+namespace QuickAccess.Parser.SmartExpressions.Bricks
 {
-	public class QuantifierBrick : ParsingBrick
+	public sealed class QuantifierBrick : SmartExpressionBrick
 	{
 		public long Min { get; }
 		public long Max { get; }
-		public ParsingBrick Content { get; }
+		public SmartExpressionBrick Content { get; }
 
 		public override bool IsEmpty => (Min == 0 && Max == 0) || Content.IsEmpty;
 
 		/// <inheritdoc />
-		protected override void ApplyRuleDefinition(string name, ParsingBrick content, bool recursion)
+		protected override void ApplyRuleDefinition(string name, SmartExpressionBrick content, bool recursion)
 		{
 			ApplyRuleDefinition(Content, name, content, recursion);
 		}
 
-		public QuantifierBrick(ParsingBrick content, long min, long max)
+		public QuantifierBrick(ISmartExpressionAlgebra algebra, SmartExpressionBrick content, long min, long max)
+		: base(algebra.GetAlgebra(content))
 		{
 			Content = content ?? throw new ArgumentNullException(nameof(content));
 
@@ -94,6 +96,11 @@ namespace QuickAccess.Parser.SmartExpressions
 				return contentExpression;
 			}
 
+			return $"(?:{ToRegularExpressionString(contentExpression)})";
+		}
+
+		public string ToRegularExpressionString(string contentExpression)
+		{
 			if (Min == 0 && Max == 1)
 			{
 				return $"{contentExpression}?";
@@ -118,7 +125,7 @@ namespace QuickAccess.Parser.SmartExpressions
 		}
 
 		/// <inheritdoc />
-		public override bool Equals(ParsingBrick other)
+		public override bool Equals(SmartExpressionBrick other)
 		{
 			if (ReferenceEquals(null, other))
 			{

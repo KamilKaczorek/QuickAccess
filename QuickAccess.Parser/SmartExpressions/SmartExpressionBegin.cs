@@ -35,49 +35,57 @@
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
 
-using System.Collections.Generic;
+using QuickAccess.DataStructures.Algebra;
 
 namespace QuickAccess.Parser.SmartExpressions
 {
-	public class CurrentRulePlaceholderBrick : ParsingBrick
+	public sealed class SmartExpressionBegin
 	{
-		private readonly SingleTimeSetValue<KeyValuePair<string, ParsingBrick>> _rule = SingleTimeSetValue.Create<KeyValuePair<string, ParsingBrick>>();
-		public string RuleName => _rule.IsSet ? _rule.Value.Key : "CURRENT";
-		public ParsingBrick Content => _rule.GetKeyValueOrDefault();
+		private readonly ISmartExpressionAlgebra _algebra;
 
-
-		public override bool Equals(ParsingBrick other)
+		public SmartExpressionBegin(ISmartExpressionAlgebra algebra)
 		{
-			return other is CurrentRulePlaceholderBrick;
+			_algebra = algebra;
 		}
 
-		/// <inheritdoc />
-		protected override void ApplyRuleDefinition(string name, ParsingBrick content, bool recursion)
+		public static SmartExpressionBrick operator &(SmartExpressionBegin left, SmartExpressionBrick right)
 		{
-			if (!recursion || _rule.IsSet)
-			{
-				return;
-			}
-			
-			_rule.Set(name, content);
+			var algebra = left._algebra.GetAlgebra(right);
+			return algebra.EvaluateOperatorResult(algebra.OptionalWhiteSpace, BinaryOperator.Sum, right);
 		}
 
-		/// <inheritdoc />
-		public override string ExpressionId => $"RULE${RuleName}$";
-
-		/// <param name="usedGroupNames"></param>
-		/// <inheritdoc />
-		public override string ToRegularExpressionString(Dictionary<string, int> usedGroupNames)
+		public static SmartExpressionBrick operator +(SmartExpressionBegin left, SmartExpressionBrick right)
 		{
-			return $"(?&{RuleName})";
+			return right;
 		}
 
-		public override bool ProvidesRegularExpression => true;
-
-		/// <inheritdoc />
-		public override string ToString()
+		public static SmartExpressionBrick operator -(SmartExpressionBegin left, SmartExpressionBrick right)
 		{
-			return RuleName;
+			var algebra = left._algebra.GetAlgebra(right);
+			return algebra.EvaluateOperatorResult(UnaryOperator.SingleMinus, right);
+		}
+
+		public static SmartExpressionBrick operator *(SmartExpressionBegin left, SmartExpressionBrick right)
+		{
+			var algebra = left._algebra.GetAlgebra(right);
+			return algebra.EvaluateOperatorResult(algebra.Anything, BinaryOperator.Sum, right);
+		}
+
+		public static SmartExpressionBrick operator |(SmartExpressionBegin left, SmartExpressionBrick right)
+		{
+			return right;
+		}
+
+		public static SmartExpressionBrick operator ^(SmartExpressionBegin left, SmartExpressionBrick right)
+		{
+			var algebra = left._algebra.GetAlgebra(right);
+			return algebra.EvaluateOperatorResult(algebra.WhiteSpace, BinaryOperator.Sum, right);
+		}
+
+		public static SmartExpressionBrick operator %(SmartExpressionBegin left, SmartExpressionBrick right)
+		{
+			var algebra = left._algebra.GetAlgebra(right);
+			return algebra.EvaluateOperatorResult(algebra.CustomSequence, BinaryOperator.Sum, right);
 		}
 	}
 }

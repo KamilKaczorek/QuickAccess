@@ -35,56 +35,74 @@
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
 
-using System.Collections.Generic;
+using System;
 
-namespace QuickAccess.Parser.SmartExpressions
+namespace QuickAccess.DataStructures.Common
 {
-	public sealed class EmptyParsingBrick : ParsingBrick
+	public sealed class LimitedNumberOfTimesSetValue<T> : FreezableValueBase<T>
 	{
-		public static readonly EmptyParsingBrick Instance = new EmptyParsingBrick();
+		private readonly int _numberOfTimesCanBeSet;
+		private int _numberOfTimesAlreadySet;
 
-		private EmptyParsingBrick()
+		public int RemainingNumberOfTimesCanBeSet => Math.Max(0, _numberOfTimesCanBeSet - _numberOfTimesAlreadySet);
+
+		internal LimitedNumberOfTimesSetValue(
+			int numberOfTimesCanBeSet
+		)
 		{
+			Item = default;
+			_numberOfTimesCanBeSet = numberOfTimesCanBeSet;
+			_numberOfTimesAlreadySet = 0;
 		}
 
-		/// <inheritdoc />
-		protected override void ApplyRuleDefinition(string name, ParsingBrick content, bool recursion)
+		internal LimitedNumberOfTimesSetValue(
+			T currentValue,
+			int remainingNumberOfTimesCanBeSet
+		)
 		{
+			Item = currentValue;
+			_numberOfTimesCanBeSet = remainingNumberOfTimesCanBeSet + 1;
+			_numberOfTimesAlreadySet = 1;
 		}
 
-		/// <inheritdoc />
-		public override string ExpressionId => string.Empty;
+		public override bool IsSet => _numberOfTimesAlreadySet > 0;
 
-		/// <param name="usedGroupNames"></param>
-		/// <inheritdoc />
-		public override string ToRegularExpressionString(Dictionary<string, int> usedGroupNames)
+		public override bool TrySet(T value)
 		{
-			return string.Empty;
-		}
-
-		/// <inheritdoc />
-		public override bool Equals(ParsingBrick other)
-		{
-			if (ReferenceEquals(other, this))
+			if (_numberOfTimesAlreadySet < _numberOfTimesCanBeSet)
 			{
+				_numberOfTimesAlreadySet++;
+				Item = value;
 				return true;
 			}
 
-			if (ReferenceEquals(other, null))
-			{
-				return false;
-			}
-
-			return other.Equals(this);
+			return false;
 		}
 
 		/// <inheritdoc />
-		public override string ToString()
+		public override bool IsFrozen => _numberOfTimesAlreadySet >= _numberOfTimesCanBeSet;
+
+		public static implicit operator T(LimitedNumberOfTimesSetValue<T> obj)
 		{
-			return string.Empty;
+			return obj.Value;
+		}
+	}
+
+	public static class LimitedNumberOfTimesSetValue
+	{
+		public static LimitedNumberOfTimesSetValue<T> CreateSet<T>(T currentValue, int remainingNumberOfTimesCanBeSet)
+		{
+			return new LimitedNumberOfTimesSetValue<T>(currentValue, remainingNumberOfTimesCanBeSet);
 		}
 
-		/// <inheritdoc />
-		public override bool IsEmpty => true;
+		public static LimitedNumberOfTimesSetValue<T> CreateSetFrozen<T>(T currentValue)
+		{
+			return new LimitedNumberOfTimesSetValue<T>(currentValue, 0);
+		}
+		
+		public static LimitedNumberOfTimesSetValue<T> CreateNotSet<T>(int numberOfTimesCanBeSet)
+		{
+			return new LimitedNumberOfTimesSetValue<T>(numberOfTimesCanBeSet);
+		}		
 	}
 }

@@ -34,57 +34,65 @@
 // http://kamil.scienceontheweb.net
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
+
+using QuickAccess.Parser.SmartExpressions.Bricks;
+
 namespace QuickAccess.Parser.SmartExpressions
 {
 	public static class SX
 	{
-		public static IParsingBrickAlgebra BrickAlgebra = new StandardParsingBrickAlgebra();
+		public static ISmartExpressionAlgebra DefaultAlgebra = new StandardSmartExpressionAlgebra(-1);
+
+		public static SmartExpressionBrick Anything => DefaultAlgebra.Anything;
+		public static SmartExpressionBrick WhiteSpace => DefaultAlgebra.WhiteSpace;
+		public static SmartExpressionBrick OptionalWhiteSpace => DefaultAlgebra.OptionalWhiteSpace;
+		public static SmartExpressionBrick CustomSequence => DefaultAlgebra.CustomSequence;
+		public static SmartExpressionBrick NextLine => DefaultAlgebra.NextLine;
+		public static SmartExpressionBrick Letter => DefaultAlgebra.Letter;
+		public static SmartExpressionBrick UpperLetter => DefaultAlgebra.UpperLetter;
+		public static SmartExpressionBrick LowerLetter => DefaultAlgebra.LowerLetter;
+		public static SmartExpressionBrick Symbol => DefaultAlgebra.Symbol;
+		public static SmartExpressionBrick Digit => DefaultAlgebra.Digit;
+
 		public const long Max = long.MaxValue;
 
-		public static ParsingBrick Empty => EmptyParsingBrick.Instance;
-		public static StartParsingExpression Start => StartParsingExpression.Instance;
-		public static ParsingBrick Current => new CurrentRulePlaceholderBrick();
+		public static SmartExpressionBrick Empty => DefaultAlgebra.Empty;
+		public static SmartExpressionBegin Start => DefaultAlgebra.Start;
+		public static SmartExpressionBrick Current => DefaultAlgebra.Current;
 
-		public static ParsingBrick ToCharacter(char ch) => new CharBrick(ch);
-		public static ParsingBrick ToTextSequence(string text) => new TextMatchingBrick(text);
+		public static SmartExpressionBrick ToCharacter(char ch) => new CharBrick(DefaultAlgebra, ch);
+		public static SmartExpressionBrick ToTextSequence(string text) => new TextMatchingBrick(DefaultAlgebra, text);
 
-		public static ParsingBrick ZeroOrMore(this string text) => ToTextSequence(text)[0, SX.Max];
+		public static SmartExpressionBrick ZeroOrMore(this string text) => ToTextSequence(text)[0, SX.Max];
 
-		public static ParsingBrick OneOrMore(this string text) => ToTextSequence(text)[1, SX.Max];
+		public static SmartExpressionBrick OneOrMore(this string text) => ToTextSequence(text)[1, SX.Max];
 
-		public static ParsingBrick Optional(this string text) => ToTextSequence(text)[0, 1];
+		public static SmartExpressionBrick Optional(this string text) => ToTextSequence(text)[0, 1];
 
-		public static ParsingBrick DefinesRule(this string text, string patternName)
+		public static SmartExpressionBrick DefinesRule(this string text, string patternName)
 		{
-			return SX.BrickAlgebra.DefineRule(ToTextSequence(text), patternName);
+			return DefaultAlgebra.DefineRule(ToTextSequence(text), patternName);
 		}
 
-		public static RulePlaceholderBrick Anything => new RulePlaceholderBrick("Anything");
-		public static RulePlaceholderBrick WhiteSpace => new RulePlaceholderBrick("WhiteSpace");
-		public static RulePlaceholderBrick OptionalWhiteSpace => new RulePlaceholderBrick("OptionalWhiteSpace");
-		public static RulePlaceholderBrick CustomSequence => new RulePlaceholderBrick("CustomSequence");
-		public static RulePlaceholderBrick Letter => new RulePlaceholderBrick("Letter");
-		public static RulePlaceholderBrick UpperLetter => new RulePlaceholderBrick("UpperLetter");
-		public static RulePlaceholderBrick LowerLetter => new RulePlaceholderBrick("LowerLetter");
-		public static RulePlaceholderBrick Symbol => new RulePlaceholderBrick("Symbol");
-		public static RulePlaceholderBrick Digit => new RulePlaceholderBrick("Digit");
+		public static SmartExpressionBrick ZeroOrMore(this SmartExpressionBrick source) => source[0, SX.Max];
 
-		//public static ParsingBrick CreateConcatenationOperatorPlaceholder
+		public static SmartExpressionBrick OneOrMore(this SmartExpressionBrick source) => source[1, SX.Max];
 
-		public static ParsingBrick Exact(this string text)
+		public static SmartExpressionBrick Optional(this SmartExpressionBrick source) => source[0, 1];
+
+		public static SmartExpressionBrick DefinesRule(this SmartExpressionBrick source, string patternName)
 		{
-			return ToTextSequence(text);
+			return DefaultAlgebra.DefineRule(source, patternName);
 		}
 
-		public static ParsingBrick Regex(this string text)
+		public static SmartExpressionBrick Exact(this string text)
 		{
 			return ToTextSequence(text);
 		}
 
-		public static ParsingBrick Rule(this string patternName)
+		public static SmartExpressionBrick Rule(this string patternName)
 		{
-			return new RulePlaceholderBrick(patternName);
+			return DefaultAlgebra.CreatePlaceholder(patternName, null);
 		}
-		
 	}
 }

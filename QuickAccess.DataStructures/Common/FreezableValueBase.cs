@@ -28,7 +28,7 @@
 // 
 // =====================================================================
 // 
-// Project: QuickAccess.Parser
+// Project: QuickAccess.DataStructures
 // 
 // Author: Kamil Piotr Kaczorek
 // http://kamil.scienceontheweb.net
@@ -37,18 +37,34 @@
 
 using System;
 
-namespace QuickAccess.Parser.SmartExpressions
+namespace QuickAccess.DataStructures.Common
 {
-	[Flags]
-	public enum BinaryOperators
+	public abstract class FreezableValueBase<T> : IFreezableValue<T>
 	{
-		Mul = 0x000100,
-		Div = 0x000200,
-		Mod = 0x000400,
-		Add = 0x001000,
-		Sub = 0x002000,
-		And = 0x010000,
-		XOr = 0x020000,
-		Or =  0x040000
+		protected T Item;
+
+		/// <inheritdoc />
+		public abstract bool IsFrozen { get; }
+
+		/// <inheritdoc />
+		public abstract bool IsSet { get; }
+
+		/// <inheritdoc />
+		public T Value => IsSet ? Item : throw new InvalidOperationException("Can't access not set value.");
+
+		/// <inheritdoc />
+		public virtual bool IsSynchronized => false;
+
+
+		public void Set(T value)
+		{
+			if (!TrySet(value))
+			{
+				throw new InvalidOperationException("Can't set frozen value.");
+			}
+		}
+
+		/// <inheritdoc />
+		public abstract bool TrySet(T value);
 	}
 }

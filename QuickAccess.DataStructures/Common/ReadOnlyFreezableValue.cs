@@ -34,17 +34,22 @@
 // http://kamil.scienceontheweb.net
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
-namespace QuickAccess.Parser.SmartExpressions
+
+namespace QuickAccess.DataStructures.Common
 {
-	public enum BinaryOperator
+	public class ReadOnlyFreezableValue<T> : IReadOnlyFreezableValue<T>
 	{
-		Mul = 0x000100,
-		Div = 0x000200,
-		Mod = 0x000400,
-		Add = 0x001000,
-		Sub = 0x002000,
-		And = 0x010000,
-		XOr = 0x020000,
-		Or =  0x040000
+		private readonly IReadOnlyFreezableValue<T> _wrapped;
+
+		public ReadOnlyFreezableValue(IReadOnlyFreezableValue<T> wrapped)
+		{
+			_wrapped = wrapped;
+		}
+
+		public bool IsSet => _wrapped.IsSet;
+
+		public T Value => _wrapped.Value;
+
+		public bool IsFrozen => _wrapped.IsFrozen;
 	}
 }

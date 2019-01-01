@@ -46,7 +46,7 @@ namespace QuickAccess.DataStructures.Graphs.Model
 	/// </summary>
 	/// <typeparam name="TEdgeData">The type of the edge data.</typeparam>
 	/// <typeparam name="TVertexKey">The type of the vertex key.</typeparam>
-	public interface IGraphSource<in TEdgeData, in TVertexKey> : IFreezable
+	public interface IGraphSource<in TEdgeData, in TVertexKey> : IFreezableSource
 	{
 		/// <summary>
 		/// Removes the directed edge between the vertices specified by the given indexes.

@@ -38,7 +38,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace QuickAccess.Parser.SmartExpressions
+namespace QuickAccess.DataStructures.Common
 {
 	public static class FreezableValueExtensions
 	{

@@ -34,12 +34,58 @@
 // http://kamil.scienceontheweb.net
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
-namespace QuickAccess.Parser.SmartExpressions
+
+using System.Collections.Generic;
+using QuickAccess.DataStructures.Common;
+
+namespace QuickAccess.Parser.SmartExpressions.Bricks
 {
-	public interface IParsingBrickAlgebra : IAlgebra<ParsingBrick>
+	public sealed class CurrentRulePlaceholderBrick : SmartExpressionBrick
 	{
-		ParsingBrick EvaluatePattern(ParsingBrick parsingBrick, string pattern);
-		ParsingBrick CreateQuantifierBrick(ParsingBrick parsingBrick, long min, long max);
-		ParsingBrick DefineRule(ParsingBrick parsingBrick, string ruleName);
+		/// <inheritdoc />
+		public override string Name => RuleName;
+		private readonly LimitedNumberOfTimesSetValue<KeyValuePair<string, SmartExpressionBrick>> _rule = LimitedNumberOfTimesSetValue.CreateNotSet<KeyValuePair<string, SmartExpressionBrick>>(1);
+		public string RuleName => _rule.IsSet ? _rule.Value.Key : "CURRENT";
+		public SmartExpressionBrick Content => _rule.GetKeyValueOrDefault();
+
+
+		public override bool Equals(SmartExpressionBrick other)
+		{
+			return other is CurrentRulePlaceholderBrick;
+		}
+
+		/// <inheritdoc />
+		protected override void ApplyRuleDefinition(string name, SmartExpressionBrick content, bool recursion)
+		{
+			if (!recursion || _rule.IsSet)
+			{
+				return;
+			}
+			
+			_rule.Set(name, content);
+		}
+
+		/// <inheritdoc />
+		public override string ExpressionId => $"RULE${RuleName}$";
+
+		/// <param name="usedGroupNames"></param>
+		/// <inheritdoc />
+		public override string ToRegularExpressionString(Dictionary<string, int> usedGroupNames)
+		{
+			return $"(?&{RuleName})";
+		}
+
+		public override bool ProvidesRegularExpression => true;
+
+		/// <inheritdoc />
+		public override string ToString()
+		{
+			return RuleName;
+		}
+
+		/// <inheritdoc />
+		public CurrentRulePlaceholderBrick(ISmartExpressionAlgebra algebra) : base(algebra)
+		{
+		}
 	}
 }
