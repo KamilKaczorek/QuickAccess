@@ -39,6 +39,7 @@ using System;
 using System.Collections.Generic;
 using QuickAccess.DataStructures.Algebra;
 using QuickAccess.DataStructures.Common;
+using QuickAccess.DataStructures.Common.RegularExpression;
 
 namespace QuickAccess.Parser.SmartExpressions
 {
@@ -163,7 +164,7 @@ namespace QuickAccess.Parser.SmartExpressions
 
 		public abstract string ExpressionId { get; }
 
-		public virtual string ToRegularExpressionString(Dictionary<string, int> usedGroupNames)
+		public virtual string ToRegularExpressionString(RegularExpressionBuildingContext ctx)
 		{
 			if (ProvidesRegularExpression)
 			{

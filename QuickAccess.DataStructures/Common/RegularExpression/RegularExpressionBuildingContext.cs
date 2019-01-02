@@ -28,64 +28,28 @@
 // 
 // =====================================================================
 // 
-// Project: QuickAccess.Parser
+// Project: QuickAccess.DataStructures
 // 
 // Author: Kamil Piotr Kaczorek
 // http://kamil.scienceontheweb.net
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
-
-using System.Collections.Generic;
-using QuickAccess.DataStructures.Common;
-using QuickAccess.DataStructures.Common.RegularExpression;
-
-namespace QuickAccess.Parser.SmartExpressions.Bricks
+namespace QuickAccess.DataStructures.Common.RegularExpression
 {
-	public sealed class CurrentRulePlaceholderBrick : SmartExpressionBrick
+	public struct RegularExpressionBuildingContext
 	{
-		/// <inheritdoc />
-		public override string Name => RuleName;
-		private readonly LimitedNumberOfTimesSetValue<KeyValuePair<string, SmartExpressionBrick>> _rule = LimitedNumberOfTimesSetValue.CreateNotSet<KeyValuePair<string, SmartExpressionBrick>>(1);
-		public string RuleName => _rule.IsSet ? _rule.Value.Key : "CURRENT";
-		public SmartExpressionBrick Content => _rule.GetKeyValueOrDefault();
-
-
-		public override bool Equals(SmartExpressionBrick other)
+		public static RegularExpressionBuildingContext CreateStandard()
 		{
-			return other is CurrentRulePlaceholderBrick;
+			return new RegularExpressionBuildingContext(new StandardRegularExpressionFactory(), new StandardRegularExpressionFactoryContext());
 		}
 
-		/// <inheritdoc />
-		protected override void ApplyRuleDefinition(string name, SmartExpressionBrick content, bool recursion)
+		public RegularExpressionBuildingContext(IRegularExpressionFactory factory, IRegularExpressionFactoryContext context)
 		{
-			if (!recursion || _rule.IsSet)
-			{
-				return;
-			}
-			
-			_rule.Set(name, content);
+			Factory = factory;
+			Context = context;
 		}
 
-		/// <inheritdoc />
-		public override string ExpressionId => $"${RuleName}";
-
-		/// <inheritdoc />
-		public override string ToRegularExpressionString(RegularExpressionBuildingContext ctx)
-		{
-			return ctx.Factory.CreateRecursiveGroupCall(ctx.Context, RuleName);
-		}
-
-		public override bool ProvidesRegularExpression => true;
-
-		/// <inheritdoc />
-		public override string ToString()
-		{
-			return RuleName;
-		}
-
-		/// <inheritdoc />
-		public CurrentRulePlaceholderBrick(ISmartExpressionAlgebra algebra) : base(algebra)
-		{
-		}
+		public IRegularExpressionFactory Factory { get; }
+		public IRegularExpressionFactoryContext Context { get; }
 	}
 }

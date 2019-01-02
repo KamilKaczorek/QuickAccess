@@ -36,13 +36,14 @@
 #endregion
 
 using System.Linq;
+using QuickAccess.DataStructures.Common.RegularExpression;
 
 namespace QuickAccess.Parser.SmartExpressions.Bricks
 {
 	public sealed class ConcatenationBrick : CompositeSmartExpressionBrick
 	{
 		/// <inheritdoc />
-		protected override string RegularExpressionSeparator => string.Empty;
+		public override bool ProvidesRegularExpression => Bricks.All(b => b.ProvidesRegularExpression);
 
 		public override string ExpressionId => string.Join(string.Empty, Bricks.Select(b => b.ExpressionId));
 
@@ -67,6 +68,12 @@ namespace QuickAccess.Parser.SmartExpressions.Bricks
 		private static bool CanMakeFlat(CompositeSmartExpressionBrick cb)
 		{
 			return cb is ConcatenationBrick;
+		}
+
+		/// <inheritdoc />
+		public override string ToRegularExpressionString(RegularExpressionBuildingContext ctx)
+		{
+			return string.Join("", Bricks.Select(b => b.ToRegularExpressionString(ctx)));
 		}
 
 		/// <inheritdoc />

@@ -61,6 +61,10 @@
     <Folder Include="Integration\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\QuickAccess.DataStructures\QuickAccess.DataStructures.csproj">
+      <Project>{BCC055DB-9D60-491B-BF87-76BE7A3130E9}</Project>
+      <Name>QuickAccess.DataStructures</Name>
+    </ProjectReference>
     <ProjectReference Include="..\QuickAccess.Parser\QuickAccess.Parser.csproj">
       <Project>{0cbf804e-989d-4593-b998-ddbe29e2a734}</Project>
       <Name>QuickAccess.Parser</Name>

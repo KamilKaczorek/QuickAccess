@@ -35,8 +35,8 @@
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
 
-using System;
-using System.Collections.Generic;
+using QuickAccess.DataStructures.Common;
+using QuickAccess.DataStructures.Common.RegularExpression;
 
 namespace QuickAccess.Parser.SmartExpressions.Bricks
 {
@@ -65,29 +65,9 @@ namespace QuickAccess.Parser.SmartExpressions.Bricks
 		}
 
 		/// <inheritdoc />
-		public override string ToRegularExpressionString(Dictionary<string, int> usedGroupNames)
+		public override string ToRegularExpressionString(RegularExpressionBuildingContext ctx)
 		{
-			switch (_range)
-			{
-				case StandardCharactersRanges.None:
-					return @"\W";
-				case StandardCharactersRanges.UpperLetter:
-					return "[A-Z]";
-				case StandardCharactersRanges.LowerLetter:
-					return "[a-z]";
-				case StandardCharactersRanges.Digit:
-					return "[0-9]";
-				case StandardCharactersRanges.Letter:
-					return "[A-Za-z]";
-				case StandardCharactersRanges.LetterOrDigit:
-					return "[A-Za-z0-9]";
-				case StandardCharactersRanges.Underscore:
-					return "_";
-				case StandardCharactersRanges.WordCharacter:
-					return @"\w";
-			}
-
-			throw new InvalidOperationException();
+			return ctx.Factory.CreateCharRange(ctx.Context, _range);
 		}
 
 		/// <inheritdoc />

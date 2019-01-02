@@ -37,6 +37,7 @@
 
 using System;
 using System.Collections.Generic;
+using QuickAccess.DataStructures.Common.RegularExpression;
 
 namespace QuickAccess.Parser.SmartExpressions.Bricks
 {
@@ -62,13 +63,12 @@ namespace QuickAccess.Parser.SmartExpressions.Bricks
 		}
 
 		/// <inheritdoc />
-		public override string ExpressionId => $"CHARACTER${ToRegularExpressionString(null)}";
+		public override string ExpressionId => $"${Character}";
 
-		/// <param name="usedGroupNames"></param>
 		/// <inheritdoc />
-		public override string ToRegularExpressionString(Dictionary<string, int> usedGroupNames)
+		public override string ToRegularExpressionString(RegularExpressionBuildingContext ctx)
 		{
-			return TextMatchingBrick.CharToRegex(Character);
+			return ctx.Factory.CharToRegex(ctx.Context, Character);
 		}
 
 		/// <inheritdoc />

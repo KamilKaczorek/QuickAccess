@@ -39,6 +39,7 @@ using System;
 using System.Collections.Generic;
 using QuickAccess.DataStructures.Algebra;
 using QuickAccess.DataStructures.Common;
+using QuickAccess.DataStructures.Common.RegularExpression;
 
 namespace QuickAccess.Parser.SmartExpressions.Bricks
 {
@@ -89,19 +90,18 @@ namespace QuickAccess.Parser.SmartExpressions.Bricks
 		/// <inheritdoc />
 		public override string ExpressionId => IsRecursion ? $"RULE${RuleName}$" : Content?.ExpressionId;
 
-		/// <param name="usedGroupNames"></param>
 		/// <inheritdoc />
-		public override string ToRegularExpressionString(Dictionary<string, int> usedGroupNames)
+		public override string ToRegularExpressionString(RegularExpressionBuildingContext  ctx)
 		{
 			if (!_rule.IsSet)
 			{
 				throw new InvalidOperationException($"Rule is not defined for this placeholder. Rule name={RuleName}");
 			}
 
-			return IsRecursion ? $"(?&{RuleName})" : Content.ToRegularExpressionString(usedGroupNames);
+			return IsRecursion ? ctx.Factory.CreateRecursiveGroupCall(ctx.Context, RuleName) : Content.ToRegularExpressionString(ctx);
 		}
 
-		public override bool ProvidesRegularExpression => Content?.ProvidesRegularExpression ?? IsRecursion;
+		public override bool ProvidesRegularExpression => IsRecursion || (Content?.ProvidesRegularExpression ?? false);
 
 		/// <inheritdoc />
 		public override string ToString()

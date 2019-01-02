@@ -28,7 +28,7 @@
 // 
 // =====================================================================
 // 
-// Project: QuickAccess.Parser
+// Project: QuickAccess.DataStructures
 // 
 // Author: Kamil Piotr Kaczorek
 // http://kamil.scienceontheweb.net
@@ -38,79 +38,99 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using QuickAccess.DataStructures.Common.RegularExpression;
 
-namespace QuickAccess.Parser.SmartExpressions.Bricks
+namespace QuickAccess.DataStructures.Common.RegularExpression
 {
-	public sealed class TextMatchingBrick : SmartExpressionBrick
+	public class StandardRegularExpressionFactoryContext : IRegularExpressionFactoryContext
 	{
-		public string Text { get; }
-
 		private static readonly HashSet<char> SpecialRegexCharacters = new HashSet<char>{'\\','^','$','.','|','?','*','+','(',')','{','}'};
 
-		public static bool IsRegexSpecial(char ch)
+		private readonly Dictionary<string, int> _usedGroupNamesCounters = new Dictionary<string, int>();
+		private readonly Dictionary<string, string> _regexGroupNameToOriginalGroupName = new Dictionary<string, string>();
+
+		public string GetOriginalGroupName(string regexGroupName)
+		{
+			return _regexGroupNameToOriginalGroupName.TryGetValue(regexGroupName, out var original) ? original : regexGroupName;
+		}
+		
+		public bool IsSpecialCharacter(char ch)
 		{
 			return SpecialRegexCharacters.Contains(ch);
 		}
 
-		public static bool IsRegexSpecialOrTab(char ch)
+		public bool IsTab(char ch)
 		{
-			return SpecialRegexCharacters.Contains(ch) || ch == '\t';
+			return ch == '\t';
 		}
 
-		public static string CharToRegex(char ch)
+		public bool IsWhiteSpaceCharacter(char ch)
 		{
-			return IsRegexSpecial(ch) ? $@"\{ch}" : ch == '\t' ? @"\t" : ch.ToString();
+			return char.IsWhiteSpace(ch);
 		}
 
-		public static string StringToRegex(string text)
+		/// <inheritdoc />
+		public void Reset()
 		{
-			var specialCount = text.Count(IsRegexSpecialOrTab);
-			var sb = new StringBuilder(specialCount+text.Length);
+			_usedGroupNamesCounters.Clear();
+			_regexGroupNameToOriginalGroupName.Clear();
+		}
 
-			foreach (var ch in text)
+		/// <inheritdoc />
+		public string GetUniqueAndValidGroupNameFor(string name)
+		{
+			var groupName = RemoveSpecialCharactersAndReplacesSpacesByUnderscore(name);
+			string res;
+
+			if (!_usedGroupNamesCounters.TryGetValue(groupName, out var counter))
 			{
-				sb.Append(CharToRegex(ch));
+				counter = 0;
+				res = groupName;
+			}
+			else
+			{
+				do res = $"{groupName}_{counter++}"; while (_usedGroupNamesCounters.ContainsKey(res));
+			}
+
+			_usedGroupNamesCounters[groupName] = counter;
+
+			if (name != res)
+			{
+				_regexGroupNameToOriginalGroupName.Add(res, name);
+			}
+
+			return res;
+		}
+
+		internal string RemoveSpecialCharactersAndReplacesSpacesByUnderscore(string text)
+		{
+			var specialCount = text.Count(IsSpecialCharacter);
+
+			if (specialCount == 0)
+			{
+				return text;
+			}
+
+			if (specialCount == text.Length)
+			{
+				return string.Empty;
+			}
+
+			var sb = new StringBuilder(text.Length-specialCount);
+
+			var isPrevWhiteSpace = true;
+			foreach (var ch in text.Where(ch => !IsSpecialCharacter(ch)))
+			{
+				var isWhiteSpace = char.IsWhiteSpace(ch);
+
+				if (!isPrevWhiteSpace || !isWhiteSpace)
+				{
+					sb.Append(isWhiteSpace ? '_' : ch);
+				}
+				
+				isPrevWhiteSpace = isWhiteSpace;
 			}
 
 			return sb.ToString();
 		}
-
-		/// <inheritdoc />
-		public override bool IsEmpty => string.IsNullOrEmpty(Text);
-
-		public TextMatchingBrick(ISmartExpressionAlgebra algebra, string text)
-			: base(algebra)
-		{
-			Text = text;
-		}
-
-		/// <inheritdoc />
-		public override bool Equals(SmartExpressionBrick other)
-		{
-			if (IsEmpty && (other?.IsEmpty ?? false))
-			{
-				return true;
-			}
-
-			return other is TextMatchingBrick cb && Text.Equals(cb.Text);
-		}
-
-		/// <inheritdoc />
-		protected override void ApplyRuleDefinition(string name, SmartExpressionBrick content, bool recursion)
-		{
-		}
-
-		/// <inheritdoc />
-		public override string ExpressionId => $"${Text}$";
-
-		/// <inheritdoc />
-		public override string ToRegularExpressionString(RegularExpressionBuildingContext ctx)
-		{
-			return ctx.Factory.StringToRegex(ctx.Context, Text);
-		}
-
-		/// <inheritdoc />
-		public override bool ProvidesRegularExpression => true;
 	}
 }

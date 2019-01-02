@@ -36,8 +36,8 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
 using QuickAccess.DataStructures.Algebra;
+using QuickAccess.DataStructures.Common.RegularExpression;
 
 namespace QuickAccess.Parser.SmartExpressions.Bricks
 {
@@ -80,49 +80,12 @@ namespace QuickAccess.Parser.SmartExpressions.Bricks
 		}
 
 		/// <inheritdoc />
-		public override string ExpressionId => $"${{{Min}${Max}}}${Content.ExpressionId}$";
+		public override string ExpressionId => $"${Content.ExpressionId}${{{Min}${Max}}}$";
 
-		public override string ToRegularExpressionString(Dictionary<string, int> usedGroupNames)
+		public override string ToRegularExpressionString(RegularExpressionBuildingContext ctx)
 		{
-			var contentExpression = Content.ToRegularExpressionString(usedGroupNames);
-
-			if (IsEmpty)
-			{
-				return SX.Empty.ToRegularExpressionString(usedGroupNames);
-			}
-
-			if (Min == 1 && Max == 1)
-			{
-				return contentExpression;
-			}
-
-			return $"(?:{ToRegularExpressionString(contentExpression)})";
-		}
-
-		public string ToRegularExpressionString(string contentExpression)
-		{
-			if (Min == 0 && Max == 1)
-			{
-				return $"{contentExpression}?";
-			}
-
-			if (Min == 0 && Max == long.MaxValue)
-			{
-				return $"{contentExpression}*";
-			}
-
-			if (Min == 1 && Max == long.MaxValue)
-			{
-				return $"{contentExpression}+";
-			}
-
-			if (Min == Max)
-			{
-				return $"{contentExpression}{{{Min}}}";
-			}
-
-			return $"{contentExpression}{{{Min},{Max}}}";
-		}
+			return ctx.Factory.CreateQuantifier(ctx.Context, Min, Max, Content.ToRegularExpressionString(ctx));
+		}		
 
 		/// <inheritdoc />
 		public override bool Equals(SmartExpressionBrick other)

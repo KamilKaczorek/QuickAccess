@@ -39,6 +39,7 @@ using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using QuickAccess.DataStructures.Common.RegularExpression;
 using QuickAccess.Parser.SmartExpressions;
 
 namespace QuickAccess.Parser.Tests
@@ -49,8 +50,15 @@ namespace QuickAccess.Parser.Tests
 	{
 		[TestMethod]
 		[DataRow("Abc();", true)]
+		[DataRow("Abc();\t", true)]
+		[DataRow("Abc(); ", true)]
+		[DataRow("Abc\t();", true)]
+		[DataRow("Abc ();", true)]
+		[DataRow("Abc\t (\t )\t ;", true)]
 		[DataRow("abcdefghijklmnopqrstuvwxyz();", true)]
 		[DataRow("ABCDEFGHIJKLMNOPQRSTUVWXYZ();", true)]
+		[DataRow("abc(ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890);", true)]
+		[DataRow("abc(abcdefghijklmnopqrstuvwxyz1234567890);", true)]
 		[DataRow("A1234567890();", true)]
 		[DataRow("Abc1( );", true)]
 		[DataRow("A1(\t);", true)]
@@ -67,6 +75,8 @@ namespace QuickAccess.Parser.Tests
 		[DataRow("abc(;", false)]
 		[DataRow("def);", false)]
 		[DataRow("123();", false)]
+		[DataRow("abc(,);", false)]
+		[DataRow("abc( , );", false)]
 		public void ON_ToRegularExpressionString_WHEN_FunctionInvocationRegularExpression_SHOULD_ReturnRegexThatParsesGivenExpression(string expression, bool expressionParsed)
 		{
 			
@@ -81,8 +91,8 @@ namespace QuickAccess.Parser.Tests
 
 
 
-			var gn = new Dictionary<string, int>();
-			var regularExpressionString = functionInvocation.ToRegularExpressionString(gn);
+			var ctx = RegularExpressionBuildingContext.CreateStandard();
+			var regularExpressionString = functionInvocation.ToRegularExpressionString(ctx);
 
 
 			var regex = new Regex(regularExpressionString, RegexOptions.Compiled);

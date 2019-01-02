@@ -28,7 +28,7 @@
 // 
 // =====================================================================
 // 
-// Project: QuickAccess.Parser
+// Project: QuickAccess.DataStructures
 // 
 // Author: Kamil Piotr Kaczorek
 // http://kamil.scienceontheweb.net
@@ -37,11 +37,22 @@
 
 using System.Collections.Generic;
 
-namespace QuickAccess.DataStructures.Common
+namespace QuickAccess.DataStructures.Common.RegularExpression
 {
-	public interface IRegularExpressionProvider
+	public interface IRegularExpressionFactory
 	{
-		string ToRegularExpressionString(Dictionary<string, int> usedGroupNames);
-		bool ProvidesRegularExpression { get; }
+		string CreateAlternation(IRegularExpressionFactoryContext ctx, IEnumerable<string> alternativeRegexs);
+		string CreateNamedGroup(IRegularExpressionFactoryContext ctx, string groupName, string groupContentRegex, out string factualGroupName);
+		string CreateQuantifier(IRegularExpressionFactoryContext ctx, long min, long max, string quantifiedRegex);
+		string CreateNonCapturingGroup(IRegularExpressionFactoryContext ctx, string groupContentRegex);
+		string CreateRecursiveGroupCall(IRegularExpressionFactoryContext ctx, string regexGroupName);
+		string CreateCapturingGroup(IRegularExpressionFactoryContext ctx, string groupContentRegex);
+		string CreateCharRange(IRegularExpressionFactoryContext ctx, StandardCharactersRanges range);
+		string CreateCharSet(IRegularExpressionFactoryContext ctx, IEnumerable<char> characters);
+		string CreateCharRange(IRegularExpressionFactoryContext ctx, char firstCharacter, char lastCharacter);
+		string GetWordCharacter(IRegularExpressionFactoryContext ctx);
+		string GetDigitCharacter(IRegularExpressionFactoryContext ctx);
+		string CharToRegex(IRegularExpressionFactoryContext ctx, char ch);
+		string StringToRegex(IRegularExpressionFactoryContext ctx, string text);
 	}
 }

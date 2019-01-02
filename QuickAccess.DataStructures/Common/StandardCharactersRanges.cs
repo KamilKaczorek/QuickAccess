@@ -35,57 +35,25 @@
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
 
-using System.Collections.Generic;
-using QuickAccess.DataStructures.Common;
-using QuickAccess.DataStructures.Common.RegularExpression;
+using System;
 
-namespace QuickAccess.Parser.SmartExpressions.Bricks
+namespace QuickAccess.DataStructures.Common
 {
-	public sealed class CurrentRulePlaceholderBrick : SmartExpressionBrick
+	[Flags]
+	public enum StandardCharactersRanges
 	{
-		/// <inheritdoc />
-		public override string Name => RuleName;
-		private readonly LimitedNumberOfTimesSetValue<KeyValuePair<string, SmartExpressionBrick>> _rule = LimitedNumberOfTimesSetValue.CreateNotSet<KeyValuePair<string, SmartExpressionBrick>>(1);
-		public string RuleName => _rule.IsSet ? _rule.Value.Key : "CURRENT";
-		public SmartExpressionBrick Content => _rule.GetKeyValueOrDefault();
-
-
-		public override bool Equals(SmartExpressionBrick other)
-		{
-			return other is CurrentRulePlaceholderBrick;
-		}
-
-		/// <inheritdoc />
-		protected override void ApplyRuleDefinition(string name, SmartExpressionBrick content, bool recursion)
-		{
-			if (!recursion || _rule.IsSet)
-			{
-				return;
-			}
-			
-			_rule.Set(name, content);
-		}
-
-		/// <inheritdoc />
-		public override string ExpressionId => $"${RuleName}";
-
-		/// <inheritdoc />
-		public override string ToRegularExpressionString(RegularExpressionBuildingContext ctx)
-		{
-			return ctx.Factory.CreateRecursiveGroupCall(ctx.Context, RuleName);
-		}
-
-		public override bool ProvidesRegularExpression => true;
-
-		/// <inheritdoc />
-		public override string ToString()
-		{
-			return RuleName;
-		}
-
-		/// <inheritdoc />
-		public CurrentRulePlaceholderBrick(ISmartExpressionAlgebra algebra) : base(algebra)
-		{
-		}
+		None = 0,
+		Not = 0x01,
+		UpperLetter = 0x02,
+		LowerLetter = 0x04,
+		Digit = 0x08,
+		Underscore = 0x10,
+		Letter = UpperLetter | LowerLetter,
+		LetterOrDigit = Letter | Digit,
+		WordCharacter = LetterOrDigit | Underscore,
+		NotWordCharacter = Not | WordCharacter,
+		NotLetter = Not | Letter,
+		NotDigit = Not | Digit,
+		NotUnderscore = Not | Underscore
 	}
 }

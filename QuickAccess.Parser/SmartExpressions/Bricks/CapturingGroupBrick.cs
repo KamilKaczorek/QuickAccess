@@ -36,6 +36,7 @@
 #endregion
 
 using System.Collections.Generic;
+using QuickAccess.DataStructures.Common.RegularExpression;
 
 namespace QuickAccess.Parser.SmartExpressions.Bricks
 {
@@ -71,27 +72,11 @@ namespace QuickAccess.Parser.SmartExpressions.Bricks
 		/// <inheritdoc />
 		public override string ExpressionId => Content.ExpressionId;
 
-		public override string ToRegularExpressionString(Dictionary<string, int> usedGroupNames)
+		public override string ToRegularExpressionString(RegularExpressionBuildingContext ctx)
 		{
-			var groupName = GroupName;
-			if (!string.IsNullOrEmpty(GroupName) && usedGroupNames != null)
-			{
-
-				if (!usedGroupNames.TryGetValue(GroupName, out var counter))
-				{
-					counter = 0;
-				}
-				else
-				{
-					groupName += $"_{counter}";
-				}
-				
-				++counter;
-				usedGroupNames[GroupName] = counter;
-
-			}
-			
-			return string.IsNullOrEmpty(GroupName) ? $"({Content.ToRegularExpressionString(usedGroupNames)})" : $"(?<{groupName}>{Content.ToRegularExpressionString(usedGroupNames)})";
+			return string.IsNullOrEmpty(GroupName)
+				? ctx.Factory.CreateCapturingGroup(ctx.Context, Content.ToRegularExpressionString(ctx))
+				: ctx.Factory.CreateNamedGroup(ctx.Context, GroupName, Content.ToRegularExpressionString(ctx), out _);
 		}
 
 		/// <inheritdoc />
@@ -104,8 +89,6 @@ namespace QuickAccess.Parser.SmartExpressions.Bricks
 
 			return other is CapturingGroupBrick cb && cb.GroupName == GroupName && cb.Content.Equals(Content);
 		}
-
-
 
 		/// <inheritdoc />
 		public override string ToString()

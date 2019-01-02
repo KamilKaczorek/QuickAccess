@@ -40,6 +40,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using QuickAccess.DataStructures.Algebra;
+using QuickAccess.DataStructures.Common.RegularExpression;
 
 namespace QuickAccess.Parser.SmartExpressions
 {
@@ -107,33 +108,7 @@ namespace QuickAccess.Parser.SmartExpressions
 			}
 		}
 
-		/// <param name="usedGroupNames"></param>
-		/// <inheritdoc />
-		public override string ToRegularExpressionString(Dictionary<string, int> usedGroupNames)
-		{
-			if (!ProvidesRegularExpression)
-			{
-				//return base.ToRegularExpressionString();
-			}
-
-			var sb = new StringBuilder(Bricks.Length);
-			sb.Append(RegularExpressionPrefix);
-			var any = false;
-			foreach (var parsingBrick in Bricks)
-			{
-				if (any)
-				{
-					sb.Append(RegularExpressionSeparator);
-				}
-				else
-				{
-					any = true;
-				}
-				sb.Append(parsingBrick.ToRegularExpressionString(usedGroupNames));
-			}
-			sb.Append(RegularExpressionPostfix);
-			return sb.ToString();
-		}
+		
 
 		/// <inheritdoc />
 		protected override void ApplyRuleDefinition(string name, SmartExpressionBrick content, bool recursion)
@@ -144,12 +119,7 @@ namespace QuickAccess.Parser.SmartExpressions
 			}
 		}
 
-		protected abstract string RegularExpressionSeparator { get; }
-		protected virtual string RegularExpressionPrefix => "(?:";
-		protected virtual string RegularExpressionPostfix => ")";
-
-		/// <inheritdoc />
-		public override bool ProvidesRegularExpression => RegularExpressionSeparator != null && Bricks.All(b => b.ProvidesRegularExpression);
+		
 
 		/// <inheritdoc />
 		public override bool Equals(SmartExpressionBrick other)

@@ -35,20 +35,46 @@
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
 
-using System;
+using System.Linq;
+using QuickAccess.DataStructures.Common.RegularExpression;
 
 namespace QuickAccess.Parser.SmartExpressions.Bricks
 {
-	[Flags]
-	public enum StandardCharactersRanges
+	public sealed class AlternationBrick : CompositeSmartExpressionBrick
 	{
-		None = 0,
-		UpperLetter = 0x01,
-		LowerLetter = 0x02,
-		Digit = 0x04,
-		Underscore = 0x10,
-		Letter = UpperLetter | LowerLetter,
-		LetterOrDigit = Letter | Digit,
-		WordCharacter = LetterOrDigit | Underscore
+		/// <inheritdoc />
+		public override bool ProvidesRegularExpression => Bricks.All(b => b.ProvidesRegularExpression);
+
+		public AlternationBrick(ISmartExpressionAlgebra algebra, SmartExpressionBrick b1, SmartExpressionBrick b2)
+			: base(algebra, b1, b2, CanMakeFlat)
+		{
+			
+		}
+
+		public AlternationBrick(ISmartExpressionAlgebra algebra, SmartExpressionBrick[] bricks)
+			: base(algebra, bricks, CanMakeFlat)
+		{
+			
+		}
+
+		private static bool CanMakeFlat(CompositeSmartExpressionBrick cb)
+		{
+			return cb is AlternationBrick;
+		}
+
+		/// <inheritdoc />
+		public override string ToString()
+		{
+			return $"({string.Join("|", Bricks.Select(b => b.ToString()))})";
+		}
+
+		/// <inheritdoc />
+		public override string ToRegularExpressionString(RegularExpressionBuildingContext ctx)
+		{
+			return ctx.Factory.CreateAlternation(ctx.Context, Bricks.Select(b => b.ToRegularExpressionString(ctx)));
+		}
+
+		/// <inheritdoc />
+		public override string ExpressionId => $"${string.Join("|", Bricks.Select(b => b.ExpressionId))})";
 	}
 }

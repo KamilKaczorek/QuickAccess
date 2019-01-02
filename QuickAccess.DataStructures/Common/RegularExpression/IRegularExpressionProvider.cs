@@ -35,39 +35,11 @@
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
 
-using System.Linq;
-
-namespace QuickAccess.Parser.SmartExpressions.Bricks
+namespace QuickAccess.DataStructures.Common.RegularExpression
 {
-	public sealed class OptionsBrick : CompositeSmartExpressionBrick
+	public interface IRegularExpressionProvider
 	{
-		/// <inheritdoc />
-		protected override string RegularExpressionSeparator => "|";
-
-		public OptionsBrick(ISmartExpressionAlgebra algebra, SmartExpressionBrick b1, SmartExpressionBrick b2)
-			: base(algebra, b1, b2, CanMakeFlat)
-		{
-			
-		}
-
-		public OptionsBrick(ISmartExpressionAlgebra algebra, SmartExpressionBrick[] bricks)
-			: base(algebra, bricks, CanMakeFlat)
-		{
-			
-		}
-
-		private static bool CanMakeFlat(CompositeSmartExpressionBrick cb)
-		{
-			return cb is OptionsBrick;
-		}
-
-		/// <inheritdoc />
-		public override string ToString()
-		{
-			return $"({string.Join("|", Bricks.Select(b => b.ToString()))})";
-		}
-
-		/// <inheritdoc />
-		public override string ExpressionId => $"$OR$({string.Join("$|$", Bricks.Select(b => b.ToString()))})";
+		string ToRegularExpressionString(RegularExpressionBuildingContext ctx);
+		bool ProvidesRegularExpression { get; }
 	}
 }

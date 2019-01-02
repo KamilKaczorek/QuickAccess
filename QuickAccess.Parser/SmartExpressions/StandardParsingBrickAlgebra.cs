@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using QuickAccess.DataStructures.Algebra;
+using QuickAccess.DataStructures.Common;
 using QuickAccess.Parser.SmartExpressions.Bricks;
 
 namespace QuickAccess.Parser.SmartExpressions
@@ -107,22 +108,22 @@ namespace QuickAccess.Parser.SmartExpressions
 				return left;
 			}
 
-			if (left is OptionsBrick lc && right is OptionsBrick rc)
+			if (left is AlternationBrick lc && right is AlternationBrick rc)
 			{
-				return new OptionsBrick(this, lc.Items.Concat(rc.Items.Where(i => !lc.Items.Contains(i))).ToArray());
+				return new AlternationBrick(this, lc.Items.Concat(rc.Items.Where(i => !lc.Items.Contains(i))).ToArray());
 			}
 
-			if (left is OptionsBrick l && l.Items.Any(i => i.Equals(right)))
+			if (left is AlternationBrick l && l.Items.Any(i => i.Equals(right)))
 			{
 				return left;
 			}
 
-			if (right is OptionsBrick r && r.Items.Any(i => i.Equals(left)))
+			if (right is AlternationBrick r && r.Items.Any(i => i.Equals(left)))
 			{
 				return right;
 			}
 
-			return new OptionsBrick(this, left, right);
+			return new AlternationBrick(this, left, right);
 		}
 
 		/// <inheritdoc />
