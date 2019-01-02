@@ -34,43 +34,11 @@
 // http://kamil.scienceontheweb.net
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
-
-using QuickAccess.DataStructures.Common;
-using QuickAccess.DataStructures.Common.RegularExpression;
-
-namespace QuickAccess.Parser.SmartExpressions.Bricks
+namespace QuickAccess.DataStructures.Common.Freezable
 {
-	public sealed class StandardCharacterRangeBrick : SmartExpressionBrick
+	public interface IReadOnlyFreezableValue<out T> : IFreezable
 	{
-		private readonly StandardCharactersRanges _range;
-
-		/// <inheritdoc />
-		public StandardCharacterRangeBrick(ISmartExpressionAlgebra algebra, StandardCharactersRanges letterTypes) : base(algebra)
-		{
-			_range = letterTypes;
-		}
-
-		/// <inheritdoc />
-		protected override void ApplyRuleDefinition(string name, SmartExpressionBrick content, bool recursion, bool freeze)
-		{
-		}
-
-		/// <inheritdoc />
-		public override string ExpressionId => $"${StandardSmartExpressionRuleNames.Letter}";
-
-		/// <inheritdoc />
-		public override bool Equals(SmartExpressionBrick other)
-		{
-			return other is StandardCharacterRangeBrick lb && lb._range == _range;
-		}
-
-		/// <inheritdoc />
-		public override string ToRegularExpressionString(RegularExpressionBuildingContext ctx)
-		{
-			return ctx.Factory.CreateCharRange(ctx.Context, _range);
-		}
-
-		/// <inheritdoc />
-		public override bool ProvidesRegularExpression => true;
+		bool IsSet { get; }
+		T Value { get; }
 	}
 }

@@ -74,6 +74,11 @@ namespace QuickAccess.Parser.SmartExpressions
 			return DefaultAlgebra.DefineRule(ToTextSequence(text), patternName);
 		}
 
+		public static SmartExpressionBrick DefinesSealedRule(this string text, string patternName)
+		{
+			return DefaultAlgebra.DefineSealedRule(ToTextSequence(text), patternName);
+		}
+
 		public static SmartExpressionBrick ZeroOrMore(this SmartExpressionBrick source) => source[0, SX.Max];
 
 		public static SmartExpressionBrick OneOrMore(this SmartExpressionBrick source) => source[1, SX.Max];
@@ -83,6 +88,11 @@ namespace QuickAccess.Parser.SmartExpressions
 		public static SmartExpressionBrick DefinesRule(this SmartExpressionBrick source, string patternName)
 		{
 			return DefaultAlgebra.DefineRule(source, patternName);
+		}
+
+		public static SmartExpressionBrick DefinesSealedRule(this SmartExpressionBrick source, string patternName)
+		{
+			return DefaultAlgebra.DefineSealedRule(source, patternName);
 		}
 
 		public static SmartExpressionBrick Exact(this string text)

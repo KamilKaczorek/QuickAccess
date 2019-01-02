@@ -38,9 +38,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using QuickAccess.DataStructures.Algebra;
-using QuickAccess.DataStructures.Common.RegularExpression;
 
 namespace QuickAccess.Parser.SmartExpressions
 {
@@ -111,11 +109,11 @@ namespace QuickAccess.Parser.SmartExpressions
 		
 
 		/// <inheritdoc />
-		protected override void ApplyRuleDefinition(string name, SmartExpressionBrick content, bool recursion)
+		protected override void ApplyRuleDefinition(string name, SmartExpressionBrick content, bool recursion, bool freeze)
 		{
 			foreach (var parsingBrick in Bricks)
 			{
-				ApplyRuleDefinition(parsingBrick, name, content, recursion);
+				ApplyRuleDefinition(parsingBrick, name, content, recursion, freeze);
 			}
 		}
 

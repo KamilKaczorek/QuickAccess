@@ -148,17 +148,23 @@ namespace QuickAccess.Parser.SmartExpressions
 
 		public void ApplyCustomRule(string name, SmartExpressionBrick content)
 		{
-			ApplyRuleDefinition(name, content, recursion: false);
+			ApplyRuleDefinition(name, content, recursion: false, freeze: false);
 		}
 
-		protected abstract void ApplyRuleDefinition(string name, SmartExpressionBrick content, bool recursion);
+		public void ApplyCustomSealedRule(string name, SmartExpressionBrick content)
+		{
+			ApplyRuleDefinition(name, content, recursion: false, freeze: true);
+		}
+
+		protected abstract void ApplyRuleDefinition(string name, SmartExpressionBrick content, bool recursion, bool freeze);
 
 		protected static void ApplyRuleDefinition(SmartExpressionBrick target,
 		                                          string name,
 		                                          SmartExpressionBrick content,
-		                                          bool recursion)
+		                                          bool recursion,
+		                                          bool freeze)
 		{
-			target.ApplyRuleDefinition(name, content, recursion);
+			target.ApplyRuleDefinition(name, content, recursion, freeze);
 		}
 
 

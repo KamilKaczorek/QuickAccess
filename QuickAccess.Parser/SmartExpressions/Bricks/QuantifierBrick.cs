@@ -50,9 +50,9 @@ namespace QuickAccess.Parser.SmartExpressions.Bricks
 		public override bool IsEmpty => (Min == 0 && Max == 0) || Content.IsEmpty;
 
 		/// <inheritdoc />
-		protected override void ApplyRuleDefinition(string name, SmartExpressionBrick content, bool recursion)
+		protected override void ApplyRuleDefinition(string name, SmartExpressionBrick content, bool recursion, bool freeze)
 		{
-			ApplyRuleDefinition(Content, name, content, recursion);
+			ApplyRuleDefinition(Content, name, content, recursion, freeze);
 		}
 
 		public QuantifierBrick(ISmartExpressionAlgebra algebra, SmartExpressionBrick content, long min, long max)

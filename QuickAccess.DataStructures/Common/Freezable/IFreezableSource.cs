@@ -34,75 +34,22 @@
 // http://kamil.scienceontheweb.net
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
-
-using System;
-
-namespace QuickAccess.DataStructures.Common
+namespace QuickAccess.DataStructures.Common.Freezable
 {
-	public sealed class AutoFreezingValue<T> : FreezableValueBase<T>
+	/// <summary>
+	///     The interface of the freezable object.
+	///     Freezable object became frozen when <see cref="Freeze" /> operation is called and stays frozen (read-only) till the
+	///     end of its lifetime.
+	/// <seealso cref="IFreezable"/>
+	/// </summary>
+	public interface IFreezableSource : IFreezable
 	{
-		private Func<T, bool> _canChangeCurrentValuePredicate;
-		private bool _isSet;
-
-		internal AutoFreezingValue(Func<T, bool> canChangeCurrentValuePredicate)
-		{
-			_isSet = false;
-			_canChangeCurrentValuePredicate = canChangeCurrentValuePredicate;
-		}
-
-		internal AutoFreezingValue(T value, Func<T, bool> canChangeCurrentValuePredicate)
-		{
-			_isSet = false;
-			Item = value;
-			_canChangeCurrentValuePredicate = (!canChangeCurrentValuePredicate?.Invoke(Item) ?? false) ? null : canChangeCurrentValuePredicate;
-		}
-
-		/// <inheritdoc />
-		public override bool IsFrozen => _canChangeCurrentValuePredicate == null;
-
-		/// <inheritdoc />
-		public override bool IsSet => _isSet;
-
-		/// <inheritdoc />
-		public override bool TrySet(T value)
-		{
-			if (IsFrozen)
-			{
-				return false;
-			}
-
-			_isSet = true;
-			Item = value;
-
-			if (!(_canChangeCurrentValuePredicate?.Invoke(Item) ?? false))
-			{
-				_canChangeCurrentValuePredicate = null;
-			}
-
-			return true;
-		}
-
-		public static implicit operator T(AutoFreezingValue<T> obj)
-		{
-			return obj.Value;
-		}
-	}
-
-	public static class AutoFreezingValue
-	{
-		public static AutoFreezingValue<T> CreateSet<T>(T currentValue, Func<T, bool> canChangeCurrentValuePredicate)
-		{
-			return new AutoFreezingValue<T>(currentValue, canChangeCurrentValuePredicate);
-		}
-
-		public static AutoFreezingValue<T> CreateSetFrozen<T>(T currentValue)
-		{
-			return new AutoFreezingValue<T>(currentValue, null);
-		}
-		
-		public static AutoFreezingValue<T> CreateNotSet<T>(Func<T, bool> canChangeCurrentValuePredicate)
-		{
-			return new AutoFreezingValue<T>(canChangeCurrentValuePredicate);
-		}		
+		/// <summary>
+		///     Freezes the object from editing, since object is frozen each editing operation will throw
+		///     <see cref="System.Data.ReadOnlyException" /> exception.
+		///     When object is frozen once, it stays frozen till the end of its lifetime.
+		///     <seealso cref="IFreezable.IsFrozen" />
+		/// </summary>
+		void Freeze();
 	}
 }

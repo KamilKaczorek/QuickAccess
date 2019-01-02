@@ -38,7 +38,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace QuickAccess.DataStructures.Common
+namespace QuickAccess.DataStructures.Common.Freezable
 {
 	public static class FreezableValueExtensions
 	{

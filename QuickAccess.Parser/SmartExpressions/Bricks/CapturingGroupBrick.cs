@@ -36,6 +36,7 @@
 #endregion
 
 using System.Collections.Generic;
+using QuickAccess.DataStructures.Algebra;
 using QuickAccess.DataStructures.Common.RegularExpression;
 
 namespace QuickAccess.Parser.SmartExpressions.Bricks
@@ -50,27 +51,42 @@ namespace QuickAccess.Parser.SmartExpressions.Bricks
 		/// <inheritdoc />
 		public override bool IsEmpty => Content.IsEmpty;
 
-		public CapturingGroupBrick(ISmartExpressionAlgebra algebra, SmartExpressionBrick content, string groupName) 
+		private CapturingGroupBrick(ISmartExpressionAlgebra algebra, CapturingGroupBrick other, string groupName, bool freeze)
+		 : this(algebra, other.Content, groupName, freeze)
+		{
+		}
+
+		public CapturingGroupBrick(ISmartExpressionAlgebra algebra, SmartExpressionBrick content, string groupName, bool freeze) 
 			: base(algebra)
 		{
 			Content = content;
 			GroupName = groupName;
-			ApplyRuleDefinition(Content, GroupName, Content, true);
+			ApplyRuleDefinition(Content, GroupName, Content, true, freeze);
 		}
 
 		/// <inheritdoc />
-		protected override void ApplyRuleDefinition(string name, SmartExpressionBrick content, bool recursion)
+		protected override void ApplyRuleDefinition(string name, SmartExpressionBrick content, bool recursion, bool freeze)
 		{
 			if (name == GroupName)
 			{
 				return;
 			}
 
-			ApplyRuleDefinition(Content, name, content, recursion);
+			ApplyRuleDefinition(Content, name, content, recursion, freeze);
 		}
 
 		/// <inheritdoc />
 		public override string ExpressionId => Content.ExpressionId;
+
+		public CapturingGroupBrick Clone(ISmartExpressionAlgebra algebra, string groupName, bool freeze = false)
+		{
+			return new CapturingGroupBrick(algebra.GetAlgebra((SmartExpressionBrick)this), Content, groupName, freeze);
+		}
+
+		public CapturingGroupBrick Clone(ISmartExpressionAlgebra algebra, bool freeze = false)
+		{
+			return new CapturingGroupBrick(algebra.GetAlgebra((SmartExpressionBrick)this), Content, GroupName, freeze);
+		}
 
 		public override string ToRegularExpressionString(RegularExpressionBuildingContext ctx)
 		{

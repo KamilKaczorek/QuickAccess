@@ -43,6 +43,7 @@ namespace QuickAccess.Parser.SmartExpressions
 	{
 		SmartExpressionBrick CreateQuantifierBrick(SmartExpressionBrick content, long min, long max);
 		SmartExpressionBrick DefineRule(SmartExpressionBrick content, string ruleName);
+		SmartExpressionBrick DefineSealedRule(SmartExpressionBrick content, string ruleName);
 		SmartExpressionBrick CreatePlaceholder(string ruleName, SmartExpressionBrick defaultExpression);
 		SmartExpressionBrick Current { get; }
 

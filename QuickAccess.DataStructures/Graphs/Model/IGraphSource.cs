@@ -38,6 +38,7 @@
 #endregion
 
 using QuickAccess.DataStructures.Common;
+using QuickAccess.DataStructures.Common.Freezable;
 
 namespace QuickAccess.DataStructures.Graphs.Model
 {

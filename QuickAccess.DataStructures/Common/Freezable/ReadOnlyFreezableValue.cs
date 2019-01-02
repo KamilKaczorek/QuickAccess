@@ -35,7 +35,7 @@
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
 
-namespace QuickAccess.DataStructures.Common
+namespace QuickAccess.DataStructures.Common.Freezable
 {
 	public class ReadOnlyFreezableValue<T> : IReadOnlyFreezableValue<T>
 	{

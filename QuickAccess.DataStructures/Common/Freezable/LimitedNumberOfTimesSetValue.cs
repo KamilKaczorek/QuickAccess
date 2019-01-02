@@ -37,7 +37,7 @@
 
 using System;
 
-namespace QuickAccess.DataStructures.Common
+namespace QuickAccess.DataStructures.Common.Freezable
 {
 	public sealed class LimitedNumberOfTimesSetValue<T> : FreezableValueBase<T>
 	{
@@ -50,7 +50,7 @@ namespace QuickAccess.DataStructures.Common
 			int numberOfTimesCanBeSet
 		)
 		{
-			Item = default;
+			Value = default;
 			_numberOfTimesCanBeSet = numberOfTimesCanBeSet;
 			_numberOfTimesAlreadySet = 0;
 		}
@@ -60,7 +60,7 @@ namespace QuickAccess.DataStructures.Common
 			int remainingNumberOfTimesCanBeSet
 		)
 		{
-			Item = currentValue;
+			Value = currentValue;
 			_numberOfTimesCanBeSet = remainingNumberOfTimesCanBeSet + 1;
 			_numberOfTimesAlreadySet = 1;
 		}
@@ -72,7 +72,7 @@ namespace QuickAccess.DataStructures.Common
 			if (_numberOfTimesAlreadySet < _numberOfTimesCanBeSet)
 			{
 				_numberOfTimesAlreadySet++;
-				Item = value;
+				Value = value;
 				return true;
 			}
 

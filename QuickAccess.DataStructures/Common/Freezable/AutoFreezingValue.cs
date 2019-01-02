@@ -28,49 +28,84 @@
 // 
 // =====================================================================
 // 
-// Project: QuickAccess.Parser
+// Project: QuickAccess.DataStructures
 // 
 // Author: Kamil Piotr Kaczorek
 // http://kamil.scienceontheweb.net
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
 
-using QuickAccess.DataStructures.Common;
-using QuickAccess.DataStructures.Common.RegularExpression;
+using System;
 
-namespace QuickAccess.Parser.SmartExpressions.Bricks
+namespace QuickAccess.DataStructures.Common.Freezable
 {
-	public sealed class StandardCharacterRangeBrick : SmartExpressionBrick
+	
+
+
+	public sealed class AutoFreezingValue<T> : FreezableValueBase<T>
 	{
-		private readonly StandardCharactersRanges _range;
+		private Func<T, bool> _canChangeCurrentValuePredicate;
+		private bool _isSet;
 
-		/// <inheritdoc />
-		public StandardCharacterRangeBrick(ISmartExpressionAlgebra algebra, StandardCharactersRanges letterTypes) : base(algebra)
+		internal AutoFreezingValue(Func<T, bool> canChangeCurrentValuePredicate)
 		{
-			_range = letterTypes;
+			_isSet = false;
+			_canChangeCurrentValuePredicate = canChangeCurrentValuePredicate;
+		}
+
+		internal AutoFreezingValue(T value, Func<T, bool> canChangeCurrentValuePredicate)
+		{
+			_isSet = false;
+			Value = value;
+			_canChangeCurrentValuePredicate = (!canChangeCurrentValuePredicate?.Invoke(Value) ?? false) ? null : canChangeCurrentValuePredicate;
 		}
 
 		/// <inheritdoc />
-		protected override void ApplyRuleDefinition(string name, SmartExpressionBrick content, bool recursion, bool freeze)
+		public override bool IsFrozen => _canChangeCurrentValuePredicate == null;
+
+		/// <inheritdoc />
+		public override bool IsSet => _isSet;
+
+		/// <inheritdoc />
+		public override bool TrySet(T value)
 		{
+			if (IsFrozen)
+			{
+				return false;
+			}
+
+			_isSet = true;
+			Value = value;
+
+			if (!(_canChangeCurrentValuePredicate?.Invoke(Value) ?? false))
+			{
+				_canChangeCurrentValuePredicate = null;
+			}
+
+			return true;
 		}
 
-		/// <inheritdoc />
-		public override string ExpressionId => $"${StandardSmartExpressionRuleNames.Letter}";
-
-		/// <inheritdoc />
-		public override bool Equals(SmartExpressionBrick other)
+		public static implicit operator T(AutoFreezingValue<T> obj)
 		{
-			return other is StandardCharacterRangeBrick lb && lb._range == _range;
+			return obj.Value;
+		}
+	}
+
+	public static class AutoFreezingValue
+	{
+		public static AutoFreezingValue<T> CreateSet<T>(T currentValue, Func<T, bool> canChangeCurrentValuePredicate)
+		{
+			return new AutoFreezingValue<T>(currentValue, canChangeCurrentValuePredicate);
 		}
 
-		/// <inheritdoc />
-		public override string ToRegularExpressionString(RegularExpressionBuildingContext ctx)
+		public static AutoFreezingValue<T> CreateSetFrozen<T>(T currentValue)
 		{
-			return ctx.Factory.CreateCharRange(ctx.Context, _range);
+			return new AutoFreezingValue<T>(currentValue, null);
 		}
-
-		/// <inheritdoc />
-		public override bool ProvidesRegularExpression => true;
+		
+		public static AutoFreezingValue<T> CreateNotSet<T>(Func<T, bool> canChangeCurrentValuePredicate)
+		{
+			return new AutoFreezingValue<T>(canChangeCurrentValuePredicate);
+		}		
 	}
 }

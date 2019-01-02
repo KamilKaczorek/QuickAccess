@@ -79,21 +79,15 @@ namespace QuickAccess.Parser.Tests
 		[DataRow("abc( , );", false)]
 		public void ON_ToRegularExpressionString_WHEN_FunctionInvocationRegularExpression_SHOULD_ReturnRegexThatParsesGivenExpression(string expression, bool expressionParsed)
 		{
-			
 			var name = (SX.Letter + (SX.Digit | SX.Letter).ZeroOrMore()).DefinesRule("Name");
 			var intNumber = SX.Digit.OneOrMore().DefinesRule("Integer");
 			var floatNumber = (intNumber + "." + intNumber).DefinesRule("Float");
-			var whiteSpace = (" ".Exact() | "\t".Exact()).OneOrMore().DefinesRule("WhiteSpace");
-			var optWs = (" ".Exact() | "\t".Exact()).ZeroOrMore();
 			var functionArg = (floatNumber | intNumber | name).DefinesRule("FunctionArg");
 			var functionArgList = (functionArg & ("," & functionArg).ZeroOrMore()).DefinesRule("FunctionArgList");
 			var functionInvocation = (name & "(" & ~functionArgList & ")" & ';').DefinesRule("FunctionInvocation");
 
-
-
 			var ctx = RegularExpressionBuildingContext.CreateStandard();
 			var regularExpressionString = functionInvocation.ToRegularExpressionString(ctx);
-
 
 			var regex = new Regex(regularExpressionString, RegexOptions.Compiled);
 

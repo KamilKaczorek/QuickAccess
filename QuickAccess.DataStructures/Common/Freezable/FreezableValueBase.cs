@@ -28,18 +28,58 @@
 // 
 // =====================================================================
 // 
-// Project: QuickAccess.Parser
+// Project: QuickAccess.DataStructures
 // 
 // Author: Kamil Piotr Kaczorek
 // http://kamil.scienceontheweb.net
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
-namespace QuickAccess.DataStructures.Common
+
+using System;
+
+namespace QuickAccess.DataStructures.Common.Freezable
 {
-	public interface IFreezableValue<T> : IReadOnlyFreezableValue<T>
+	public abstract class FreezableValueBase<T> : IFreezableValue<T>
 	{
-		bool IsSynchronized { get; }
-		void Set(T value);
-		bool TrySet(T value);
+		private T _value;
+		/// <inheritdoc />
+		public abstract bool IsFrozen { get; }
+
+		/// <inheritdoc />
+		public abstract bool IsSet { get; }
+
+		/// <inheritdoc />
+		public T Value
+		{
+			get => IsSet ? _value : throw new InvalidOperationException("Can't access not set value.");
+			protected set
+			{
+				if (!IsFrozen)
+				{
+					_value = value;
+				}
+			}
+		}
+
+		/// <inheritdoc />
+		public virtual bool IsSynchronized => false;
+
+		/// <inheritdoc />
+		public void Set(T value)
+		{
+			if (!TrySet(value))
+			{
+				throw new InvalidOperationException(IsFrozen ? "Can't change frozen value." : $"Can't set value to {value}.");
+			}
+		}
+
+		/// <inheritdoc />
+		public abstract bool TrySet(T value);
+
+		/// <inheritdoc />
+		public override string ToString()
+		{
+			return $"{(IsSet ? Value?.ToString() ?? "NULL" : "---")}{(IsFrozen ? "FROZEN" : string.Empty)}";
+		}
 	}
 }

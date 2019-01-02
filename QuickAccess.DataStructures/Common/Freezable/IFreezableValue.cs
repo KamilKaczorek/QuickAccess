@@ -28,43 +28,18 @@
 // 
 // =====================================================================
 // 
-// Project: QuickAccess.DataStructures
+// Project: QuickAccess.Parser
 // 
 // Author: Kamil Piotr Kaczorek
 // http://kamil.scienceontheweb.net
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
-
-using System;
-
-namespace QuickAccess.DataStructures.Common
+namespace QuickAccess.DataStructures.Common.Freezable
 {
-	public abstract class FreezableValueBase<T> : IFreezableValue<T>
+	public interface IFreezableValue<T> : IReadOnlyFreezableValue<T>
 	{
-		protected T Item;
-
-		/// <inheritdoc />
-		public abstract bool IsFrozen { get; }
-
-		/// <inheritdoc />
-		public abstract bool IsSet { get; }
-
-		/// <inheritdoc />
-		public T Value => IsSet ? Item : throw new InvalidOperationException("Can't access not set value.");
-
-		/// <inheritdoc />
-		public virtual bool IsSynchronized => false;
-
-
-		public void Set(T value)
-		{
-			if (!TrySet(value))
-			{
-				throw new InvalidOperationException("Can't set frozen value.");
-			}
-		}
-
-		/// <inheritdoc />
-		public abstract bool TrySet(T value);
+		bool IsSynchronized { get; }
+		void Set(T value);
+		bool TrySet(T value);
 	}
 }

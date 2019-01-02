@@ -28,17 +28,63 @@
 // 
 // =====================================================================
 // 
-// Project: QuickAccess.Parser
+// Project: QuickAccess.DataStructures
 // 
 // Author: Kamil Piotr Kaczorek
 // http://kamil.scienceontheweb.net
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
-namespace QuickAccess.DataStructures.Common
+namespace QuickAccess.DataStructures.Common.Freezable
 {
-	public interface IReadOnlyFreezableValue<out T> : IFreezable
+	public sealed class FreezableValue<T> : FreezableValueBase<T>, IFreezableSource
 	{
-		bool IsSet { get; }
-		T Value { get; }
+		public FreezableValue()
+		{
+			_isFrozen = false;
+			_isSet = false;
+		}
+
+		public FreezableValue(T value)
+		{
+			Value = value;
+			_isFrozen = false;
+			_isSet = true;
+		}
+
+		private bool _isFrozen;
+		private bool _isSet;
+
+		/// <inheritdoc />
+		public override bool IsFrozen => _isFrozen;
+
+		/// <inheritdoc />
+		public void Freeze()
+		{
+			_isFrozen = true;
+		}
+
+		/// <inheritdoc />
+		public override bool IsSet => _isSet;
+
+		/// <inheritdoc />
+		public override bool TrySet(T value)
+		{
+			if (_isFrozen)
+			{
+				return false;
+			}
+
+			Value = value;
+			_isSet = true;
+
+			return true;
+		}
+
+		public bool TrySet(T value, bool freeze)
+		{
+			var res = TrySet(value);
+			_isFrozen |= freeze;
+			return res;
+		}
 	}
 }

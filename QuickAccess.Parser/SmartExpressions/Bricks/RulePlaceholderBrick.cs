@@ -36,43 +36,44 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
 using QuickAccess.DataStructures.Algebra;
 using QuickAccess.DataStructures.Common;
+using QuickAccess.DataStructures.Common.Freezable;
 using QuickAccess.DataStructures.Common.RegularExpression;
 
 namespace QuickAccess.Parser.SmartExpressions.Bricks
 {
 	public sealed class RulePlaceholderBrick : SmartExpressionBrick
 	{
-		private readonly IFreezableValue<Tuple<SmartExpressionBrick, bool>> _rule;
+		private readonly FreezableValue<Tuple<SmartExpressionBrick, bool>> _rule;
 
 		public string RuleName { get; }
 		/// <inheritdoc />
 		public override string Name => RuleName;
 		public SmartExpressionBrick Content => _rule.IsSet ? _rule.Value.Item1 : null;
 		public bool IsRecursion => _rule.IsSet && _rule.Value.Item2;
+		public bool IsFrozen => _rule.IsFrozen;
 
 		public RulePlaceholderBrick(ISmartExpressionAlgebra algebra, string ruleName)
 		: base(algebra)
 		{
 			RuleName = ruleName;
-			_rule = LimitedNumberOfTimesSetValue.CreateNotSet<Tuple<SmartExpressionBrick, bool>>(1);
+			_rule = new FreezableValue<Tuple<SmartExpressionBrick, bool>>();
 		}
 
 		public RulePlaceholderBrick(ISmartExpressionAlgebra algebra, string ruleName, SmartExpressionBrick defaultRule)
 		: base(algebra.GetAlgebra(defaultRule))
 		{
 			RuleName = ruleName;
-			_rule = LimitedNumberOfTimesSetValue.CreateSet(Tuple.Create(defaultRule, false), 1);
+			_rule = new FreezableValue<Tuple<SmartExpressionBrick, bool>>(Tuple.Create(defaultRule, false));
 		}
 
 		/// <inheritdoc />
-		protected override void ApplyRuleDefinition(string name, SmartExpressionBrick content, bool recursion)
+		protected override void ApplyRuleDefinition(string name, SmartExpressionBrick content, bool recursion, bool freeze)
 		{
-			if (name == RuleName)
+			if (name == RuleName && !IsFrozen)
 			{
-				_rule.TrySet(content, recursion);
+				_rule.TrySet(Tuple.Create(content, recursion), freeze);
 			}
 		}
 
