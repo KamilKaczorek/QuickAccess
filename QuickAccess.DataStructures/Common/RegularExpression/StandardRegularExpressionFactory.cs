@@ -89,6 +89,8 @@ namespace QuickAccess.DataStructures.Common.RegularExpression
 				return string.Empty;
 			}
 
+			regexContent = CreateNonCapturingGroup(ctx, regexContent);
+
 			if (min == 1 && max == 1)
 			{
 				return regexContent;
@@ -126,11 +128,7 @@ namespace QuickAccess.DataStructures.Common.RegularExpression
 		/// <inheritdoc />
 		public string CreateNonCapturingGroup(IRegularExpressionFactoryContext ctx, string groupContentRegex)
 		{
-			if (groupContentRegex.StartsWith("(") && groupContentRegex.EndsWith(")"))
-			{
-				return groupContentRegex;
-			}
-
+			
 			return $"(?:{groupContentRegex})";
 		}
 
@@ -143,16 +141,6 @@ namespace QuickAccess.DataStructures.Common.RegularExpression
 		/// <inheritdoc />
 		public string CreateCapturingGroup(IRegularExpressionFactoryContext ctx, string groupContentRegex)
 		{
-			if (groupContentRegex.StartsWith("(?:") && groupContentRegex.EndsWith(")"))
-			{
-				return CreateCapturingGroup(ctx, groupContentRegex.Substring(3, groupContentRegex.Length-4));
-			}
-
-			if (!groupContentRegex.StartsWith("(?") && !groupContentRegex.StartsWith("(") && groupContentRegex.EndsWith(")"))
-			{
-				return groupContentRegex;
-			}
-
 			return $"({groupContentRegex})";
 		}
 
