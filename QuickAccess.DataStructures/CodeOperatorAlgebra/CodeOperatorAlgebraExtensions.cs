@@ -45,28 +45,28 @@ namespace QuickAccess.DataStructures.CodeOperatorAlgebra
 	public static class CodeOperatorAlgebraExtensions
 	{
 		[Pure]
-		public static T GetOperatorResultOfHighestPrioritizedAlgebra<T>(this T left, OverloadableCodeSymmetricBinaryOperator binaryOperator, T right)
+		public static T GetOperatorResultOfHighestPrioritizedAlgebra<T>(this T left, OverloadableCodeBinarySymmetricOperator binaryOperator, T right)
 			where T : ICodeOperatorAlgebraicDomain<T, ICodeOperatorSymmetricAlgebra<T>>
 		{
 			return GetHighestPrioritizedAlgebra<T, ICodeOperatorSymmetricAlgebra<T>>(left, right).EvaluateOperatorResult(left, binaryOperator, right);
 		}
 
 		[Pure]
-		public static T GetOperatorResultOfHighestPrioritizedAlgebra<T>(this ICodeOperatorSymmetricAlgebra<T> defaultAlgebra, T left,  OverloadableCodeSymmetricBinaryOperator binaryOperator, T right)
+		public static T GetOperatorResultOfHighestPrioritizedAlgebra<T>(this ICodeOperatorSymmetricAlgebra<T> defaultAlgebra, T left,  OverloadableCodeBinarySymmetricOperator binaryOperator, T right)
 			where T : ICodeOperatorAlgebraicDomain<T, ICodeOperatorSymmetricAlgebra<T>>
 		{
 			return defaultAlgebra.GetHighestPrioritizedAlgebra(left, right).EvaluateOperatorResult(left, binaryOperator, right);
 		}
 
 		[Pure]
-		public static T GetOperatorResultOfHighestPrioritizedAlgebra<T>(this ICodeOperatorSymmetricAlgebra<T> defaultAlgebra, OverloadableCodeSymmetricUnaryOperator unaryOperator, T arg)
+		public static T GetOperatorResultOfHighestPrioritizedAlgebra<T>(this ICodeOperatorSymmetricAlgebra<T> defaultAlgebra, OverloadableCodeUnarySymmetricOperator unaryOperator, T arg)
 			where T : ICodeOperatorAlgebraicDomain<T, ICodeOperatorSymmetricAlgebra<T>>
 		{
 			return defaultAlgebra.GetHighestPrioritizedAlgebra(arg).EvaluateOperatorResult(unaryOperator, arg);
 		}
 
 		[Pure]
-		public static T GetOperatorResult<T>(this T arg, OverloadableCodeSymmetricUnaryOperator unaryOperator)
+		public static T GetOperatorResult<T>(this T arg, OverloadableCodeUnarySymmetricOperator unaryOperator)
 			where T : ICodeOperatorAlgebraicDomain<T, ICodeOperatorSymmetricAlgebra<T>>
 		{
 			return arg.Algebra.EvaluateOperatorResult(unaryOperator, arg);

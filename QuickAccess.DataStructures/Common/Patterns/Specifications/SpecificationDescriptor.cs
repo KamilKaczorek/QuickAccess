@@ -41,10 +41,10 @@ namespace QuickAccess.DataStructures.Common.Patterns.Specifications
 {
 	public sealed class SpecificationDescriptor : IEquatable<SpecificationDescriptor>
 	{
-		string Id { get; }
-		string Name { get; }
-		string Description { get; }
-		string DomainType { get; }
+		public string Id { get; }
+		public string Name { get; }
+		public string Description { get; }
+		public string DomainType { get; }
 
 		public SpecificationDescriptor(string id, string name, string description, string domainType)
 		{
@@ -91,6 +91,12 @@ namespace QuickAccess.DataStructures.Common.Patterns.Specifications
 		{
 			var hashCode = (Id != null ? Id.GetHashCode() : 0);
 			return hashCode;
+		}
+
+		/// <inheritdoc />
+		public override string ToString()
+		{
+			return Name;
 		}
 	}
 }

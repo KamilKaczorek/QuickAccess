@@ -44,7 +44,8 @@ namespace QuickAccess.DataStructures.Common.Patterns.Specifications
 		private readonly Func<T, bool> _predicate;
 
 		/// <inheritdoc />
-		public PredicateSpecification(ISpecificationAlgebra<T> algebra, Func<T, bool > predicate, SpecificationDescriptor descriptor = null) : base(algebra, descriptor)
+		public PredicateSpecification(ISpecificationAlgebra<T> algebra, Func<T, bool > predicate, SpecificationDescriptor descriptor = null) 
+			: base(algebra, descriptor)
 		{
 			_predicate = predicate;
 		}

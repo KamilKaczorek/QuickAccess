@@ -60,6 +60,76 @@ namespace QuickAccess.DataStructures.CodeOperatorAlgebra
 
 		public const OverloadableCodeOperators AllOperators = Unary | Binary;
 
+		[Pure]
+		public static string ToCodeRepresentation(this OverloadableCodeBinarySymmetricOperator source, string arg = null, string right = null)
+		{
+			return source.ToCodeOperator().ToCodeRepresentation(arg, right);
+		}
+
+		[Pure]
+		public static string ToCodeRepresentation(this OverloadableCodeUnarySymmetricOperator source, string arg = null, string right = null)
+		{
+			return source.ToCodeOperator().ToCodeRepresentation(arg, right);
+		}
+
+		[Pure]
+		public static string ToCodeRepresentation(this OverloadableCodeOperator source, string arg = null, string right = null, string spaceBetweenBinOperatorAndArgument = null)
+		{
+			var s = spaceBetweenBinOperatorAndArgument;
+			switch (source)
+			{
+				case OverloadableCodeOperator.Increment:
+					return $"{arg}++";
+				case OverloadableCodeOperator.Decrement:
+					return $"{arg}--";
+				case OverloadableCodeOperator.Plus:
+					return $"+{arg}";
+				case OverloadableCodeOperator.Minus:
+					return $"-{arg}";
+				case OverloadableCodeOperator.LogicalNegation:
+					return $"!{arg}";
+				case OverloadableCodeOperator.BitwiseComplement:
+					return $"~{arg}";
+				case OverloadableCodeOperator.TrueOperator:
+					return "true";
+				case OverloadableCodeOperator.FalseOperator:
+					return "false";
+				case OverloadableCodeOperator.Mul:
+					return $"{arg}{s}*{s}{right}";
+				case OverloadableCodeOperator.Div:
+					return $"{arg}{s}/{s}{right}";
+				case OverloadableCodeOperator.Mod:
+					return $"{arg}{s}%{s}{right}";
+				case OverloadableCodeOperator.Sum:
+					return $"{arg}{s}+{s}{right}";
+				case OverloadableCodeOperator.Sub:
+					return $"{arg}{s}-{s}{right}";
+				case OverloadableCodeOperator.LeftShift:
+					return $"{arg}{s}<<{s}{right}";
+				case OverloadableCodeOperator.RightShift:
+					return $"{arg}{s}>>{s}{right}";
+				case OverloadableCodeOperator.LessThan:
+					return $"{arg}{s}<{s}{right}";
+				case OverloadableCodeOperator.LessThanOrEqual:
+					return $"{arg}{s}<={s}{right}";
+				case OverloadableCodeOperator.GreaterThan:
+					return $"{arg}{s}>{s}{right}";
+				case OverloadableCodeOperator.GreaterThanOrEqual:
+					return $"{arg}{s}>={s}{right}";
+				case OverloadableCodeOperator.Equal:
+					return $"{arg}{s}=={s}{right}";
+				case OverloadableCodeOperator.Unequal:
+					return $"{arg}{s}!={s}{right}";
+				case OverloadableCodeOperator.And:
+					return $"{arg}{s}&{s}{right}";
+				case OverloadableCodeOperator.XOr:
+					return $"{arg}{s}^{s}{right}";
+				case OverloadableCodeOperator.Or:
+					return $"{arg}{s}|{s}{right}";
+				default:
+					throw new ArgumentOutOfRangeException(nameof(source), source, null);
+			}
+		}
 
 		[Pure]
 		public static bool IsOneOf(this OverloadableCodeOperator source, OverloadableCodeOperators flags)
@@ -74,7 +144,59 @@ namespace QuickAccess.DataStructures.CodeOperatorAlgebra
 		}
 
 		[Pure]
-		public static IEnumerable<OverloadableCodeOperator> ToOverloadableCSharpOperatorSequence(
+		public static bool IsOneOf(this OverloadableCodeBinarySymmetricOperator source, OverloadableCodeOperators flags)
+		{
+			return ((int) source & (int) flags) != 0;
+		}
+
+		[Pure]
+		public static bool IsNotAnyOf(this OverloadableCodeBinarySymmetricOperator source, OverloadableCodeOperators flags)
+		{
+			return ((int) source & (int) flags) == 0;
+		}
+
+		[Pure]
+		public static bool IsOneOf(this OverloadableCodeUnarySymmetricOperator source, OverloadableCodeOperators flags)
+		{
+			return ((int) source & (int) flags) != 0;
+		}
+
+		[Pure]
+		public static bool IsNotAnyOf(this OverloadableCodeUnarySymmetricOperator source, OverloadableCodeOperators flags)
+		{
+			return ((int) source & (int) flags) == 0;
+		}
+
+		[Pure]
+		public static OverloadableCodeBinarySymmetricOperator ToBinarySymmetricOperator(this OverloadableCodeOperator source)
+		{
+			return source.IsOneOf(Binary|Symmetric)
+				? (OverloadableCodeBinarySymmetricOperator) source
+				: throw new ArgumentException($"The {source} is not binary symmetric operator.", nameof(source));
+		}
+
+		[Pure]
+		public static OverloadableCodeUnarySymmetricOperator ToUnarySymmetricOperator(this OverloadableCodeOperator source)
+		{
+			return source.IsOneOf(Unary|Symmetric)
+				? (OverloadableCodeUnarySymmetricOperator) source
+				: throw new ArgumentException($"The {source} is not unary symmetric operator.", nameof(source));
+		}
+
+		[Pure]
+		public static OverloadableCodeOperator ToCodeOperator(this OverloadableCodeBinarySymmetricOperator source)
+		{
+			return (OverloadableCodeOperator) source;
+		}
+
+		[Pure]
+		public static OverloadableCodeOperator ToCodeOperator(this OverloadableCodeUnarySymmetricOperator source)
+		{
+			return (OverloadableCodeOperator) source;
+		}
+
+		[Pure]
+		public static IEnumerable<OverloadableCodeOperator> ToOverloadableCodeOperatorSequence(
 			this OverloadableCodeOperators source)
 		{
 			return Enum.GetValues(typeof(OverloadableCodeOperator))

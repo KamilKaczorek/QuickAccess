@@ -38,6 +38,6 @@ namespace QuickAccess.DataStructures.Common.Patterns.Specifications
 {
 	public interface ICompositeSpecification<in T> : IAggregateSpecification<T>
 	{
-		CompositeSpecificationOperator Operator { get; }
+		CompositeSpecificationOperation Operation { get; }
 	}
 }

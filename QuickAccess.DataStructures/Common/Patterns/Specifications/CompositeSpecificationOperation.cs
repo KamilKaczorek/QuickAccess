@@ -34,38 +34,14 @@
 // http://kamil.scienceontheweb.net
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
-
-using System;
-using QuickAccess.DataStructures.CodeOperatorAlgebra;
-
 namespace QuickAccess.DataStructures.Common.Patterns.Specifications
 {
-	internal static class CompositeSpecificationOperatorExtensions
+	public enum CompositeSpecificationOperation
 	{
-		public static CompositeSpecificationOperator ToCompositeSpecificationOperator(
-			this OverloadableCodeSymmetricBinaryOperator binaryOperator)
-		{
-			switch (binaryOperator)
-			{
-				case OverloadableCodeSymmetricBinaryOperator.And : return CompositeSpecificationOperator.And;
-				case OverloadableCodeSymmetricBinaryOperator.Or : return CompositeSpecificationOperator.Or;
-				case OverloadableCodeSymmetricBinaryOperator.XOr : return CompositeSpecificationOperator.XOr;
-				case OverloadableCodeSymmetricBinaryOperator.Div : return CompositeSpecificationOperator.Single;
-				default:throw new NotSupportedException($"Operator {binaryOperator} is not supported.");
-			}
-		}
-
-		public static OverloadableCodeSymmetricBinaryOperator ToCodeSymmetricBinaryOperator(
-			this CompositeSpecificationOperator binaryOperator)
-		{
-			switch (binaryOperator)
-			{
-				case CompositeSpecificationOperator.And : return OverloadableCodeSymmetricBinaryOperator.And;
-				case CompositeSpecificationOperator.Or :  return OverloadableCodeSymmetricBinaryOperator.Or;
-				case CompositeSpecificationOperator.XOr : return OverloadableCodeSymmetricBinaryOperator.XOr;
-				case CompositeSpecificationOperator.Single : return OverloadableCodeSymmetricBinaryOperator.Div;
-				default:throw new NotSupportedException($"Operator {binaryOperator} is not supported.");
-			}
-		}
+		And,
+		Or,
+		XOr,
+		Single,
+		AllButOne
 	}
 }

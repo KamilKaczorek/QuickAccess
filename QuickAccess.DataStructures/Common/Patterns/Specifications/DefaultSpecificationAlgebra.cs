@@ -62,35 +62,35 @@ namespace QuickAccess.DataStructures.Common.Patterns.Specifications
 		                                                       OverloadableCodeOperators.LogicalNegation;
 
 		/// <inheritdoc />
-		public bool IsUnaryOperatorSupported(OverloadableCodeSymmetricUnaryOperator unaryOperator)
+		public bool IsUnaryOperatorSupported(OverloadableCodeUnarySymmetricOperator unaryOperator)
 		{
-			return ((int) unaryOperator & (int) SupportedOperators) != 0;
+			return unaryOperator.IsOneOf(SupportedOperators);
 		}
 
 		/// <inheritdoc />
-		public bool IsBinaryOperatorSupported(OverloadableCodeSymmetricBinaryOperator binaryOperator)
+		public bool IsBinaryOperatorSupported(OverloadableCodeBinarySymmetricOperator binaryOperator)
 		{
-			return ((int) binaryOperator & (int) SupportedOperators) != 0;
+			return binaryOperator.IsOneOf(SupportedOperators);
 		}
 
 		/// <inheritdoc />
-		public string GetBinaryOperatorDescription(OverloadableCodeSymmetricBinaryOperator binaryOperator)
+		public string GetBinaryOperatorDescription(OverloadableCodeBinarySymmetricOperator binaryOperator)
 		{
 			switch (binaryOperator)
 			{
-				case OverloadableCodeSymmetricBinaryOperator.And : return $"Creates composite specification where the overall result is a disjunction of results of aggregated specifications.";
-				case OverloadableCodeSymmetricBinaryOperator.Or : return  $"Creates composite specification where the overall result is a conjunction of results of aggregated specifications.";
-				case OverloadableCodeSymmetricBinaryOperator.XOr : return  $"Creates composite specification where the overall result is a exclusive OR of results of aggregated specifications.";
+				case OverloadableCodeBinarySymmetricOperator.And : return $"Creates composite specification where the overall result is a disjunction of results of aggregated specifications.";
+				case OverloadableCodeBinarySymmetricOperator.Or : return  $"Creates composite specification where the overall result is a conjunction of results of aggregated specifications.";
+				case OverloadableCodeBinarySymmetricOperator.XOr : return  $"Creates composite specification where the overall result is a exclusive OR of results of aggregated specifications.";
 				default:throw new NotSupportedException($"Operator {binaryOperator} is not supported.");
 			}
 		}
 
 		/// <inheritdoc />
-		public string GetUnaryOperatorDescription(OverloadableCodeSymmetricUnaryOperator unaryOperator)
+		public string GetUnaryOperatorDescription(OverloadableCodeUnarySymmetricOperator unaryOperator)
 		{
 			switch (unaryOperator)
 			{
-				case OverloadableCodeSymmetricUnaryOperator.LogicalNegation :
+				case OverloadableCodeUnarySymmetricOperator.LogicalNegation :
 					return
 						"Creates specification where the specification result will be negation of a result of aggregated specification.";
 				default:throw new NotSupportedException($"Operator {unaryOperator} is not supported.");
@@ -99,7 +99,7 @@ namespace QuickAccess.DataStructures.Common.Patterns.Specifications
 
 		/// <inheritdoc />
 		public bool TryEvaluateOperatorResult(object left,
-		                                      OverloadableCodeSymmetricBinaryOperator binaryOperator,
+		                                      OverloadableCodeBinarySymmetricOperator binaryOperator,
 		                                      object right,
 		                                      out object result)
 		{
@@ -114,7 +114,7 @@ namespace QuickAccess.DataStructures.Common.Patterns.Specifications
 		}
 
 		/// <inheritdoc />
-		public bool TryEvaluateOperatorResult(OverloadableCodeSymmetricUnaryOperator unaryOperator, object arg, out object result)
+		public bool TryEvaluateOperatorResult(OverloadableCodeUnarySymmetricOperator unaryOperator, object arg, out object result)
 		{
 			if (arg is ISpecification<T> spec)
 			{
@@ -128,18 +128,18 @@ namespace QuickAccess.DataStructures.Common.Patterns.Specifications
 
 		/// <inheritdoc />
 		public Specification<T> EvaluateOperatorResult(Specification<T> left,
-		                                               OverloadableCodeSymmetricBinaryOperator binaryOperator,
+		                                               OverloadableCodeBinarySymmetricOperator binaryOperator,
 		                                               Specification<T> right)
 		{
-			return new CompositeSpecification<T>(this, binaryOperator.ToCompositeSpecificationOperator(), left, right);
+			return new CompositeSpecification<T>(this, binaryOperator.ToCompositeSpecificationOperation(), left, right);
 		}
 
 		/// <inheritdoc />
-		public Specification<T> EvaluateOperatorResult(OverloadableCodeSymmetricUnaryOperator unaryOperator, Specification<T> arg)
+		public Specification<T> EvaluateOperatorResult(OverloadableCodeUnarySymmetricOperator unaryOperator, Specification<T> arg)
 		{
 			switch (unaryOperator)
 			{
-				case OverloadableCodeSymmetricUnaryOperator.LogicalNegation :
+				case OverloadableCodeUnarySymmetricOperator.LogicalNegation :
 					return GetNegation(arg);
 				default:throw new NotSupportedException($"Operator {unaryOperator} is not supported.");
 			}

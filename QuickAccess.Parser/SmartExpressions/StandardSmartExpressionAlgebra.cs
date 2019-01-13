@@ -27,37 +27,37 @@ namespace QuickAccess.Parser.SmartExpressions
 		                                                         | OverloadableCodeOperators.Minus;
 
 		/// <inheritdoc />
-		public bool IsUnaryOperatorSupported(OverloadableCodeSymmetricUnaryOperator unaryOperator)
+		public bool IsUnaryOperatorSupported(OverloadableCodeUnarySymmetricOperator unaryOperator)
 		{
 			return ((int) unaryOperator & (int) SupportedOperators) != 0;
 		}
 
 		/// <inheritdoc />
-		public bool IsBinaryOperatorSupported(OverloadableCodeSymmetricBinaryOperator binaryOperator)
+		public bool IsBinaryOperatorSupported(OverloadableCodeBinarySymmetricOperator binaryOperator)
 		{
 			return ((int) binaryOperator & (int) SupportedOperators) != 0;
 		}
 
 		/// <inheritdoc />
-		public string GetBinaryOperatorDescription(OverloadableCodeSymmetricBinaryOperator binaryOperator)
+		public string GetBinaryOperatorDescription(OverloadableCodeBinarySymmetricOperator binaryOperator)
 		{
 			switch (binaryOperator)
 			{
-				case OverloadableCodeSymmetricBinaryOperator.Mul:
+				case OverloadableCodeBinarySymmetricOperator.Mul:
 					return "Concatenates left and right expression with 'Anything' in between.";
-				case OverloadableCodeSymmetricBinaryOperator.Div:
+				case OverloadableCodeBinarySymmetricOperator.Div:
 					return "Concatenates left and right expression with 'next line' in between.";
-				case OverloadableCodeSymmetricBinaryOperator.Mod:
+				case OverloadableCodeBinarySymmetricOperator.Mod:
 					return "Concatenates left and right expression placing 'custom pattern' in between.";
-				case OverloadableCodeSymmetricBinaryOperator.Sum:
+				case OverloadableCodeBinarySymmetricOperator.Sum:
 					return "Concatenates left and right expression.";
-				case OverloadableCodeSymmetricBinaryOperator.Sub:
+				case OverloadableCodeBinarySymmetricOperator.Sub:
 					return "Concatenates left and right expression, where the right one is defined as positive lookahead.";
-				case OverloadableCodeSymmetricBinaryOperator.And:
+				case OverloadableCodeBinarySymmetricOperator.And:
 					return "Concatenates left and right expression with optional, multiple white space in between.";
-				case OverloadableCodeSymmetricBinaryOperator.XOr:
+				case OverloadableCodeBinarySymmetricOperator.XOr:
 					return "Concatenates left and right expression with (non optional) white space in between.";
-				case OverloadableCodeSymmetricBinaryOperator.Or:
+				case OverloadableCodeBinarySymmetricOperator.Or:
 					return "Creates alternation from left and right expression.";
 				default:
 					throw new NotSupportedException($"Operator {binaryOperator} is not supported.");
@@ -65,15 +65,15 @@ namespace QuickAccess.Parser.SmartExpressions
 		}
 
 		/// <inheritdoc />
-		public string GetUnaryOperatorDescription(OverloadableCodeSymmetricUnaryOperator unaryOperator)
+		public string GetUnaryOperatorDescription(OverloadableCodeUnarySymmetricOperator unaryOperator)
 		{
 			switch (unaryOperator)
 			{
-				case OverloadableCodeSymmetricUnaryOperator.BitwiseComplement:
+				case OverloadableCodeUnarySymmetricOperator.BitwiseComplement:
 					return "Wraps expression with quantifier 0-1";
-				case OverloadableCodeSymmetricUnaryOperator.LogicalNegation:
+				case OverloadableCodeUnarySymmetricOperator.LogicalNegation:
 					return "Creates negated expression.";
-				case OverloadableCodeSymmetricUnaryOperator.Minus:
+				case OverloadableCodeUnarySymmetricOperator.Minus:
 					return "Creates positive lookahead from expression.";
 				default:
 					throw new NotSupportedException($"Operator {unaryOperator} is not supported.");
@@ -82,7 +82,7 @@ namespace QuickAccess.Parser.SmartExpressions
 
 		/// <inheritdoc />
 		public bool TryEvaluateOperatorResult(object left,
-		                                      OverloadableCodeSymmetricBinaryOperator binaryOperator,
+		                                      OverloadableCodeBinarySymmetricOperator binaryOperator,
 		                                      object right,
 		                                      out object result)
 		{
@@ -97,7 +97,7 @@ namespace QuickAccess.Parser.SmartExpressions
 		}
 
 		/// <inheritdoc />
-		public bool TryEvaluateOperatorResult(OverloadableCodeSymmetricUnaryOperator unaryOperator, object arg, out object result)
+		public bool TryEvaluateOperatorResult(OverloadableCodeUnarySymmetricOperator unaryOperator, object arg, out object result)
 		{
 			if (arg is SmartExpressionBrick sb)
 			{
@@ -193,44 +193,44 @@ namespace QuickAccess.Parser.SmartExpressions
 			return DefineRule(content, ruleName, blockFromRuleOverwriting: false);
 		}
 
-		public SmartExpressionBrick EvaluateOperatorResult(SmartExpressionBrick left, OverloadableCodeSymmetricBinaryOperator binaryOperator, SmartExpressionBrick right)
+		public SmartExpressionBrick EvaluateOperatorResult(SmartExpressionBrick left, OverloadableCodeBinarySymmetricOperator binaryOperator, SmartExpressionBrick right)
 		{
 			EvaluateArguments(ref left, ref right);
 
 			switch (binaryOperator)
 			{
-				case OverloadableCodeSymmetricBinaryOperator.Mul:
+				case OverloadableCodeBinarySymmetricOperator.Mul:
 					return Concatenate(left, SX.Anything, right);
-				case OverloadableCodeSymmetricBinaryOperator.Div:
+				case OverloadableCodeBinarySymmetricOperator.Div:
 					return Concatenate(left, SX.NextLine, right);
-				case OverloadableCodeSymmetricBinaryOperator.Mod:
+				case OverloadableCodeBinarySymmetricOperator.Mod:
 					return Concatenate(left, SX.CustomSequence, right);
-				case OverloadableCodeSymmetricBinaryOperator.Sum:
+				case OverloadableCodeBinarySymmetricOperator.Sum:
 					return Concatenate(left, right);
-				case OverloadableCodeSymmetricBinaryOperator.Sub:
+				case OverloadableCodeBinarySymmetricOperator.Sub:
 					return Concatenate(left, CreatePositiveLookahead(right));
-				case OverloadableCodeSymmetricBinaryOperator.And:
+				case OverloadableCodeBinarySymmetricOperator.And:
 					return Concatenate(left, SX.OptionalWhiteSpace, right);
-				case OverloadableCodeSymmetricBinaryOperator.XOr:
+				case OverloadableCodeBinarySymmetricOperator.XOr:
 					return Concatenate(left, SX.WhiteSpace, right);
-				case OverloadableCodeSymmetricBinaryOperator.Or:
+				case OverloadableCodeBinarySymmetricOperator.Or:
 					return CreateAlternation(left, right);
 				default:
 					throw new NotSupportedException($"Operator {binaryOperator} is not supported for two arguments of type {nameof(SmartExpressionBrick)}.");
 			}
 		}
 		
-		public SmartExpressionBrick EvaluateOperatorResult(OverloadableCodeSymmetricUnaryOperator unaryOperator, SmartExpressionBrick arg)
+		public SmartExpressionBrick EvaluateOperatorResult(OverloadableCodeUnarySymmetricOperator unaryOperator, SmartExpressionBrick arg)
 		{
 			EvaluateArguments(ref arg);
 
 			switch (unaryOperator)
 			{
-				case OverloadableCodeSymmetricUnaryOperator.Minus:
+				case OverloadableCodeUnarySymmetricOperator.Minus:
 					return CreatePositiveLookahead(arg);
-				case OverloadableCodeSymmetricUnaryOperator.LogicalNegation:
+				case OverloadableCodeUnarySymmetricOperator.LogicalNegation:
 					throw new NotImplementedException();
-				case OverloadableCodeSymmetricUnaryOperator.BitwiseComplement:
+				case OverloadableCodeUnarySymmetricOperator.BitwiseComplement:
 					return CreateQuantifierBrick(arg, 0, 1);
 				default:
 					throw new NotSupportedException($"Operator {unaryOperator} is not supported for argument of type {nameof(SmartExpressionBrick)}.");

@@ -70,5 +70,11 @@ namespace QuickAccess.DataStructures.Common.Patterns.Specifications
 		{
 			return true;
 		}
+
+		/// <inheritdoc />
+		public override string ToString()
+		{
+			return $"!{_argument}";
+		}
 	}
 }

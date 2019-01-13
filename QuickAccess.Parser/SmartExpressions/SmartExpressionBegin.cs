@@ -51,7 +51,7 @@ namespace QuickAccess.Parser.SmartExpressions
 		public static SmartExpressionBrick operator &(SmartExpressionBegin left, SmartExpressionBrick right)
 		{
 			var algebra = left._algebra.GetHighestPrioritizedAlgebra(right);
-			return algebra.EvaluateOperatorResult(algebra.OptionalWhiteSpace, OverloadableCodeSymmetricBinaryOperator.Sum, right);
+			return algebra.EvaluateOperatorResult(algebra.OptionalWhiteSpace, OverloadableCodeBinarySymmetricOperator.Sum, right);
 		}
 
 		public static SmartExpressionBrick operator +(SmartExpressionBegin left, SmartExpressionBrick right)
@@ -62,13 +62,13 @@ namespace QuickAccess.Parser.SmartExpressions
 		public static SmartExpressionBrick operator -(SmartExpressionBegin left, SmartExpressionBrick right)
 		{
 			var algebra = left._algebra.GetHighestPrioritizedAlgebra(right);
-			return algebra.EvaluateOperatorResult(OverloadableCodeSymmetricUnaryOperator.Minus, right);
+			return algebra.EvaluateOperatorResult(OverloadableCodeUnarySymmetricOperator.Minus, right);
 		}
 
 		public static SmartExpressionBrick operator *(SmartExpressionBegin left, SmartExpressionBrick right)
 		{
 			var algebra = left._algebra.GetHighestPrioritizedAlgebra(right);
-			return algebra.EvaluateOperatorResult(algebra.Anything, OverloadableCodeSymmetricBinaryOperator.Sum, right);
+			return algebra.EvaluateOperatorResult(algebra.Anything, OverloadableCodeBinarySymmetricOperator.Sum, right);
 		}
 
 		public static SmartExpressionBrick operator |(SmartExpressionBegin left, SmartExpressionBrick right)
@@ -79,13 +79,13 @@ namespace QuickAccess.Parser.SmartExpressions
 		public static SmartExpressionBrick operator ^(SmartExpressionBegin left, SmartExpressionBrick right)
 		{
 			var algebra = left._algebra.GetHighestPrioritizedAlgebra(right);
-			return algebra.EvaluateOperatorResult(algebra.WhiteSpace, OverloadableCodeSymmetricBinaryOperator.Sum, right);
+			return algebra.EvaluateOperatorResult(algebra.WhiteSpace, OverloadableCodeBinarySymmetricOperator.Sum, right);
 		}
 
 		public static SmartExpressionBrick operator %(SmartExpressionBegin left, SmartExpressionBrick right)
 		{
 			var algebra = left._algebra.GetHighestPrioritizedAlgebra(right);
-			return algebra.EvaluateOperatorResult(algebra.CustomSequence, OverloadableCodeSymmetricBinaryOperator.Sum, right);
+			return algebra.EvaluateOperatorResult(algebra.CustomSequence, OverloadableCodeBinarySymmetricOperator.Sum, right);
 		}
 	}
 }

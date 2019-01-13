@@ -28,20 +28,21 @@
 // 
 // =====================================================================
 // 
-// Project: QuickAccess.DataStructures
+// Project: QuickAccess.Parser
 // 
 // Author: Kamil Piotr Kaczorek
 // http://kamil.scienceontheweb.net
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
-namespace QuickAccess.DataStructures.Common.Patterns.Specifications
+namespace QuickAccess.DataStructures.CodeOperatorAlgebra
 {
-	public enum CompositeSpecificationOperator
+	public enum OverloadableCodeUnarySymmetricOperator
 	{
-		And,
-		Or,
-		XOr,
-		Single,
-		AllButOne
+		Increment = OverloadableCodeOperator.Increment,
+		Decrement = OverloadableCodeOperator.Decrement,
+		Plus = OverloadableCodeOperator.Plus,
+		Minus =  OverloadableCodeOperator.Minus,
+		LogicalNegation = OverloadableCodeOperator.LogicalNegation,
+		BitwiseComplement = OverloadableCodeOperator.BitwiseComplement
 	}
 }

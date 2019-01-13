@@ -36,7 +36,7 @@
 #endregion
 namespace QuickAccess.DataStructures.CodeOperatorAlgebra
 {
-	public enum OverloadableCodeSymmetricBinaryOperator
+	public enum OverloadableCodeBinarySymmetricOperator
 	{
 		Mul = OverloadableCodeOperator.Mul,
 		Div = OverloadableCodeOperator.Div,

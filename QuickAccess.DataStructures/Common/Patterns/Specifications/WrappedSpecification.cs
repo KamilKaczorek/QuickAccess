@@ -79,5 +79,11 @@ namespace QuickAccess.DataStructures.Common.Patterns.Specifications
 		{
 			return _wrapped is Specification<TWrapped> spec && spec.IsDeMorganSimplificationCandidate();
 		}
+
+		/// <inheritdoc />
+		public override string ToString()
+		{
+			return _wrapped.ToString();
+		}
 	}
 }

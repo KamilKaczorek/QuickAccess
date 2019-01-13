@@ -40,6 +40,29 @@ using QuickAccess.DataStructures.CodeOperatorAlgebra;
 
 namespace QuickAccess.DataStructures.Common.Patterns.Specifications
 {
+	public static class Specification
+	{
+		public static ISpecificationAlgebra<T> GetDefaultAlgebra<T>()
+		{
+			return DefaultSpecificationAlgebra<T>.Instance;
+		}
+
+		public static Specification<T> FromPredicate<T>(Func<T, bool> predicate)
+		{
+			return predicate.ToSpecification();
+		}
+
+		public static Specification<T> GetTrue<T>()
+		{
+			return new TrueSpecification<T>(GetDefaultAlgebra<T>());
+		}
+
+		public static Specification<T> GetFalse<T>()
+		{
+			return new FalseSpecification<T>(GetDefaultAlgebra<T>());
+		}
+	}
+
 	public abstract class Specification<T> : ISpecification<T>, IEquatable<Specification<T>>, ICodeOperatorAlgebraicDomain<Specification<T>, ISpecificationAlgebra<T>>
 	{
 		/// <inheritdoc />
@@ -95,52 +118,52 @@ namespace QuickAccess.DataStructures.Common.Patterns.Specifications
 
 		public static Specification<T> operator &(Specification<T> left, Specification<T> right)
 		{
-			return left.GetOperatorResultOfHighestPrioritizedAlgebra(OverloadableCodeSymmetricBinaryOperator.And, right);
+			return left.GetOperatorResultOfHighestPrioritizedAlgebra(OverloadableCodeBinarySymmetricOperator.And, right);
 		}
 
 		public static Specification<T> operator |(Specification<T> left, Specification<T> right)
 		{
-			return left.GetOperatorResultOfHighestPrioritizedAlgebra(OverloadableCodeSymmetricBinaryOperator.Or, right);
+			return left.GetOperatorResultOfHighestPrioritizedAlgebra(OverloadableCodeBinarySymmetricOperator.Or, right);
 		}
 
 		public static Specification<T> operator ^(Specification<T> left, Specification<T> right)
 		{
-			return left.GetOperatorResultOfHighestPrioritizedAlgebra(OverloadableCodeSymmetricBinaryOperator.XOr, right);
+			return left.GetOperatorResultOfHighestPrioritizedAlgebra(OverloadableCodeBinarySymmetricOperator.XOr, right);
 		}
 
 		public static Specification<T> operator &(Func<T, bool> left, Specification<T> right)
 		{
-			return right.Algebra.EvaluateOperatorResult(left.ToSpecification(), OverloadableCodeSymmetricBinaryOperator.And, right);
+			return right.Algebra.EvaluateOperatorResult(left.ToSpecification(), OverloadableCodeBinarySymmetricOperator.And, right);
 		}
 
 		public static Specification<T> operator |(Func<T, bool> left, Specification<T> right)
 		{
-			return right.Algebra.EvaluateOperatorResult(left.ToSpecification(), OverloadableCodeSymmetricBinaryOperator.Or, right);
+			return right.Algebra.EvaluateOperatorResult(left.ToSpecification(), OverloadableCodeBinarySymmetricOperator.Or, right);
 		}
 
 		public static Specification<T> operator ^(Func<T, bool> left, Specification<T> right)
 		{
-			return right.Algebra.EvaluateOperatorResult(left.ToSpecification(), OverloadableCodeSymmetricBinaryOperator.XOr, right);
+			return right.Algebra.EvaluateOperatorResult(left.ToSpecification(), OverloadableCodeBinarySymmetricOperator.XOr, right);
 		}
 
 		public static Specification<T> operator &(Specification<T> left, Func<T, bool> right)
 		{
-			return left.Algebra.EvaluateOperatorResult(left, OverloadableCodeSymmetricBinaryOperator.And, right.ToSpecification());
+			return left.Algebra.EvaluateOperatorResult(left, OverloadableCodeBinarySymmetricOperator.And, right.ToSpecification());
 		}
 
 		public static Specification<T> operator |(Specification<T> left, Func<T, bool> right)
 		{
-			return left.Algebra.EvaluateOperatorResult(left, OverloadableCodeSymmetricBinaryOperator.Or, right.ToSpecification());
+			return left.Algebra.EvaluateOperatorResult(left, OverloadableCodeBinarySymmetricOperator.Or, right.ToSpecification());
 		}
 
 		public static Specification<T> operator ^(Specification<T> left, Func<T, bool> right)
 		{
-			return left.Algebra.EvaluateOperatorResult(left, OverloadableCodeSymmetricBinaryOperator.XOr, right.ToSpecification());
+			return left.Algebra.EvaluateOperatorResult(left, OverloadableCodeBinarySymmetricOperator.XOr, right.ToSpecification());
 		}
 
 		public static Specification<T> operator !(Specification<T> arg)
 		{
-			return arg.GetOperatorResult(OverloadableCodeSymmetricUnaryOperator.LogicalNegation);
+			return arg.GetOperatorResult(OverloadableCodeUnarySymmetricOperator.LogicalNegation);
 		}
 
 		/// <inheritdoc />
@@ -183,6 +206,10 @@ namespace QuickAccess.DataStructures.Common.Patterns.Specifications
 			return name.Replace("Specification", "");
 		}
 
-		
+		/// <inheritdoc />
+		public override string ToString()
+		{
+			return Descriptor.ToString();
+		}
 	}
 }

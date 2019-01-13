@@ -28,21 +28,55 @@
 // 
 // =====================================================================
 // 
-// Project: QuickAccess.Parser
+// Project: QuickAccess.DataStructures
 // 
 // Author: Kamil Piotr Kaczorek
 // http://kamil.scienceontheweb.net
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
-namespace QuickAccess.DataStructures.CodeOperatorAlgebra
+
+using System;
+using QuickAccess.DataStructures.CodeOperatorAlgebra;
+
+namespace QuickAccess.DataStructures.Common.Patterns.Specifications
 {
-	public enum OverloadableCodeSymmetricUnaryOperator
+	internal static class CompositeSpecificationOperationExtensions
 	{
-		Increment = OverloadableCodeOperator.Increment,
-		Decrement = OverloadableCodeOperator.Decrement,
-		Plus = OverloadableCodeOperator.Plus,
-		Minus =  OverloadableCodeOperator.Minus,
-		LogicalNegation = OverloadableCodeOperator.LogicalNegation,
-		BitwiseComplement = OverloadableCodeOperator.BitwiseComplement
+		public static bool CanBeRepresentedByCodeOperator(this CompositeSpecificationOperation operation)
+		{
+			switch (operation)
+			{
+				case CompositeSpecificationOperation.And :
+				case CompositeSpecificationOperation.Or :
+				case CompositeSpecificationOperation.XOr :
+					return true;
+				default:
+					return false;
+			}
+		}
+
+		public static CompositeSpecificationOperation ToCompositeSpecificationOperation(
+			this OverloadableCodeBinarySymmetricOperator binaryOperator)
+		{
+			switch (binaryOperator)
+			{
+				case OverloadableCodeBinarySymmetricOperator.And : return CompositeSpecificationOperation.And;
+				case OverloadableCodeBinarySymmetricOperator.Or : return CompositeSpecificationOperation.Or;
+				case OverloadableCodeBinarySymmetricOperator.XOr : return CompositeSpecificationOperation.XOr;
+				default:throw new NotSupportedException($"Operator {binaryOperator} is not supported.");
+			}
+		}
+
+		public static OverloadableCodeBinarySymmetricOperator ToCodeSymmetricBinaryOperator(
+			this CompositeSpecificationOperation operation)
+		{
+			switch (operation)
+			{
+				case CompositeSpecificationOperation.And : return OverloadableCodeBinarySymmetricOperator.And;
+				case CompositeSpecificationOperation.Or :  return OverloadableCodeBinarySymmetricOperator.Or;
+				case CompositeSpecificationOperation.XOr : return OverloadableCodeBinarySymmetricOperator.XOr;
+				default:throw new NotSupportedException($"Operator {operation} is not supported.");
+			}
+		}
 	}
 }

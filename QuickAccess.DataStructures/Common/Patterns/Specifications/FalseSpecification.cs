@@ -34,6 +34,9 @@
 // http://kamil.scienceontheweb.net
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
+
+using QuickAccess.DataStructures.CodeOperatorAlgebra;
+
 namespace QuickAccess.DataStructures.Common.Patterns.Specifications
 {
 	public sealed class FalseSpecification<T> : Specification<T>
@@ -59,6 +62,12 @@ namespace QuickAccess.DataStructures.Common.Patterns.Specifications
 		public override bool IsDeMorganSimplificationCandidate()
 		{
 			return true;
+		}
+
+		/// <inheritdoc />
+		public override string ToString()
+		{
+			return OverloadableCodeOperator.FalseOperator.ToCodeRepresentation();
 		}
 	}
 }

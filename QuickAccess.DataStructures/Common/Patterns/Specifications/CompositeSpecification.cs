@@ -48,35 +48,35 @@ namespace QuickAccess.DataStructures.Common.Patterns.Specifications
 		private readonly ISpecification<T>[] _arguments;
 
 
-		public CompositeSpecificationOperator Operator { get; }
+		public CompositeSpecificationOperation Operation { get; }
 
 		/// <inheritdoc />
 		public IReadOnlyList<ISpecification<T>> Arguments => _arguments;
 
 		/// <summary>Initializes a new instance of the <see cref="CompositeSpecification{T}"/> class.</summary>
 		/// <param name="algebra">The algebra.</param>
-		/// <param name="operator">The operator.</param>
+		/// <param name="operation">The operator.</param>
 		/// <param name="arguments">The arguments.</param>
 		public CompositeSpecification(ISpecificationAlgebra<T> algebra,
-		                              CompositeSpecificationOperator @operator,
+		                              CompositeSpecificationOperation operation,
 		                              params ISpecification<T>[] arguments
 		)
 			: base(algebra.GetHighestPrioritizedAlgebra<Specification<T>, ISpecificationAlgebra<T>>(arguments.OfType<ICodeOperatorAlgebraicDomain<Specification<T>, ISpecificationAlgebra<T>>>().Select(a => a.Algebra)), null)
 		{
-			Operator = @operator;
-			_arguments = GetFlatArgumentsArray(@operator, arguments);
+			Operation = operation;
+			_arguments = GetFlatArgumentsArray(operation, arguments);
 		}
 
-		private static ISpecification<T>[] GetFlatArgumentsArray(CompositeSpecificationOperator @operator,
+		private static ISpecification<T>[] GetFlatArgumentsArray(CompositeSpecificationOperation operation,
 		                                                         ISpecification<T>[] arguments)
 		{
-			if (@operator != CompositeSpecificationOperator.And &&
-			    @operator != CompositeSpecificationOperator.Or)
+			if (operation != CompositeSpecificationOperation.And &&
+			    operation != CompositeSpecificationOperation.Or)
 			{
 				return arguments;
 			}
 
-			var argsCount = GetFlatArgsCount(@operator, arguments);
+			var argsCount = GetFlatArgsCount(operation, arguments);
 
 			if (argsCount == arguments.Length)
 			{
@@ -85,7 +85,7 @@ namespace QuickAccess.DataStructures.Common.Patterns.Specifications
 
 			var res = new ISpecification<T>[argsCount];
 			var idx = 0;
-			foreach (var arg in GetFlatArgs(@operator, arguments))
+			foreach (var arg in GetFlatArgs(operation, arguments))
 			{
 				res[idx] = arg;
 				++idx;
@@ -94,18 +94,18 @@ namespace QuickAccess.DataStructures.Common.Patterns.Specifications
 			return res;
 		}
 
-		private static int GetFlatArgsCount(CompositeSpecificationOperator @operator, IEnumerable<ISpecification<T>> specifications)
+		private static int GetFlatArgsCount(CompositeSpecificationOperation operation, IEnumerable<ISpecification<T>> specifications)
 		{
-			return specifications.Sum(spec => spec is ICompositeSpecification<T> composite && composite.Operator == @operator
+			return specifications.Sum(spec => spec is ICompositeSpecification<T> composite && composite.Operation == operation
 				? composite.Arguments.Count
 				: 1);
 		}
 
-		private static IEnumerable<ISpecification<T>> GetFlatArgs(CompositeSpecificationOperator @operator, IEnumerable<ISpecification<T>> specifications)
+		private static IEnumerable<ISpecification<T>> GetFlatArgs(CompositeSpecificationOperation @operator, IEnumerable<ISpecification<T>> specifications)
 		{
 			foreach (var spec in specifications)
 			{
-				if (spec is ICompositeSpecification<T> composite && composite.Operator == @operator)
+				if (spec is ICompositeSpecification<T> composite && composite.Operation == @operator)
 				{
 					foreach (var arg in composite.Arguments)
 					{
@@ -122,11 +122,11 @@ namespace QuickAccess.DataStructures.Common.Patterns.Specifications
 		/// <inheritdoc />
 		public override bool IsSatisfiedBy(T candidate)
 		{
-			switch (Operator)
+			switch (Operation)
 			{
-				case CompositeSpecificationOperator.And : return _arguments.All(arg => arg.IsSatisfiedBy(candidate));
-				case CompositeSpecificationOperator.Or : return  _arguments.Any(arg => arg.IsSatisfiedBy(candidate));
-				case CompositeSpecificationOperator.XOr:
+				case CompositeSpecificationOperation.And : return _arguments.All(arg => arg.IsSatisfiedBy(candidate));
+				case CompositeSpecificationOperation.Or : return  _arguments.Any(arg => arg.IsSatisfiedBy(candidate));
+				case CompositeSpecificationOperation.XOr:
 				{
 					var count = _arguments.Length;
 
@@ -143,18 +143,18 @@ namespace QuickAccess.DataStructures.Common.Patterns.Specifications
 
 					return res;
 				}
-				case CompositeSpecificationOperator.Single :
+				case CompositeSpecificationOperation.Single :
 					return _arguments.ExactlyOne(v => v.IsSatisfiedBy(candidate));
-				case CompositeSpecificationOperator.AllButOne:
+				case CompositeSpecificationOperation.AllButOne:
 					return _arguments.AllButOne(v => v.IsSatisfiedBy(candidate));
-				default:throw new InvalidOperationException($"Operator {Operator} is not supported.");
+				default:throw new InvalidOperationException($"Operator {Operation} is not supported.");
 			}
 		}
 
 		/// <inheritdoc />
 		public override bool IsDeMorganSimplificationCandidate()
 		{
-			if (Operator != CompositeSpecificationOperator.And && Operator != CompositeSpecificationOperator.Or)
+			if (Operation != CompositeSpecificationOperation.And && Operation != CompositeSpecificationOperation.Or)
 			{
 				return false;
 			}
@@ -171,7 +171,18 @@ namespace QuickAccess.DataStructures.Common.Patterns.Specifications
 				return null;
 			}
 
-			return new CompositeSpecification<T>(Algebra, Operator == CompositeSpecificationOperator.And ? CompositeSpecificationOperator.Or : CompositeSpecificationOperator.And, _arguments.Select(a => Algebra.GetNegation(a)).Cast<ISpecification<T>>().ToArray());
+			return new CompositeSpecification<T>(Algebra, Operation == CompositeSpecificationOperation.And ? CompositeSpecificationOperation.Or : CompositeSpecificationOperation.And, _arguments.Select(a => Algebra.GetNegation(a)).Cast<ISpecification<T>>().ToArray());
+		}
+
+		/// <inheritdoc />
+		public override string ToString()
+		{
+			var isCodeOperator = Operation.CanBeRepresentedByCodeOperator();
+			var args = _arguments.Select(arg => arg.ToString());
+			var separator = isCodeOperator ? Operation.ToCodeSymmetricBinaryOperator().ToCodeRepresentation() : ", ";
+			var operation = isCodeOperator ? string.Empty : Operation.ToString();
+			
+			return $"{operation}({string.Join(separator, args)})";
 		}
 	}
 }

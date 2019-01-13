@@ -63,7 +63,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Common\Patterns\Specification\SpecificationIntegrationTests.cs" />
+    <Compile Include="Common\Patterns\Specifications\SpecificationIntegrationTests.cs" />
     <Compile Include="Graphs\Algorithms\BreadthFirstSearchTest.cs" />
     <Compile Include="Graphs\Algorithms\VertexSearchMapTest.cs" />
     <Compile Include="Graphs\Model\Factory\VerticesFactoryTest.cs" />
