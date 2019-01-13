@@ -45,6 +45,11 @@ using QuickAccess.Parser.SmartExpressions;
 namespace QuickAccess.Parser.Tests
 {
 
+	public interface ITestCompiler
+	{
+
+	}
+
 	[TestClass]
 	public class ParserBuilderIntegrationTest
 	{
@@ -94,6 +99,9 @@ namespace QuickAccess.Parser.Tests
 			var res = regex.IsMatch(expression);
 
 			Assert.AreEqual(expressionParsed, res);
+
+
+		
 
 			// * anything
 			// + nothing

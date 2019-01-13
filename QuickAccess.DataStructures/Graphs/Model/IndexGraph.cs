@@ -43,6 +43,7 @@ using System.Data;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using QuickAccess.DataStructures.Common;
+using QuickAccess.DataStructures.Common.Collections;
 using QuickAccess.DataStructures.Graphs.Extensions;
 using QuickAccess.DataStructures.Graphs.Factory;
 using QuickAccess.DataStructures.Graphs.Factory.Internal;

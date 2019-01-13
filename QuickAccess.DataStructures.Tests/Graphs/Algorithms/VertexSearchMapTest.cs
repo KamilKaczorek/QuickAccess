@@ -42,6 +42,7 @@ using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using QuickAccess.DataStructures.Common;
+using QuickAccess.DataStructures.Common.Collections;
 using QuickAccess.DataStructures.Graphs.Algorithms;
 using QuickAccess.DataStructures.Graphs.Model;
 using QuickAccess.DataStructures.Tests.Graphs.Model;

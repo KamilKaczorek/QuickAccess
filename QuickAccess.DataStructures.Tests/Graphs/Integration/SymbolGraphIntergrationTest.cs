@@ -42,6 +42,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using QuickAccess.DataStructures.Common;
+using QuickAccess.DataStructures.Common.Collections;
 using QuickAccess.DataStructures.Graphs.Algorithms;
 using QuickAccess.DataStructures.Graphs.Extensions;
 using QuickAccess.DataStructures.Graphs.Model;

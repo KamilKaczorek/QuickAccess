@@ -36,7 +36,6 @@
 #endregion
 
 using System.Collections.Generic;
-using QuickAccess.DataStructures.Common;
 using QuickAccess.DataStructures.Common.Freezable;
 using QuickAccess.DataStructures.Common.RegularExpression;
 

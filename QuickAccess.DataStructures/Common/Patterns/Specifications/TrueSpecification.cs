@@ -34,22 +34,31 @@
 // http://kamil.scienceontheweb.net
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
-namespace QuickAccess.DataStructures.Common.Freezable
+namespace QuickAccess.DataStructures.Common.Patterns.Specifications
 {
-	/// <summary>
-	///     The interface of the freezable object.
-	///     Freezable object became frozen when <see cref="Freeze" /> operation is called and stays frozen (read-only) till the
-	///     end of its lifetime.
-	/// <seealso cref="IFreezable"/>
-	/// </summary>
-	public interface IFreezableSource : IFreezable
+	public sealed class TrueSpecification<T> : Specification<T>
 	{
-		/// <summary>
-		///     Freezes the object from editing, since object is frozen each editing operation will throw
-		///     <see cref="System.Data.ReadOnlyException" /> exception.
-		///     When object is frozen once, it stays frozen till the end of its lifetime.
-		///     <seealso cref="IFreezable.IsFrozen" />
-		/// </summary>
-		void Freeze();
+		/// <inheritdoc />
+		public TrueSpecification(ISpecificationAlgebra<T> algebra, SpecificationDescriptor descriptor = null) : base(algebra, descriptor)
+		{
+		}
+
+		/// <inheritdoc />
+		public override bool IsSatisfiedBy(T candidate)
+		{
+			return true;
+		}
+
+		/// <inheritdoc />
+		public override Specification<T> GetCustomNegation()
+		{
+			return new FalseSpecification<T>(Algebra);
+		}
+
+		/// <inheritdoc />
+		public override bool IsDeMorganSimplificationCandidate()
+		{
+			return true;
+		}
 	}
 }

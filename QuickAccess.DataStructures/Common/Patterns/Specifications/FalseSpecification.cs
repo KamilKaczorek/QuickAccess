@@ -1,9 +1,8 @@
 ﻿#region LICENSE [BSD-2-Clause]
-
 // This code is distributed under the BSD-2-Clause license.
 // =====================================================================
 // 
-// Copyright ©2018 by Kamil Piotr Kaczorek
+// Copyright ©2019 by Kamil Piotr Kaczorek
 // All rights reserved.
 // 
 // Redistribution and use in source and binary forms, with or without modification, 
@@ -34,67 +33,32 @@
 // Author: Kamil Piotr Kaczorek
 // http://kamil.scienceontheweb.net
 // e-mail: kamil.piotr.kaczorek@gmail.com
-
 #endregion
-
-using System;
-using System.Collections;
-using System.Collections.Generic;
-
-namespace QuickAccess.DataStructures.Common
+namespace QuickAccess.DataStructures.Common.Patterns.Specifications
 {
-	public sealed class DefaultTailReadOnlyList<T> : IReadOnlyList<T>
+	public sealed class FalseSpecification<T> : Specification<T>
 	{
-		private readonly T[] _source;
-
-		public T OutOfTheSourceValue { get; }
-
-		public int SpecifiedInstancesCount => _source?.Length ?? 0;
-
-		public DefaultTailReadOnlyList(T[] source, int count, T outOfTheSourceValue)
+		/// <inheritdoc />
+		public FalseSpecification(ISpecificationAlgebra<T> algebra, SpecificationDescriptor descriptor = null) : base(algebra, descriptor)
 		{
-			_source = source != null && source.Length <= 0 ? null : source;
-			Count = count;
-			OutOfTheSourceValue = outOfTheSourceValue;
 		}
 
-		public T this[int index]
+		/// <inheritdoc />
+		public override bool IsSatisfiedBy(T candidate)
 		{
-			get
-			{
-				if (index < 0 || index >= Count)
-				{
-					throw new IndexOutOfRangeException();
-				}
-
-				return index < _source.Length
-					? _source[index]
-					: OutOfTheSourceValue;
-			}
+			return false;
 		}
 
-		public int Count { get; }
-
-		public IEnumerator<T> GetEnumerator()
+		/// <inheritdoc />
+		public override Specification<T> GetCustomNegation()
 		{
-			var srcCount = _source?.Length ?? 0;
-			for (var idx = 0; idx < Count; idx++)
-			{
-				yield return idx < srcCount
-					// ReSharper disable once PossibleNullReferenceException
-					? _source[idx]
-					: OutOfTheSourceValue;
-			}
+			return new TrueSpecification<T>(Algebra);
 		}
 
-		IEnumerator IEnumerable.GetEnumerator()
+		/// <inheritdoc />
+		public override bool IsDeMorganSimplificationCandidate()
 		{
-			return GetEnumerator();
-		}
-
-		public bool ContainsSpecifiedInstanceAt(int index)
-		{
-			return _source != null && index >= 0 && index < SpecifiedInstancesCount;
+			return true;
 		}
 	}
 }

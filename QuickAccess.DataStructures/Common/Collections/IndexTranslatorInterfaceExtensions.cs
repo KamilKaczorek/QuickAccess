@@ -41,7 +41,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 
-namespace QuickAccess.DataStructures.Common
+namespace QuickAccess.DataStructures.Common.Collections
 {
 	/// <summary>
 	///     The extension methods of the <see cref="IIndexTranslator" /> interface.

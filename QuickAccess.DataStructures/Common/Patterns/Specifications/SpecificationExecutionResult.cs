@@ -28,23 +28,19 @@
 // 
 // =====================================================================
 // 
-// Project: QuickAccess.Parser
+// Project: QuickAccess.DataStructures
 // 
 // Author: Kamil Piotr Kaczorek
 // http://kamil.scienceontheweb.net
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
-namespace QuickAccess.DataStructures.Algebra
+namespace QuickAccess.DataStructures.Common.Patterns.Specifications
 {
-	public enum BinaryOperator
+	public enum SpecificationExecutionResult
 	{
-		Mul = BinaryOperators.Mul,
-		Div = BinaryOperators.Div,
-		Mod = BinaryOperators.Mod,
-		Sum = BinaryOperators.Sum,
-		Sub = BinaryOperators.Sub,
-		And = BinaryOperators.And,
-		XOr = BinaryOperators.XOr,
-		Or =  BinaryOperators.Or
+		Undefined = 0,
+		Fulfilled,
+		Unfulfilled,
+		Error
 	}
 }

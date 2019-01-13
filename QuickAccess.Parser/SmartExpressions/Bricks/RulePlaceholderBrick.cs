@@ -36,8 +36,7 @@
 #endregion
 
 using System;
-using QuickAccess.DataStructures.Algebra;
-using QuickAccess.DataStructures.Common;
+using QuickAccess.DataStructures.CodeOperatorAlgebra;
 using QuickAccess.DataStructures.Common.Freezable;
 using QuickAccess.DataStructures.Common.RegularExpression;
 
@@ -62,7 +61,7 @@ namespace QuickAccess.Parser.SmartExpressions.Bricks
 		}
 
 		public RulePlaceholderBrick(ISmartExpressionAlgebra algebra, string ruleName, SmartExpressionBrick defaultRule)
-		: base(algebra.GetAlgebra(defaultRule))
+		: base(algebra.GetHighestPrioritizedAlgebra(defaultRule))
 		{
 			RuleName = ruleName;
 			_rule = new FreezableValue<Tuple<SmartExpressionBrick, bool>>(Tuple.Create(defaultRule, false));

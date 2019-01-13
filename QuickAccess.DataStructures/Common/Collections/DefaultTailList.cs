@@ -42,7 +42,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace QuickAccess.DataStructures.Common
+namespace QuickAccess.DataStructures.Common.Collections
 {
 	/// <summary>
 	///     The list that consists of two parts: regular defined items and undefined tail, for which the default item is

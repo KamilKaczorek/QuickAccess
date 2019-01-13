@@ -42,6 +42,7 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using QuickAccess.DataStructures.Common;
+using QuickAccess.DataStructures.Common.Collections;
 
 namespace QuickAccess.DataStructures.Graphs.Model
 {
@@ -205,7 +206,7 @@ namespace QuickAccess.DataStructures.Graphs.Model
 						? obj.AdjacentIndexes.MultiplyEachItemBy(23)
 						: obj.Select(e => (e.Destination * 23) ^ EdgeDataEqualityComparer.GetHashCode(e.Data))
 					)
-					.XOr(obj.EdgesCount);
+					.BitwiseXOr(obj.EdgesCount);
 			}
 		}
 	}

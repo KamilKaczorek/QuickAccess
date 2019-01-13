@@ -40,6 +40,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using QuickAccess.DataStructures.Common.Collections;
 
 namespace QuickAccess.DataStructures.Common
 {

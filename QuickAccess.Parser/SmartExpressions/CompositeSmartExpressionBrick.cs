@@ -38,7 +38,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using QuickAccess.DataStructures.Algebra;
+using QuickAccess.DataStructures.CodeOperatorAlgebra;
 
 namespace QuickAccess.Parser.SmartExpressions
 {
@@ -52,7 +52,7 @@ namespace QuickAccess.Parser.SmartExpressions
 		public override bool IsEmpty => Bricks.All(b => b.IsEmpty);
 
 		protected CompositeSmartExpressionBrick(ISmartExpressionAlgebra algebra, SmartExpressionBrick b1, SmartExpressionBrick b2, Func<CompositeSmartExpressionBrick, bool> canFlattenPredicate)
-		 :base(algebra.GetAlgebra(b1, b2))
+		 :base(algebra.GetHighestPrioritizedAlgebra(b1, b2))
 		{
 			var flatLength = GetSourceLength(b1,canFlattenPredicate) + GetSourceLength(b2,canFlattenPredicate);
 			Bricks = new SmartExpressionBrick[flatLength];
@@ -62,7 +62,7 @@ namespace QuickAccess.Parser.SmartExpressions
 		}
 
 		protected CompositeSmartExpressionBrick(ISmartExpressionAlgebra algebra, SmartExpressionBrick b1, SmartExpressionBrick b2, SmartExpressionBrick b3, Func<CompositeSmartExpressionBrick, bool> canFlattenPredicate)
-			:base(algebra.GetAlgebra(b1, b2, b3))
+			:base(algebra.GetHighestPrioritizedAlgebra(b1, b2, b3))
 		{
 			var flatLength = GetSourceLength(b1,canFlattenPredicate) + GetSourceLength(b2,canFlattenPredicate) + GetSourceLength(b3,canFlattenPredicate);
 			Bricks = new SmartExpressionBrick[flatLength];
@@ -73,7 +73,7 @@ namespace QuickAccess.Parser.SmartExpressions
 		}
 
 		protected CompositeSmartExpressionBrick(ISmartExpressionAlgebra algebra, SmartExpressionBrick[] bricks, Func<CompositeSmartExpressionBrick, bool> canFlattenPredicate)
-			:base(algebra.GetAlgebra(bricks))
+			:base(algebra.GetHighestPrioritizedAlgebra(bricks))
 		{
 			var flatLength = bricks.Sum(b => GetSourceLength(b, canFlattenPredicate));
 			Bricks = new SmartExpressionBrick[flatLength];
@@ -106,8 +106,6 @@ namespace QuickAccess.Parser.SmartExpressions
 			}
 		}
 
-		
-
 		/// <inheritdoc />
 		protected override void ApplyRuleDefinition(string name, SmartExpressionBrick content, bool recursion, bool freeze)
 		{
@@ -116,8 +114,6 @@ namespace QuickAccess.Parser.SmartExpressions
 				ApplyRuleDefinition(parsingBrick, name, content, recursion, freeze);
 			}
 		}
-
-		
 
 		/// <inheritdoc />
 		public override bool Equals(SmartExpressionBrick other)

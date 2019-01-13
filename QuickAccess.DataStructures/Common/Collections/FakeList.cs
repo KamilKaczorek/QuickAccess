@@ -42,7 +42,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace QuickAccess.DataStructures.Common
+namespace QuickAccess.DataStructures.Common.Collections
 {
 	/// <summary>
 	///     The fake list, that returns single specified value for each list element.

@@ -1,9 +1,8 @@
 ﻿#region LICENSE [BSD-2-Clause]
-
 // This code is distributed under the BSD-2-Clause license.
 // =====================================================================
 // 
-// Copyright ©2018 by Kamil Piotr Kaczorek
+// Copyright ©2019 by Kamil Piotr Kaczorek
 // All rights reserved.
 // 
 // Redistribution and use in source and binary forms, with or without modification, 
@@ -34,25 +33,23 @@
 // Author: Kamil Piotr Kaczorek
 // http://kamil.scienceontheweb.net
 // e-mail: kamil.piotr.kaczorek@gmail.com
-
 #endregion
-
 namespace QuickAccess.DataStructures.Common.Freezable
 {
 	/// <summary>
 	///     The interface of the freezable object.
-	///     Freezable object became frozen when <see cref="IFreezableSource.Freeze" /> operation is called and stays frozen (read-only) till the
+	///     Freezable object became frozen when <see cref="Freeze" /> operation is called and stays frozen (read-only) till the
 	///     end of its lifetime.
+	/// <seealso cref="IReadOnlyFreezable"/>
 	/// </summary>
-	public interface IFreezable
+	public interface IFreezable : IReadOnlyFreezable
 	{
 		/// <summary>
-		///     Gets a value indicating whether the current object is frozen (editing is not enabled).
-		///     <seealso cref="IFreezableSource.Freeze" />
+		///     Freezes the object from editing, since object is frozen each editing operation will throw
+		///     <see cref="System.Data.ReadOnlyException" /> exception.
+		///     When object is frozen once, it stays frozen till the end of its lifetime.
+		///     <seealso cref="IReadOnlyFreezable.IsFrozen" />
 		/// </summary>
-		/// <value>
-		///     <c>true</c> if this object is frozen; otherwise, <c>false</c>.
-		/// </value>
-		bool IsFrozen { get; }
+		void Freeze();
 	}
 }

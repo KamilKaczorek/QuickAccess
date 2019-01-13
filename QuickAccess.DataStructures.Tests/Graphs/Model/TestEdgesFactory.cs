@@ -40,6 +40,7 @@
 using System;
 using System.Linq;
 using QuickAccess.DataStructures.Common;
+using QuickAccess.DataStructures.Common.Collections;
 using QuickAccess.DataStructures.Graphs.Extensions;
 using QuickAccess.DataStructures.Graphs.Model;
 

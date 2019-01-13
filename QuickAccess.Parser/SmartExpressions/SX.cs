@@ -102,7 +102,7 @@ namespace QuickAccess.Parser.SmartExpressions
 
 		public static SmartExpressionBrick Rule(this string patternName)
 		{
-			return DefaultAlgebra.CreatePlaceholder(patternName, null);
+			return DefaultAlgebra.CreateRulePlaceholder(patternName, null);
 		}
 	}
 }

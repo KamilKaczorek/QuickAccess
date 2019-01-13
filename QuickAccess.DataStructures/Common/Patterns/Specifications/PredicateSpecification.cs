@@ -28,7 +28,7 @@
 // 
 // =====================================================================
 // 
-// Project: QuickAccess.Parser
+// Project: QuickAccess.DataStructures
 // 
 // Author: Kamil Piotr Kaczorek
 // http://kamil.scienceontheweb.net
@@ -37,16 +37,22 @@
 
 using System;
 
-namespace QuickAccess.DataStructures.Algebra
+namespace QuickAccess.DataStructures.Common.Patterns.Specifications
 {
-	[Flags]
-	public enum UnaryOperators
+	public sealed class PredicateSpecification<T> : Specification<T>
 	{
-		DoublePlus = 0x01,
-		DoubleMinus = 0x02,
-		SinglePlus = 0x04,
-		SingleMinus =  0x08,
-		LogicalNot = 0x10,
-		BinaryNot = 0x20
+		private readonly Func<T, bool> _predicate;
+
+		/// <inheritdoc />
+		public PredicateSpecification(ISpecificationAlgebra<T> algebra, Func<T, bool > predicate, SpecificationDescriptor descriptor = null) : base(algebra, descriptor)
+		{
+			_predicate = predicate;
+		}
+
+		/// <inheritdoc />
+		public override bool IsSatisfiedBy(T candidate)
+		{
+			return _predicate.Invoke(candidate);
+		}
 	}
 }

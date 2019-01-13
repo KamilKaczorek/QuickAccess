@@ -35,16 +35,17 @@
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
 
-using QuickAccess.DataStructures.Algebra;
+using QuickAccess.DataStructures.CodeOperatorAlgebra;
 
 namespace QuickAccess.Parser.SmartExpressions
 {
-	public interface ISmartExpressionAlgebra : IAlgebra<SmartExpressionBrick>
+	public interface ISmartExpressionAlgebra : ICodeOperatorSymmetricAlgebra<SmartExpressionBrick>
 	{
+		SmartExpressionBrick CreatePositiveLookahead(SmartExpressionBrick content);
 		SmartExpressionBrick CreateQuantifierBrick(SmartExpressionBrick content, long min, long max);
 		SmartExpressionBrick DefineRule(SmartExpressionBrick content, string ruleName);
 		SmartExpressionBrick DefineSealedRule(SmartExpressionBrick content, string ruleName);
-		SmartExpressionBrick CreatePlaceholder(string ruleName, SmartExpressionBrick defaultExpression);
+		SmartExpressionBrick CreateRulePlaceholder(string ruleName, SmartExpressionBrick defaultExpression);
 		SmartExpressionBrick Current { get; }
 
 		SmartExpressionBegin Start { get; }

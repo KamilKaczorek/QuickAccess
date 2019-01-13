@@ -1,7 +1,7 @@
 ﻿
 using System.Diagnostics.Contracts;
 
-namespace QuickAccess.DataStructures.Common
+namespace QuickAccess.DataStructures.Common.Collections
 {
 	/// <summary>
 	/// The interface of the index translator that translate source index into destination index and vice versa.

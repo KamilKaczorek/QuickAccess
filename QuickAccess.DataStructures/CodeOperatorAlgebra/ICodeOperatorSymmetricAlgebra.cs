@@ -37,18 +37,40 @@
 
 using System;
 
-namespace QuickAccess.DataStructures.Algebra
+namespace QuickAccess.DataStructures.CodeOperatorAlgebra
 {
-	[Flags]
-	public enum BinaryOperators
+	public interface IAlgebra
 	{
-		Mul = 0x000100,
-		Div = 0x000200,
-		Mod = 0x000400,
-		Sum = 0x001000,
-		Sub = 0x002000,
-		And = 0x010000,
-		XOr = 0x020000,
-		Or =  0x040000
+		Type BaseDomainType { get; }
+		int Priority { get; }
+		bool IsDomainSupported(Type domainType);
 	}
+
+
+	public interface IAlgebra<in TUnaryOperator, in TBinaryOperator> : IAlgebra
+	{
+		bool IsUnaryOperatorSupported(TUnaryOperator unaryOperator);
+		bool IsBinaryOperatorSupported(TBinaryOperator binaryOperator);
+	
+		string GetBinaryOperatorDescription(TBinaryOperator binaryOperator);
+		string GetUnaryOperatorDescription(TUnaryOperator unaryOperator);
+
+		bool TryEvaluateOperatorResult(object left, TBinaryOperator binaryOperator, object right, out object result);
+		bool TryEvaluateOperatorResult(TUnaryOperator unaryOperator, object arg, out object result);
+	}
+
+
+	public interface ICodeOperatorSymmetricAlgebra : IAlgebra<OverloadableCodeSymmetricUnaryOperator, OverloadableCodeSymmetricBinaryOperator>
+	{
+		OverloadableCodeOperators SupportedOperators { get; }
+	}
+
+	public interface ICodeOperatorSymmetricAlgebra<TDomain> : ICodeOperatorSymmetricAlgebra
+	{
+		TDomain EvaluateOperatorResult(TDomain left, OverloadableCodeSymmetricBinaryOperator binaryOperator, TDomain right);
+		TDomain EvaluateOperatorResult(OverloadableCodeSymmetricUnaryOperator unaryOperator, TDomain arg);
+	}
+
+
+	
 }

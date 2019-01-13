@@ -36,7 +36,7 @@
 #endregion
 
 using System;
-using QuickAccess.DataStructures.Algebra;
+using QuickAccess.DataStructures.CodeOperatorAlgebra;
 using QuickAccess.DataStructures.Common.RegularExpression;
 
 namespace QuickAccess.Parser.SmartExpressions.Bricks
@@ -56,7 +56,7 @@ namespace QuickAccess.Parser.SmartExpressions.Bricks
 		}
 
 		public QuantifierBrick(ISmartExpressionAlgebra algebra, SmartExpressionBrick content, long min, long max)
-		: base(algebra.GetAlgebra(content))
+		: base(algebra.GetHighestPrioritizedAlgebra(content))
 		{
 			Content = content ?? throw new ArgumentNullException(nameof(content));
 

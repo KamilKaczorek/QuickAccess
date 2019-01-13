@@ -28,21 +28,16 @@
 // 
 // =====================================================================
 // 
-// Project: QuickAccess.Parser
+// Project: QuickAccess.DataStructures
 // 
 // Author: Kamil Piotr Kaczorek
 // http://kamil.scienceontheweb.net
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
-namespace QuickAccess.DataStructures.Algebra
+namespace QuickAccess.DataStructures.Common.Patterns.Specifications
 {
-	public enum UnaryOperator
+	public interface ICompositeSpecification<in T> : IAggregateSpecification<T>
 	{
-		DoublePlus = UnaryOperators.DoublePlus,
-		DoubleMinus = UnaryOperators.DoubleMinus,
-		SinglePlus = UnaryOperators.SinglePlus,
-		SingleMinus =  UnaryOperators.SingleMinus,
-		LogicalNot = UnaryOperators.LogicalNot,
-		BinaryNot = UnaryOperators.BinaryNot
+		CompositeSpecificationOperator Operator { get; }
 	}
 }

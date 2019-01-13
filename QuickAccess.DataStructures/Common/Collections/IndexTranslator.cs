@@ -39,7 +39,7 @@
 
 using System;
 
-namespace QuickAccess.DataStructures.Common
+namespace QuickAccess.DataStructures.Common.Collections
 {
 	/// <summary>
 	///     The index translator.

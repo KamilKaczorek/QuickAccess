@@ -35,12 +35,47 @@
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
 
-using System.Collections.Generic;
-using QuickAccess.DataStructures.Algebra;
+using QuickAccess.DataStructures.CodeOperatorAlgebra;
 using QuickAccess.DataStructures.Common.RegularExpression;
 
 namespace QuickAccess.Parser.SmartExpressions.Bricks
 {
+	public sealed class NegationBrick : SmartExpressionBrick
+	{
+		/// <inheritdoc />
+		public override string Name => "Not";
+		public SmartExpressionBrick Content { get; }
+		/// <inheritdoc />
+		public NegationBrick(ISmartExpressionAlgebra algebra, SmartExpressionBrick content) : base(algebra)
+		{
+			Content = content;
+		}
+
+		/// <inheritdoc />
+		protected override void ApplyRuleDefinition(string name, SmartExpressionBrick content, bool recursion, bool freeze)
+		{
+			ApplyRuleDefinition(Content, name, content, recursion, freeze);
+		}
+
+		/// <inheritdoc />
+		public override string ExpressionId => $"$!{Content.ExpressionId}";
+
+		/// <inheritdoc />
+		public override bool Equals(SmartExpressionBrick other)
+		{
+			return other is NegationBrick nb && nb.Content.Equals(Content);
+		}
+
+		/// <inheritdoc />
+		public override bool ProvidesRegularExpression => Content.ProvidesRegularExpression;
+
+		/// <inheritdoc />
+		public override string ToRegularExpressionString(RegularExpressionBuildingContext ctx)
+		{
+			return ctx.Factory.CreateNot(ctx.Context, Content.ToRegularExpressionString(ctx));
+		}
+	}
+
 	public sealed class CapturingGroupBrick : SmartExpressionBrick
 	{
 		/// <inheritdoc />
@@ -80,12 +115,12 @@ namespace QuickAccess.Parser.SmartExpressions.Bricks
 
 		public CapturingGroupBrick Clone(ISmartExpressionAlgebra algebra, string groupName, bool freeze = false)
 		{
-			return new CapturingGroupBrick(algebra.GetAlgebra((SmartExpressionBrick)this), Content, groupName, freeze);
+			return new CapturingGroupBrick(algebra.GetHighestPrioritizedAlgebra((SmartExpressionBrick)this), Content, groupName, freeze);
 		}
 
 		public CapturingGroupBrick Clone(ISmartExpressionAlgebra algebra, bool freeze = false)
 		{
-			return new CapturingGroupBrick(algebra.GetAlgebra((SmartExpressionBrick)this), Content, GroupName, freeze);
+			return new CapturingGroupBrick(algebra.GetHighestPrioritizedAlgebra((SmartExpressionBrick)this), Content, GroupName, freeze);
 		}
 
 		public override string ToRegularExpressionString(RegularExpressionBuildingContext ctx)

@@ -39,7 +39,7 @@ using System;
 
 namespace QuickAccess.DataStructures.Common.Freezable
 {
-	public sealed class GuardedFreezableValue<T> : FreezableValueBase<T>, IFreezableSource
+	public sealed class GuardedFreezableValue<T> : FreezableValueBase<T>, IFreezable
 	{
 		private bool _isSet;
 		private Func<T, bool> _canSetPredicate;

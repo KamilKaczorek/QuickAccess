@@ -36,7 +36,7 @@
 #endregion
 namespace QuickAccess.DataStructures.Common.Freezable
 {
-	public interface IReadOnlyFreezableValue<out T> : IFreezable
+	public interface IReadOnlyFreezableValue<out T> : IReadOnlyFreezable
 	{
 		bool IsSet { get; }
 		T Value { get; }

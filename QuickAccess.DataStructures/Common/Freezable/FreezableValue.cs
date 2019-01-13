@@ -36,7 +36,7 @@
 #endregion
 namespace QuickAccess.DataStructures.Common.Freezable
 {
-	public sealed class FreezableValue<T> : FreezableValueBase<T>, IFreezableSource
+	public sealed class FreezableValue<T> : FreezableValueBase<T>, IFreezable
 	{
 		public FreezableValue()
 		{

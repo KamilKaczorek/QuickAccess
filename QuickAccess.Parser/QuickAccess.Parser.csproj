@@ -3,11 +3,10 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>latest</LangVersion>
-    <AssemblyVersion>1.4.0.0</AssemblyVersion>
+    <AssemblyVersion>1.5.0.0</AssemblyVersion>
     <Version>1.4.0</Version>
-    <PackageReleaseNotes>Regular expression evaluation fixed.
-Sealing (freezing) of parser rules implemented.</PackageReleaseNotes>
-    <FileVersion>1.4.0.0</FileVersion>
+    <PackageReleaseNotes>Applied changes of code operator algebra refactoring.</PackageReleaseNotes>
+    <FileVersion>1.5.0.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>

@@ -36,16 +36,14 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
-using QuickAccess.DataStructures.Algebra;
-using QuickAccess.DataStructures.Common;
+using QuickAccess.DataStructures.CodeOperatorAlgebra;
 using QuickAccess.DataStructures.Common.RegularExpression;
 
 namespace QuickAccess.Parser.SmartExpressions
 {
 	public abstract class SmartExpressionBrick
 		: IRegularExpressionProvider,
-		  IAlgebraicDomain<SmartExpressionBrick, ISmartExpressionAlgebra>,
+		  ICodeOperatorAlgebraicDomain<SmartExpressionBrick, ISmartExpressionAlgebra>,
 		  IEquatable<SmartExpressionBrick>
 	{
 		protected SmartExpressionBrick(ISmartExpressionAlgebra algebra)
@@ -68,72 +66,72 @@ namespace QuickAccess.Parser.SmartExpressions
 
 		public static SmartExpressionBrick operator *(SmartExpressionBrick left, SmartExpressionBrick right)
 		{
-			return SX.DefaultAlgebra.Calculate(left, BinaryOperator.Mul, right);
+			return SX.DefaultAlgebra.GetOperatorResultOfHighestPrioritizedAlgebra(left, OverloadableCodeSymmetricBinaryOperator.Mul, right);
 		}
 
 		public static SmartExpressionBrick operator /(SmartExpressionBrick left, SmartExpressionBrick right)
 		{
-			return SX.DefaultAlgebra.Calculate(left, BinaryOperator.Div, right);
+			return SX.DefaultAlgebra.GetOperatorResultOfHighestPrioritizedAlgebra(left, OverloadableCodeSymmetricBinaryOperator.Div, right);
 		}
 
 		public static SmartExpressionBrick operator %(SmartExpressionBrick left, SmartExpressionBrick right)
 		{
-			return SX.DefaultAlgebra.Calculate(left, BinaryOperator.Mod, right);
+			return SX.DefaultAlgebra.GetOperatorResultOfHighestPrioritizedAlgebra(left, OverloadableCodeSymmetricBinaryOperator.Mod, right);
 		}
 
 		public static SmartExpressionBrick operator +(SmartExpressionBrick left, SmartExpressionBrick right)
 		{
-			return SX.DefaultAlgebra.Calculate(left, BinaryOperator.Sum, right);
+			return SX.DefaultAlgebra.GetOperatorResultOfHighestPrioritizedAlgebra(left, OverloadableCodeSymmetricBinaryOperator.Sum, right);
 		}
 
 		public static SmartExpressionBrick operator -(SmartExpressionBrick left, SmartExpressionBrick right)
 		{
-			return SX.DefaultAlgebra.Calculate(left, BinaryOperator.Sub, right);
+			return SX.DefaultAlgebra.GetOperatorResultOfHighestPrioritizedAlgebra(left, OverloadableCodeSymmetricBinaryOperator.Sub, right);
 		}
 
 		public static SmartExpressionBrick operator &(SmartExpressionBrick left, SmartExpressionBrick right)
 		{
-			return SX.DefaultAlgebra.Calculate(left, BinaryOperator.And, right);
+			return SX.DefaultAlgebra.GetOperatorResultOfHighestPrioritizedAlgebra(left, OverloadableCodeSymmetricBinaryOperator.And, right);
 		}
 
 		public static SmartExpressionBrick operator ^(SmartExpressionBrick left, SmartExpressionBrick right)
 		{
-			return SX.DefaultAlgebra.Calculate(left, BinaryOperator.XOr, right);
+			return SX.DefaultAlgebra.GetOperatorResultOfHighestPrioritizedAlgebra(left, OverloadableCodeSymmetricBinaryOperator.XOr, right);
 		}
 
 		public static SmartExpressionBrick operator |(SmartExpressionBrick left, SmartExpressionBrick right)
 		{
-			return SX.DefaultAlgebra.Calculate(left, BinaryOperator.Or, right);
+			return SX.DefaultAlgebra.GetOperatorResultOfHighestPrioritizedAlgebra(left, OverloadableCodeSymmetricBinaryOperator.Or, right);
 		}
 
 		public static SmartExpressionBrick operator ++(SmartExpressionBrick arg)
 		{
-			return SX.DefaultAlgebra.EvaluateOperatorResult(UnaryOperator.DoublePlus, arg);
+			return SX.DefaultAlgebra.EvaluateOperatorResult(OverloadableCodeSymmetricUnaryOperator.Increment, arg);
 		}
 
 		public static SmartExpressionBrick operator --(SmartExpressionBrick arg)
 		{
-			return SX.DefaultAlgebra.EvaluateOperatorResult(UnaryOperator.DoubleMinus, arg);
+			return SX.DefaultAlgebra.EvaluateOperatorResult(OverloadableCodeSymmetricUnaryOperator.Decrement, arg);
 		}
 
 		public static SmartExpressionBrick operator +(SmartExpressionBrick arg)
 		{
-			return SX.DefaultAlgebra.EvaluateOperatorResult(UnaryOperator.SinglePlus, arg);
+			return SX.DefaultAlgebra.EvaluateOperatorResult(OverloadableCodeSymmetricUnaryOperator.Plus, arg);
 		}
 
 		public static SmartExpressionBrick operator -(SmartExpressionBrick arg)
 		{
-			return SX.DefaultAlgebra.EvaluateOperatorResult(UnaryOperator.SingleMinus, arg);
+			return SX.DefaultAlgebra.EvaluateOperatorResult(OverloadableCodeSymmetricUnaryOperator.Minus, arg);
 		}
 
 		public static SmartExpressionBrick operator !(SmartExpressionBrick arg)
 		{
-			return SX.DefaultAlgebra.EvaluateOperatorResult(UnaryOperator.LogicalNot, arg);
+			return SX.DefaultAlgebra.EvaluateOperatorResult(OverloadableCodeSymmetricUnaryOperator.LogicalNegation, arg);
 		}
 
 		public static SmartExpressionBrick operator ~(SmartExpressionBrick arg)
 		{
-			return SX.DefaultAlgebra.EvaluateOperatorResult(UnaryOperator.BinaryNot, arg);
+			return SX.DefaultAlgebra.EvaluateOperatorResult(OverloadableCodeSymmetricUnaryOperator.BitwiseComplement, arg);
 		}
 
 		public static implicit operator SmartExpressionBrick(string x)

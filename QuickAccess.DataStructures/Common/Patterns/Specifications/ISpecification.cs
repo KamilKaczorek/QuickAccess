@@ -34,12 +34,11 @@
 // http://kamil.scienceontheweb.net
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
-namespace QuickAccess.DataStructures.Algebra
+
+namespace QuickAccess.DataStructures.Common.Patterns.Specifications
 {
-	public interface IAlgebraicDomain<TDomain, out TAlgebra>
-	where TDomain : IAlgebraicDomain<TDomain, TAlgebra>
-	where TAlgebra : IAlgebra<TDomain>
+	public interface ISpecification<in T> : ISpecificationInfo
 	{
-		TAlgebra Algebra { get; }
+		bool IsSatisfiedBy(T candidate);
 	}
 }

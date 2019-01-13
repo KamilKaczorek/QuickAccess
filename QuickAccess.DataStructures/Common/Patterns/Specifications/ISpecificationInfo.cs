@@ -28,25 +28,20 @@
 // 
 // =====================================================================
 // 
-// Project: QuickAccess.Parser
+// Project: QuickAccess.DataStructures
 // 
 // Author: Kamil Piotr Kaczorek
 // http://kamil.scienceontheweb.net
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
 
-using System.Collections.Generic;
+using System;
 
-namespace QuickAccess.DataStructures.Algebra
+namespace QuickAccess.DataStructures.Common.Patterns.Specifications
 {
-	public interface IAlgebra
+	public interface ISpecificationInfo : IEquatable<ISpecificationInfo>
 	{
-		int Priority { get; }
-	}
-
-	public interface IAlgebra<T> : IAlgebra
-	{
-		T EvaluateOperatorResult(T left, BinaryOperator binaryOperator, T right);
-		T EvaluateOperatorResult(UnaryOperator unaryOperator, T arg);
+		SpecificationDescriptor Descriptor { get; }
+		bool IsGeneralizationOf(ISpecificationInfo specificationInfo);
 	}
 }

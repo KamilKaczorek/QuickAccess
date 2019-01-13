@@ -1,9 +1,8 @@
 ﻿#region LICENSE [BSD-2-Clause]
-
 // This code is distributed under the BSD-2-Clause license.
 // =====================================================================
 // 
-// Copyright ©2018 by Kamil Piotr Kaczorek
+// Copyright ©2019 by Kamil Piotr Kaczorek
 // All rights reserved.
 // 
 // Redistribution and use in source and binary forms, with or without modification, 
@@ -29,48 +28,21 @@
 // 
 // =====================================================================
 // 
-// Project: QuickAccess.DataStructures
+// Project: QuickAccess.Parser
 // 
 // Author: Kamil Piotr Kaczorek
 // http://kamil.scienceontheweb.net
 // e-mail: kamil.piotr.kaczorek@gmail.com
-
 #endregion
-
-namespace QuickAccess.DataStructures.Common
+namespace QuickAccess.DataStructures.CodeOperatorAlgebra
 {
-	/// <summary>
-	/// The result of re-indexed data operation with result data and re-indexing information.
-	/// </summary>
-	/// <typeparam name="TData">The type of the data.</typeparam>
-	public struct ReindexedDataResult<TData>
+	public enum OverloadableCodeSymmetricUnaryOperator
 	{
-		/// <summary>Initializes a new instance of the <see cref="ReindexedDataResult{TData}"/> struct.</summary>
-		/// <param name="indexTranslator">The index map.</param>
-		/// <param name="data">The data.</param>
-		public ReindexedDataResult(IIndexTranslator indexTranslator, TData data)
-		{
-			IndexTranslator = indexTranslator;
-			Data = data;
-		}
-
-
-		/// <summary>Gets the index translator.</summary>
-		/// <value>The index translator.</value>
-		public IIndexTranslator IndexTranslator { get; }
-
-		/// <summary>Gets the affected data.</summary>
-		/// <value>The data.</value>
-		public TData Data { get; }
-
-		/// <summary>
-		/// Performs an implicit conversion from <see cref="ReindexedDataResult{TData}"/> to <see cref="TData"/>.
-		/// </summary>
-		/// <param name="source">The source.</param>
-		/// <returns>The result of the conversion.</returns>
-		public static implicit operator TData(ReindexedDataResult<TData> source)
-		{
-			return source.Data;
-		}
+		Increment = OverloadableCodeOperator.Increment,
+		Decrement = OverloadableCodeOperator.Decrement,
+		Plus = OverloadableCodeOperator.Plus,
+		Minus =  OverloadableCodeOperator.Minus,
+		LogicalNegation = OverloadableCodeOperator.LogicalNegation,
+		BitwiseComplement = OverloadableCodeOperator.BitwiseComplement
 	}
 }

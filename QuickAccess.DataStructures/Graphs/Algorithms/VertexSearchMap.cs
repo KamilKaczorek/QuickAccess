@@ -43,6 +43,7 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using QuickAccess.DataStructures.Common;
+using QuickAccess.DataStructures.Common.Collections;
 using QuickAccess.DataStructures.Graphs.Model;
 
 namespace QuickAccess.DataStructures.Graphs.Algorithms

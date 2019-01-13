@@ -42,7 +42,7 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
 
-namespace QuickAccess.DataStructures.Common
+namespace QuickAccess.DataStructures.Common.Collections
 {
 	public static class EnumerableExtensions
 	{
@@ -59,7 +59,7 @@ namespace QuickAccess.DataStructures.Common
 		}
 
 		[Pure]
-		public static T[][] GetMultidimentionalClone<T>(this IReadOnlyList<T[]> source)
+		public static T[][] GetMultidimensionalClone<T>(this IReadOnlyList<T[]> source)
 		{
 			var res = new T[source.Count][];
 
@@ -72,39 +72,39 @@ namespace QuickAccess.DataStructures.Common
 		}
 
 		[Pure]
-		public static T[][][] GetMultidimentionalClone<T>(this IReadOnlyList<IReadOnlyList<T[]>> source)
+		public static T[][][] GetMultidimensionalClone<T>(this IReadOnlyList<IReadOnlyList<T[]>> source)
 		{
 			var res = new T[source.Count][][];
 
 			for (var idx = 0; idx < source.Count; idx++)
 			{
-				res[idx] = source[idx].GetMultidimentionalClone();
+				res[idx] = source[idx].GetMultidimensionalClone();
 			}
 
 			return res;
 		}
 
 		[Pure]
-		public static T[][][][] GetMultidimentionalClone<T>(this IReadOnlyList<IReadOnlyList<IReadOnlyList<T[]>>> source)
+		public static T[][][][] GetMultidimensionalClone<T>(this IReadOnlyList<IReadOnlyList<IReadOnlyList<T[]>>> source)
 		{
 			var res = new T[source.Count][][][];
 
 			for (var idx = 0; idx < source.Count; idx++)
 			{
-				res[idx] = source[idx].GetMultidimentionalClone();
+				res[idx] = source[idx].GetMultidimensionalClone();
 			}
 
 			return res;
 		}
 
 		[Pure]
-		public static T[][][][][] GetMultidimentionalClone<T>(this IReadOnlyList<IReadOnlyList<IReadOnlyList<IReadOnlyList<T[]>>>> source)
+		public static T[][][][][] GetMultidimensionalClone<T>(this IReadOnlyList<IReadOnlyList<IReadOnlyList<IReadOnlyList<T[]>>>> source)
 		{
 			var res = new T[source.Count][][][][];
 
 			for (var idx = 0; idx < source.Count; idx++)
 			{
-				res[idx] = source[idx].GetMultidimentionalClone();
+				res[idx] = source[idx].GetMultidimensionalClone();
 			}
 
 			return res;
@@ -632,70 +632,165 @@ namespace QuickAccess.DataStructures.Common
 			return source.Select(i => i*value);
 		}
 
-
-		
-		
 		[Pure]
-		public static int XOr(this IEnumerable<int> source, int seed = 0)
+		public static int BitwiseXOr(this IEnumerable<int> source, int seed = 0)
 		{
 			return source.Aggregate(seed, (a, b) => a ^ b);
 		}
 		[Pure]
-		public static int Or(this IEnumerable<int> source, int seed = 0)
+		public static int BitwiseOr(this IEnumerable<int> source, int seed = 0)
 		{
 			return source.Aggregate(seed, (a, b) => a | b);
 		}
 		[Pure]
-		public static int And(this IEnumerable<int> source, int seed = ~0)
+		public static int BitwiseAnd(this IEnumerable<int> source, int seed = ~0)
 		{
 			return source.Aggregate(seed, (a, b) => a & b);
 		}
 		[Pure]
-		public static uint XOr(this IEnumerable<uint> source, uint seed = 0U)
+		public static uint BitwiseXOr(this IEnumerable<uint> source, uint seed = 0U)
 		{
 			return source.Aggregate(seed, (a, b) => a ^ b);
 		}
 		[Pure]
-		public static uint Or(this IEnumerable<uint> source, uint seed = 0U)
+		public static uint BitwiseOr(this IEnumerable<uint> source, uint seed = 0U)
 		{
 			return source.Aggregate(seed, (a, b) => a | b);
 		}
 		[Pure]
-		public static uint And(this IEnumerable<uint> source, uint seed = ~0U)
+		public static uint BitwiseAnd(this IEnumerable<uint> source, uint seed = ~0U)
 		{
 			return source.Aggregate(seed, (a, b) => a & b);
 		}
 		[Pure]
-		public static long XOr(this IEnumerable<long> source, long seed = 0L)
+		public static long BitwiseXOr(this IEnumerable<long> source, long seed = 0L)
 		{
 			return source.Aggregate(seed, (a, b) => a ^ b);
 		}
 		[Pure]
-		public static long Or(this IEnumerable<long> source, long seed = 0L)
+		public static long BitwiseOr(this IEnumerable<long> source, long seed = 0L)
 		{
 			return source.Aggregate(seed, (a, b) => a | b);
 		}
 		[Pure]
-		public static long And(this IEnumerable<long> source, long seed = ~0L)
+		public static long BitwiseAnd(this IEnumerable<long> source, long seed = ~0L)
 		{
 			return source.Aggregate(seed, (a, b) => a & b);
 		}
 		[Pure]
-		public static ulong XOr(this IEnumerable<ulong> source, ulong seed = 0UL)
+		public static ulong BitwiseXOr(this IEnumerable<ulong> source, ulong seed = 0UL)
 		{
 			return source.Aggregate(seed, (a, b) => a ^ b);
 		}
 		[Pure]
-		public static ulong Or(this IEnumerable<ulong> source, ulong seed = 0UL)
+		public static ulong BitwiseOr(this IEnumerable<ulong> source, ulong seed = 0UL)
 		{
 			return source.Aggregate(seed, (a, b) => a | b);
 		}
 		[Pure]
-		public static ulong And(this IEnumerable<ulong> source, ulong seed = ~0UL)
+		public static ulong BitwiseAnd(this IEnumerable<ulong> source, ulong seed = ~0UL)
 		{
 			return source.Aggregate(seed, (a, b) => a & b);
 		}
 
+		[Pure]
+		public static bool CountInRange<T>(this IEnumerable<T> values, Func<T, bool> predicate,  int minCount, int maxCount)
+		{
+			if (values is IReadOnlyCollection<T> collection && collection.Count < minCount)
+			{
+				return false;
+			}
+
+			var count = 0;
+			foreach (var value in values)
+			{
+				if (predicate.Invoke(value))
+				{
+					++count;
+					if (count > maxCount)
+					{
+						return false;
+					}
+				}
+			}
+
+			return count >= minCount;
+		}
+
+		[Pure]
+		public static bool CountAtLeast<T>(this IEnumerable<T> values, Func<T, bool> predicate, int minCount)
+		{
+			if (values is IReadOnlyCollection<T> collection && collection.Count < minCount)
+			{
+				return false;
+			}
+
+			var count = 0;
+			foreach (var value in values)
+			{
+				if (predicate.Invoke(value))
+				{
+					++count;
+					if (count >= minCount)
+					{
+						return true;
+					}
+				}
+			}
+
+			return count >= minCount;
+		}
+
+		[Pure]
+		public static bool ExactlyOne<T>(this IEnumerable<T> values, Func<T, bool> predicate)
+		{
+			var found = false;
+			foreach (var value in values)
+			{
+				if (predicate.Invoke(value))
+				{
+					if (found == true)
+					{
+						return false;
+					}
+
+					found = true;
+				}
+			}
+
+			return found;
+		}
+
+		[Pure]
+		public static bool AllButOne<T>(this IEnumerable<T> values, Func<T, bool> predicate)
+		{
+			return ExactlyOne(values, v => !predicate.Invoke(v));
+		}
+
+		[Pure]
+		public static T NthOrDefault<T>(this IEnumerable<T> values, Func<T, bool> predicate, int index)
+		{
+			if (values is IReadOnlyCollection<T> collection && collection.Count <= index)
+			{
+				return default;
+			}
+
+			var idx = 0;
+			foreach (var value in values)
+			{
+				if (predicate.Invoke(value))
+				{
+					if (idx == index)
+					{
+						return value;
+					}
+
+					++idx;
+				}
+			}
+
+			return default;
+		}
 
 		public static IndexTranslator SortWithReindexingResult<T>(this T[] items, IComparer<T> comparer = null)
 		{
@@ -802,6 +897,52 @@ namespace QuickAccess.DataStructures.Common
 			}
 
 			source.Remove(key);
+			return true;
+		}
+
+		public static TValue GetExistingValueOrNew<TKey, TValue>(this IDictionary<TKey, TValue> source, TKey key, Func<TKey, TValue> valueFactoryCallback)
+		{
+			if (!source.TryGetValue(key, out var value))
+			{
+				value = valueFactoryCallback.Invoke(key);
+				source[key] = value;
+			}
+
+			return value;
+		}
+
+		public static TValue GetExistingValueOrNew<TKey, TValue>(this IDictionary<TKey, TValue> source, TKey key, Func<TValue> valueFactoryCallback)
+		{
+			if (!source.TryGetValue(key, out var value))
+			{
+				value = valueFactoryCallback.Invoke();
+				source[key] = value;
+			}
+
+			return value;
+		}
+
+		public static bool TryGetExistingValueOrNew<TKey, TValue>(this IDictionary<TKey, TValue> source, TKey key, Func<TKey, TValue> valueFactoryCallback, out TValue value)
+		{
+			if (!source.TryGetValue(key, out value))
+			{
+				value = valueFactoryCallback.Invoke(key);
+				source[key] = value;
+				return false;
+			}
+
+			return true;
+		}
+
+		public static bool TryGetExistingValueOrNew<TKey, TValue>(this IDictionary<TKey, TValue> source, TKey key, Func<TValue> valueFactoryCallback, out TValue value)
+		{
+			if (!source.TryGetValue(key, out value))
+			{
+				value = valueFactoryCallback.Invoke();
+				source[key] = value;
+				return false;
+			}
+
 			return true;
 		}
 	}

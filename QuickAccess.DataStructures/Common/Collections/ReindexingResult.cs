@@ -37,71 +37,40 @@
 
 #endregion
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-
-namespace QuickAccess.DataStructures.Common
+namespace QuickAccess.DataStructures.Common.Collections
 {
 	/// <summary>
-	/// It provides empty enumerable instance that satisfies following target types:
-	/// <see cref="IReadOnlyList{T}"/>
-	/// <see cref="IReadOnlyCollection{T}"/>
-	/// <see cref="IEnumerable{T}"/>
-	/// <see cref="IEnumerable"/>
-	/// <see cref="IEnumerator{T}"/>
+	/// The result of re-indexed data operation with result data and re-indexing information.
 	/// </summary>
-	/// <typeparam name="T">The type of enumerated item.</typeparam>
-	/// <seealso cref="EmptyValue"/>
-	public sealed class EmptyEnumerable<T> : IReadOnlyList<T>, IEnumerator<T>
+	/// <typeparam name="TData">The type of the data.</typeparam>
+	public struct ReindexedDataResult<TData>
 	{
+		/// <summary>Initializes a new instance of the <see cref="ReindexedDataResult{TData}"/> struct.</summary>
+		/// <param name="indexTranslator">The index map.</param>
+		/// <param name="data">The data.</param>
+		public ReindexedDataResult(IIndexTranslator indexTranslator, TData data)
+		{
+			IndexTranslator = indexTranslator;
+			Data = data;
+		}
+
+
+		/// <summary>Gets the index translator.</summary>
+		/// <value>The index translator.</value>
+		public IIndexTranslator IndexTranslator { get; }
+
+		/// <summary>Gets the affected data.</summary>
+		/// <value>The data.</value>
+		public TData Data { get; }
+
 		/// <summary>
-		/// The empty sequence instance.
+		/// Performs an implicit conversion from <see cref="ReindexedDataResult{TData}"/> to <see cref="TData"/>.
 		/// </summary>
-		public static EmptyEnumerable<T> Instance = new EmptyEnumerable<T>();
-
-		private EmptyEnumerable()
+		/// <param name="source">The source.</param>
+		/// <returns>The result of the conversion.</returns>
+		public static implicit operator TData(ReindexedDataResult<TData> source)
 		{
+			return source.Data;
 		}
-
-		/// <inheritdoc />
-		public bool MoveNext()
-		{
-			return false;
-		}
-
-		/// <inheritdoc />
-		public void Reset()
-		{
-		}
-
-		/// <inheritdoc />
-		public T Current => default;
-
-		/// <inheritdoc />
-		object IEnumerator.Current => Current;
-
-		/// <inheritdoc />
-		public void Dispose()
-		{
-		}
-
-		/// <inheritdoc />
-		public IEnumerator<T> GetEnumerator()
-		{
-			return this;
-		}
-
-		/// <inheritdoc />
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return this;
-		}
-
-		/// <inheritdoc />
-		public int Count => 0;
-
-		/// <inheritdoc />
-		public T this[int index] => throw new IndexOutOfRangeException();
 	}
 }

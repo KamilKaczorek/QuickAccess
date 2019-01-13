@@ -68,6 +68,12 @@ namespace QuickAccess.DataStructures.Common.RegularExpression
 		}
 
 		/// <inheritdoc />
+		public string CreateNot(IRegularExpressionFactoryContext ctx, string negatedContentRegex)
+		{
+			return $"(?:(?:(?!{negatedContentRegex}).*)|.+(?:{negatedContentRegex}).*|.*(?:{negatedContentRegex}).+)";
+		}
+
+		/// <inheritdoc />
 		public string CreateAlternation(IRegularExpressionFactoryContext ctx, IEnumerable<string> alternativeRegexs)
 		{
 			return CreateNonCapturingGroup(ctx, string.Join("|", alternativeRegexs));
@@ -82,18 +88,18 @@ namespace QuickAccess.DataStructures.Common.RegularExpression
 		}
 
 		/// <inheritdoc />
-		public string CreateQuantifier(IRegularExpressionFactoryContext ctx, long min, long max, string regexContent)
+		public string CreateQuantifier(IRegularExpressionFactoryContext ctx, long min, long max, string quantifiedContentRegex)
 		{
-			if (string.IsNullOrEmpty(regexContent))
+			if (string.IsNullOrEmpty(quantifiedContentRegex))
 			{
 				return string.Empty;
 			}
 
-			regexContent = CreateNonCapturingGroup(ctx, regexContent);
+			quantifiedContentRegex = CreateNonCapturingGroup(ctx, quantifiedContentRegex);
 
 			if (min == 1 && max == 1)
 			{
-				return regexContent;
+				return quantifiedContentRegex;
 			}
 
 			return CreateNonCapturingGroup(ctx, GetQuantifiedContent());
@@ -103,25 +109,25 @@ namespace QuickAccess.DataStructures.Common.RegularExpression
 			{
 				if (min == 0 && max == 1)
 				{
-					return $"{regexContent}?";
+					return $"{quantifiedContentRegex}?";
 				}
 
 				if (min == 0 && max == long.MaxValue)
 				{
-					return $"{regexContent}*";
+					return $"{quantifiedContentRegex}*";
 				}
 
 				if (min == 1 && max == long.MaxValue)
 				{
-					return $"{regexContent}+";
+					return $"{quantifiedContentRegex}+";
 				}
 
 				if (min == max)
 				{
-					return $"{regexContent}{{{min}}}";
+					return $"{quantifiedContentRegex}{{{min}}}";
 				}
 
-				return $"{regexContent}{{{min},{max}}}";
+				return $"{quantifiedContentRegex}{{{min},{max}}}";
 			}
 		}
 
@@ -130,6 +136,18 @@ namespace QuickAccess.DataStructures.Common.RegularExpression
 		{
 			
 			return $"(?:{groupContentRegex})";
+		}
+
+		/// <inheritdoc />
+		public string CreatePositiveLookaheadGroup(IRegularExpressionFactoryContext ctx, string groupContentRegex)
+		{
+			return $"(?={groupContentRegex})";
+		}
+
+		/// <inheritdoc />
+		public string CreateNegativeLookaheadGroup(IRegularExpressionFactoryContext ctx, string groupContentRegex)
+		{
+			return $"(?!{groupContentRegex})";
 		}
 
 		/// <inheritdoc />

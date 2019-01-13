@@ -1,8 +1,9 @@
 ﻿#region LICENSE [BSD-2-Clause]
+
 // This code is distributed under the BSD-2-Clause license.
 // =====================================================================
 // 
-// Copyright ©2019 by Kamil Piotr Kaczorek
+// Copyright ©2018 by Kamil Piotr Kaczorek
 // All rights reserved.
 // 
 // Redistribution and use in source and binary forms, with or without modification, 
@@ -28,32 +29,30 @@
 // 
 // =====================================================================
 // 
-// Project: QuickAccess.Parser
+// Project: QuickAccess.DataStructures
 // 
 // Author: Kamil Piotr Kaczorek
 // http://kamil.scienceontheweb.net
 // e-mail: kamil.piotr.kaczorek@gmail.com
+
 #endregion
 
-using System;
-
-namespace QuickAccess.DataStructures.Common
+namespace QuickAccess.DataStructures.Common.Freezable
 {
-	[Flags]
-	public enum StandardCharactersRanges
+	/// <summary>
+	///     The interface of the freezable object.
+	///     Freezable object became frozen when <see cref="IFreezable.Freeze" /> operation is called and stays frozen (read-only) till the
+	///     end of its lifetime.
+	/// </summary>
+	public interface IReadOnlyFreezable
 	{
-		None = 0,
-		Not = 0x01,
-		UpperLetter = 0x02,
-		LowerLetter = 0x04,
-		Digit = 0x08,
-		Underscore = 0x10,
-		Letter = UpperLetter | LowerLetter,
-		LetterOrDigit = Letter | Digit,
-		WordCharacter = LetterOrDigit | Underscore,
-		NotWordCharacter = Not | WordCharacter,
-		NotLetter = Not | Letter,
-		NotDigit = Not | Digit,
-		NotUnderscore = Not | Underscore
+		/// <summary>
+		///     Gets a value indicating whether the current object is frozen (editing is not enabled).
+		///     <seealso cref="IFreezable.Freeze" />
+		/// </summary>
+		/// <value>
+		///     <c>true</c> if this object is frozen; otherwise, <c>false</c>.
+		/// </value>
+		bool IsFrozen { get; }
 	}
 }
