@@ -42,5 +42,6 @@ namespace QuickAccess.DataStructures.Common.Patterns.Specifications
 	public interface ISpecificationAlgebra<T> : ICodeOperatorSymmetricAlgebra<Specification<T>>
 	{
 		Specification<T> GetNegation(ISpecification<T> arg);
+		ISpecificationAlgebra<TDest> OfCandidate<TDest>();
 	}
 }

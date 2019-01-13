@@ -66,6 +66,17 @@ namespace QuickAccess.DataStructures.Common.Patterns.Specifications
 		}
 
 		/// <inheritdoc />
+		public override bool IsGeneralizationOf(ISpecificationInfo specificationInfo)
+		{
+			if (base.IsGeneralizationOf(specificationInfo))
+			{
+				return true;
+			}
+
+			return specificationInfo is NotSpecification<T> spec && spec._argument.IsGeneralizationOf(_argument);
+		}
+
+		/// <inheritdoc />
 		public override bool IsDeMorganSimplificationCandidate()
 		{
 			return true;

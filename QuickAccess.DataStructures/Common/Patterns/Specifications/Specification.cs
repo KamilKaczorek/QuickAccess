@@ -85,6 +85,11 @@ namespace QuickAccess.DataStructures.Common.Patterns.Specifications
 		/// <inheritdoc />
 		public virtual bool IsGeneralizationOf(ISpecificationInfo specificationInfo)
 		{
+			if (specificationInfo is TrueSpecification<T>)
+			{
+				return true;
+			}
+
 			return Equals(specificationInfo);
 		}
 
@@ -190,6 +195,17 @@ namespace QuickAccess.DataStructures.Common.Patterns.Specifications
 		public virtual Specification<T> GetCustomNegation()
 		{
 			return null;
+		}
+
+		public virtual Specification<TDest> OfCandidate<TDest>()
+			where TDest : T
+		{
+			return new WrappedSpecification<T, TDest>(Algebra.OfCandidate<TDest>(), this);
+		}
+
+		public virtual Specification<TDest> OfCandidate<TDest>(Func<TDest, T> convertCandidateCallback)	
+		{
+			return new CandidateConverterSpecification<T,TDest>(Algebra.OfCandidate<TDest>(), this, convertCandidateCallback);
 		}
 
 		private SpecificationDescriptor CreateDefaultDescriptor()

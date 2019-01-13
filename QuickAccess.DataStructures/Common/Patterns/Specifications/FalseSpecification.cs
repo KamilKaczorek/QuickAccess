@@ -59,6 +59,12 @@ namespace QuickAccess.DataStructures.Common.Patterns.Specifications
 		}
 
 		/// <inheritdoc />
+		public override bool IsGeneralizationOf(ISpecificationInfo specificationInfo)
+		{
+			return true;
+		}
+
+		/// <inheritdoc />
 		public override bool IsDeMorganSimplificationCandidate()
 		{
 			return true;

@@ -175,6 +175,18 @@ namespace QuickAccess.DataStructures.Common.Patterns.Specifications
 		}
 
 		/// <inheritdoc />
+		public override bool IsGeneralizationOf(ISpecificationInfo specificationInfo)
+		{
+			if (base.IsGeneralizationOf(specificationInfo))
+			{
+				return true;
+			}
+
+			return Operation == CompositeSpecificationOperation.And && _arguments.Any(a => a.IsGeneralizationOf(specificationInfo))
+				|| Operation == CompositeSpecificationOperation.Or && _arguments.Any(a => a.Equals(specificationInfo));
+		}
+
+		/// <inheritdoc />
 		public override string ToString()
 		{
 			var isCodeOperator = Operation.CanBeRepresentedByCodeOperator();

@@ -150,5 +150,11 @@ namespace QuickAccess.DataStructures.Common.Patterns.Specifications
 		{
 			return (arg is Specification<T> spec ? spec.GetCustomNegation() : null) ?? new NotSpecification<T>(this, arg);
 		}
+
+		/// <inheritdoc />
+		public ISpecificationAlgebra<TDest> OfCandidate<TDest>()
+		{
+			return new DefaultSpecificationAlgebra<TDest>();
+		}
 	}
 }
