@@ -193,6 +193,9 @@ namespace QuickAccess.Parser
         }
 
         /// <inheritdoc />
+        public int AcceptedPosition => _acceptedPosition < 0 ? -1 : _acceptedPosition + Offset;
+
+        /// <inheritdoc />
         public void Dispose()
         {
             if (_acceptedPosition >= 0)
@@ -202,6 +205,29 @@ namespace QuickAccess.Parser
 
             _parent = DisposedParsedContextStreamParent.Instance;
         }
+
+        /// <inheritdoc />
+        public bool Equals(IParsingContextStream other)
+        {
+	        if (ReferenceEquals(other, null))
+	        {
+		        return false;
+	        }
+
+	        if (ReferenceEquals(other, this))
+	        {
+		        return true;
+	        }
+
+	        return other.AcceptedPosition == this.AcceptedPosition && other.HasNext == this.HasNext && other.Current == this.Current &&
+	                other.GetAcceptedFragment() == this.GetAcceptedFragment();
+        }
+
+        /// <inheritdoc />
+        public int CompareTo(IParsingContextStream other)
+        {
+	        return this.AcceptedPosition.CompareTo(other?.AcceptedPosition ?? -1);
+        }        
 
         public override string ToString()
         {

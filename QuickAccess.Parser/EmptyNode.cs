@@ -36,62 +36,48 @@
 #endregion
 
 using System.Collections.Generic;
-using QuickAccess.DataStructures.Common.RegularExpression;
 
-namespace QuickAccess.Parser.SmartExpressions.Bricks
+namespace QuickAccess.Parser
 {
-	public sealed class EmptyParsingBrick : SmartExpressionBrick
+	public sealed class EmptyNode : IParsedExpressionNode
 	{
-		public static readonly EmptyParsingBrick Instance = new EmptyParsingBrick(SX.DefaultAlgebra);
+		public static bool IsEmptyNode(IParsedExpressionNode node)
+		{
+			return node is EmptyNode;
+		}
 
-		private EmptyParsingBrick(ISmartExpressionAlgebra algebra)
-		: base(algebra)
+		private readonly EmptyFragment _emptyFragment;
+
+		public EmptyNode(ISourceCode src)
+		 : this(src.GetFurtherContext())
 		{
 		}
 
-		/// <inheritdoc />
-		protected override void ApplyRuleDefinition(string name, SmartExpressionBrick content, bool recursion, bool freeze)
+		public EmptyNode(IParsingContextStream ctx)
+			:this(ctx.AcceptedPosition)
 		{
 		}
 
-		/// <inheritdoc />
-		public override string ExpressionId => "$";
-
-		/// <inheritdoc />
-		public override string ToRegularExpressionString(RegularExpressionBuildingContext ctx)
+		public EmptyNode(int position)
+			:this(new EmptyFragment(position))
 		{
-			return string.Empty;
+		}
+
+		public EmptyNode(EmptyFragment emptyFragment)
+		{
+			_emptyFragment = emptyFragment;
 		}
 
 		/// <inheritdoc />
-		public override bool Equals(SmartExpressionBrick other)
-		{
-			if (ReferenceEquals(other, this))
-			{
-				return true;
-			}
-
-			if (ReferenceEquals(other, null))
-			{
-				return false;
-			}
-
-			return other.Equals(this);
-		}
+		public string ExpressionTypeId => "Empty";
 
 		/// <inheritdoc />
-		protected override IParsedExpressionNode TryParseInternal(IParsingContextStream ctx)
-		{
-			return new EmptyNode(ctx);
-		}
+		public string ValueTypeId => null;
 
 		/// <inheritdoc />
-		public override string ToString()
-		{
-			return string.Empty;
-		}
+		public ISourceCodeFragment Fragment => _emptyFragment;
 
 		/// <inheritdoc />
-		public override bool IsEmpty => true;
+		public IReadOnlyList<IParsedExpressionNode> SubNodes => null;
 	}
 }

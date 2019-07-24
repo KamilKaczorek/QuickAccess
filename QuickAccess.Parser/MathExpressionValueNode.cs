@@ -37,13 +37,12 @@
 
 #endregion
 
-
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace QuickAccess.Parser
 {
-    /// <summary>
+	/// <summary>
     /// The math expression value node.
     /// </summary>
     /// <seealso cref="ParsedExpressionNode" />

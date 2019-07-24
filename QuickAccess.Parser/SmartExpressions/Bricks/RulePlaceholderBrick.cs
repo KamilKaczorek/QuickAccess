@@ -88,6 +88,12 @@ namespace QuickAccess.Parser.SmartExpressions.Bricks
 		}
 
 		/// <inheritdoc />
+		protected override IParsedExpressionNode TryParseInternal(IParsingContextStream ctx)
+		{
+			return Content.TryParse(ctx);
+		}
+
+		/// <inheritdoc />
 		public override string ExpressionId => IsRecursion ? $"RULE${RuleName}$" : Content?.ExpressionId;
 
 		/// <inheritdoc />
@@ -101,7 +107,9 @@ namespace QuickAccess.Parser.SmartExpressions.Bricks
 			return IsRecursion ? ctx.Factory.CreateRecursiveGroupCall(ctx.Context, RuleName) : Content.ToRegularExpressionString(ctx);
 		}
 
-		public override bool ProvidesRegularExpression => IsRecursion || (Content?.ProvidesRegularExpression ?? false);
+		/// <inheritdoc />
+		public override MatchingLevel RegularExpressionMatchingLevel =>
+			IsRecursion ? MatchingLevel.Exact : Content?.RegularExpressionMatchingLevel ?? MatchingLevel.None;
 
 		/// <inheritdoc />
 		public override string ToString()

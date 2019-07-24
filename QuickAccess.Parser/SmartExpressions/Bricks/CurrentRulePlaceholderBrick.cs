@@ -56,6 +56,12 @@ namespace QuickAccess.Parser.SmartExpressions.Bricks
 		}
 
 		/// <inheritdoc />
+		protected override IParsedExpressionNode TryParseInternal(IParsingContextStream ctx)
+		{
+			return Content.TryParse(ctx);
+		}
+
+		/// <inheritdoc />
 		protected override void ApplyRuleDefinition(string name, SmartExpressionBrick content, bool recursion, bool freeze)
 		{
 			if (!recursion || _rule.IsSet)
@@ -75,7 +81,8 @@ namespace QuickAccess.Parser.SmartExpressions.Bricks
 			return ctx.Factory.CreateRecursiveGroupCall(ctx.Context, RuleName);
 		}
 
-		public override bool ProvidesRegularExpression => true;
+		/// <inheritdoc />
+		public override MatchingLevel RegularExpressionMatchingLevel => MatchingLevel.Exact;
 
 		/// <inheritdoc />
 		public override string ToString()

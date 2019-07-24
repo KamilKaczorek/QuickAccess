@@ -34,64 +34,12 @@
 // http://kamil.scienceontheweb.net
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
-
-using System.Collections.Generic;
-using QuickAccess.DataStructures.Common.RegularExpression;
-
-namespace QuickAccess.Parser.SmartExpressions.Bricks
+namespace QuickAccess.Parser
 {
-	public sealed class EmptyParsingBrick : SmartExpressionBrick
+	public enum ParsingAlternationType
 	{
-		public static readonly EmptyParsingBrick Instance = new EmptyParsingBrick(SX.DefaultAlgebra);
-
-		private EmptyParsingBrick(ISmartExpressionAlgebra algebra)
-		: base(algebra)
-		{
-		}
-
-		/// <inheritdoc />
-		protected override void ApplyRuleDefinition(string name, SmartExpressionBrick content, bool recursion, bool freeze)
-		{
-		}
-
-		/// <inheritdoc />
-		public override string ExpressionId => "$";
-
-		/// <inheritdoc />
-		public override string ToRegularExpressionString(RegularExpressionBuildingContext ctx)
-		{
-			return string.Empty;
-		}
-
-		/// <inheritdoc />
-		public override bool Equals(SmartExpressionBrick other)
-		{
-			if (ReferenceEquals(other, this))
-			{
-				return true;
-			}
-
-			if (ReferenceEquals(other, null))
-			{
-				return false;
-			}
-
-			return other.Equals(this);
-		}
-
-		/// <inheritdoc />
-		protected override IParsedExpressionNode TryParseInternal(IParsingContextStream ctx)
-		{
-			return new EmptyNode(ctx);
-		}
-
-		/// <inheritdoc />
-		public override string ToString()
-		{
-			return string.Empty;
-		}
-
-		/// <inheritdoc />
-		public override bool IsEmpty => true;
+		TakeFirst = 0,
+		TakeShortest = 1,
+		TakeLongest = 2
 	}
 }

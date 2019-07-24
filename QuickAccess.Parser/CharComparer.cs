@@ -37,6 +37,7 @@
 
 #endregion
 
+using System;
 using System.Collections.Generic;
 
 namespace QuickAccess.Parser
@@ -49,7 +50,7 @@ namespace QuickAccess.Parser
     /// <seealso cref="IEqualityComparer{T}" />
     public sealed class CharComparer : IEqualityComparer<char>
     {
-        public static readonly IEqualityComparer<char> CaseInsensitive = new CharComparer(false);
+        public static readonly IEqualityComparer<char> CaseInsensitive = new CharComparer(true);
         public static readonly IEqualityComparer<char> CaseSensitive = new CharComparer(false);
 
         private readonly bool _ignoreCase;
@@ -61,6 +62,23 @@ namespace QuickAccess.Parser
         private CharComparer(bool ignoreCase)
         {
             _ignoreCase = ignoreCase;
+        }
+
+        public bool IsCharContainedByCollection(char c, ICollection<char> charSet)
+        {
+            var contains = charSet.Contains(c);
+
+            if (contains)
+            {
+                return true;
+            }
+            
+            if (!_ignoreCase)
+            {
+                return false;
+            }
+
+            return charSet.Contains(char.ToLowerInvariant(c)) || charSet.Contains(char.ToUpperInvariant(c));
         }
 
         public bool Equals(char ch1, char ch2)

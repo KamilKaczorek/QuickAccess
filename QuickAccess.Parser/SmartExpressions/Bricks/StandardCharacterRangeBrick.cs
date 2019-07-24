@@ -42,10 +42,10 @@ namespace QuickAccess.Parser.SmartExpressions.Bricks
 {
 	public sealed class StandardCharacterRangeBrick : SmartExpressionBrick
 	{
-		private readonly StandardCharactersRanges _range;
+		private readonly StandardCharactersRange _range;
 
 		/// <inheritdoc />
-		public StandardCharacterRangeBrick(ISmartExpressionAlgebra algebra, StandardCharactersRanges letterTypes) : base(algebra)
+		public StandardCharacterRangeBrick(ISmartExpressionAlgebra algebra, StandardCharactersRange letterTypes) : base(algebra)
 		{
 			_range = letterTypes;
 		}
@@ -56,12 +56,20 @@ namespace QuickAccess.Parser.SmartExpressions.Bricks
 		}
 
 		/// <inheritdoc />
-		public override string ExpressionId => $"${StandardSmartExpressionRuleNames.Letter}";
+		public override string ExpressionId => $"${SmartExpression.StandardRuleName.Letter}";
 
 		/// <inheritdoc />
 		public override bool Equals(SmartExpressionBrick other)
 		{
 			return other is StandardCharacterRangeBrick lb && lb._range == _range;
+		}
+
+		/// <inheritdoc />
+		protected override IParsedExpressionNode TryParseInternal(IParsingContextStream ctx)
+		{
+			return ctx.MoveNext() && ctx.Current.IsFromRange(_range)
+				? new ParsingNode(ctx.AcceptAndGetFragment(), "char", null)
+				: null;
 		}
 
 		/// <inheritdoc />
@@ -71,6 +79,6 @@ namespace QuickAccess.Parser.SmartExpressions.Bricks
 		}
 
 		/// <inheritdoc />
-		public override bool ProvidesRegularExpression => true;
+		public override MatchingLevel RegularExpressionMatchingLevel => MatchingLevel.Exact;
 	}
 }

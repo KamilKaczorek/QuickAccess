@@ -36,18 +36,28 @@
 #endregion
 namespace QuickAccess.Parser.SmartExpressions
 {
-	public static class StandardSmartExpressionRuleNames
+	
+
+	public static class SmartExpression
 	{
-		public const string Anything = "Anything";
-		public const string Empty = "Empty";
-		public const string WhiteSpace = "WhiteSpace";
-		public const string OptionalWhiteSpace = "OptionalWhiteSpace";
-		public const string CustomSequence = "CustomSequence";
-		public const string NextLine = "NextLine";
-		public const string Letter = "Letter";
-		public const string UpperLetter = "UpperLetter";
-		public const string LowerLetter = "LowerLetter";
-		public const string Symbol = "Symbol";
-		public const string Digit = "Digit";
+		public static class StandardRuleName
+		{
+			public const string Anything = "Anything";
+			public const string Empty = "Empty";
+			public const string WhiteSpace = "WhiteSpace";
+			public const string OptionalWhiteSpace = "OptionalWhiteSpace";
+			public const string CustomSequence = "CustomSequence";
+			public const string NextLine = "NextLine";
+			public const string Letter = "Letter";
+			public const string UpperLetter = "UpperLetter";
+			public const string LowerLetter = "LowerLetter";
+			public const string Symbol = "Symbol";
+			public const string Digit = "Digit";
+		}
+
+		public static class ExpressionType
+		{
+			public const string Composition = "Composition";
+		}
 	}
 }

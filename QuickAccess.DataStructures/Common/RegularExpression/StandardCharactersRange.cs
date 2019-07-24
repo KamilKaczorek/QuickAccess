@@ -35,63 +35,25 @@
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
 
-using System.Collections.Generic;
-using QuickAccess.DataStructures.Common.RegularExpression;
+using System;
 
-namespace QuickAccess.Parser.SmartExpressions.Bricks
+namespace QuickAccess.DataStructures.Common.RegularExpression
 {
-	public sealed class EmptyParsingBrick : SmartExpressionBrick
+	[Flags]
+	public enum StandardCharactersRange
 	{
-		public static readonly EmptyParsingBrick Instance = new EmptyParsingBrick(SX.DefaultAlgebra);
-
-		private EmptyParsingBrick(ISmartExpressionAlgebra algebra)
-		: base(algebra)
-		{
-		}
-
-		/// <inheritdoc />
-		protected override void ApplyRuleDefinition(string name, SmartExpressionBrick content, bool recursion, bool freeze)
-		{
-		}
-
-		/// <inheritdoc />
-		public override string ExpressionId => "$";
-
-		/// <inheritdoc />
-		public override string ToRegularExpressionString(RegularExpressionBuildingContext ctx)
-		{
-			return string.Empty;
-		}
-
-		/// <inheritdoc />
-		public override bool Equals(SmartExpressionBrick other)
-		{
-			if (ReferenceEquals(other, this))
-			{
-				return true;
-			}
-
-			if (ReferenceEquals(other, null))
-			{
-				return false;
-			}
-
-			return other.Equals(this);
-		}
-
-		/// <inheritdoc />
-		protected override IParsedExpressionNode TryParseInternal(IParsingContextStream ctx)
-		{
-			return new EmptyNode(ctx);
-		}
-
-		/// <inheritdoc />
-		public override string ToString()
-		{
-			return string.Empty;
-		}
-
-		/// <inheritdoc />
-		public override bool IsEmpty => true;
+		None = 0,
+		Not = 0x01,
+		UpperLetter = 0x02,
+		LowerLetter = 0x04,
+		Digit = 0x08,
+		Underscore = 0x10,
+		Letter = UpperLetter | LowerLetter,
+		LetterOrDigit = Letter | Digit,
+		WordCharacter = LetterOrDigit | Underscore,
+		NotWordCharacter = Not | WordCharacter,
+		NotLetter = Not | Letter,
+		NotDigit = Not | Digit,
+		NotUnderscore = Not | Underscore
 	}
 }

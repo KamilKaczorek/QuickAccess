@@ -69,6 +69,7 @@ namespace QuickAccess.Parser
         /// Initializes a new instance of the <see cref="StringSourceCode"/> class.
         /// </summary>
         /// <param name="contextStreamFactory">The context stream factory.</param>
+        /// <param name="sourceCodeFragmentFactory">The source code fragment factory.</param>
         /// <param name="sourceCodeBuffer">The buffer that contains the source code.</param>
         /// <param name="maxContextStackSize">
         /// Maximum size of the context stack - defines the maximum depth of the parented parsing context chain.

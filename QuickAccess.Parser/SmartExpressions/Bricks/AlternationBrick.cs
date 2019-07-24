@@ -36,6 +36,7 @@
 #endregion
 
 using System.Linq;
+using QuickAccess.DataStructures.Common.Collections;
 using QuickAccess.DataStructures.Common.RegularExpression;
 
 namespace QuickAccess.Parser.SmartExpressions.Bricks
@@ -43,7 +44,13 @@ namespace QuickAccess.Parser.SmartExpressions.Bricks
 	public sealed class AlternationBrick : CompositeSmartExpressionBrick
 	{
 		/// <inheritdoc />
-		public override bool ProvidesRegularExpression => Bricks.All(b => b.ProvidesRegularExpression);
+		public override MatchingLevel RegularExpressionMatchingLevel => Bricks.GetMinimalMatchingLevel();
+
+		/// <inheritdoc />
+		protected override IParsedExpressionNode TryParseInternal(IParsingContextStream ctx)
+		{
+			return Bricks.TryAlternativeParse(ctx);
+		}
 
 		public AlternationBrick(ISmartExpressionAlgebra algebra, SmartExpressionBrick b1, SmartExpressionBrick b2)
 			: base(algebra, b1, b2, CanMakeFlat)

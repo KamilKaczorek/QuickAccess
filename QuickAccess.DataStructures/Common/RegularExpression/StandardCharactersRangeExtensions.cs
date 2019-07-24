@@ -35,27 +35,75 @@
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
 
-using System.Collections.Generic;
+using System;
 
 namespace QuickAccess.DataStructures.Common.RegularExpression
 {
-	public interface IRegularExpressionFactory
+	public static class StandardCharactersRangeExtensions
 	{
-		string CreateAlternation(IRegularExpressionFactoryContext ctx, IEnumerable<string> alternativeRegexs);
-		string CreateNamedGroup(IRegularExpressionFactoryContext ctx, string groupName, string groupContentRegex, out string factualGroupName);
-		string CreateQuantifier(IRegularExpressionFactoryContext ctx, long min, long max, string quantifiedContentRegex);
-		string CreateNonCapturingGroup(IRegularExpressionFactoryContext ctx, string groupContentRegex);
-		string CreatePositiveLookaheadGroup(IRegularExpressionFactoryContext ctx, string groupContentRegex);
-		string CreateNegativeLookaheadGroup(IRegularExpressionFactoryContext ctx, string groupContentRegex);
-		string CreateRecursiveGroupCall(IRegularExpressionFactoryContext ctx, string regexGroupName);
-		string CreateCapturingGroup(IRegularExpressionFactoryContext ctx, string groupContentRegex);
-		string CreateCharRange(IRegularExpressionFactoryContext ctx, StandardCharactersRange range);
-		string CreateCharSet(IRegularExpressionFactoryContext ctx, IEnumerable<char> characters);
-		string CreateCharRange(IRegularExpressionFactoryContext ctx, char firstCharacter, char lastCharacter);
-		string GetWordCharacter(IRegularExpressionFactoryContext ctx);
-		string GetDigitCharacter(IRegularExpressionFactoryContext ctx);
-		string CharToRegex(IRegularExpressionFactoryContext ctx, char ch);
-		string StringToRegex(IRegularExpressionFactoryContext ctx, string text);
-		string CreateNot(IRegularExpressionFactoryContext ctx, string negatedContentRegex);
+		private static bool IsWordChar(this char source)
+		{
+			return char.IsLetter(source) || char.IsDigit(source) || source == '_';
+		}
+
+		public static bool IsFromRange(this char source, StandardCharactersRange range)
+		{
+			if ((range & ~StandardCharactersRange.NotWordCharacter) != StandardCharactersRange.None)
+			{
+				throw new NotSupportedException($"Can't create character range: Specified range is not supported ({range})");
+			}
+
+			switch (range)
+			{
+				case StandardCharactersRange.None:
+				case StandardCharactersRange.Not:
+					throw new InvalidOperationException($"Can't create character range: range is empty ({range}).");
+				case StandardCharactersRange.Underscore:
+					return source == '_';
+				case StandardCharactersRange.WordCharacter:
+					return source.IsWordChar();
+				case StandardCharactersRange.NotWordCharacter:
+					return !source.IsWordChar();
+				case StandardCharactersRange.NotUnderscore:
+					return source != '_';
+			}
+
+			var positive = (range & StandardCharactersRange.Not) == StandardCharactersRange.None;
+
+			 
+			if ((range & StandardCharactersRange.UpperLetter) != StandardCharactersRange.None)
+			{
+				if (char.IsUpper(source) && char.IsLetter(source))
+				{
+					return positive;
+				}
+			}
+
+			if ((range & StandardCharactersRange.LowerLetter) != StandardCharactersRange.None)
+			{
+				if (char.IsLower(source) && char.IsLetter(source))
+				{
+					return positive;
+				}
+			}
+
+			if ((range & StandardCharactersRange.Digit) != StandardCharactersRange.None)
+			{
+				if (char.IsDigit(source))
+				{
+					return positive;
+				}
+			}
+
+			if ((range & StandardCharactersRange.Underscore) != StandardCharactersRange.None)
+			{
+				if (source == '_')
+				{
+					return positive;
+				}
+			}
+
+			return !positive;
+		}
 	}
 }

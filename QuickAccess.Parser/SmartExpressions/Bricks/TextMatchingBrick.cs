@@ -35,6 +35,7 @@
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -97,6 +98,12 @@ namespace QuickAccess.Parser.SmartExpressions.Bricks
 		}
 
 		/// <inheritdoc />
+		protected override IParsedExpressionNode TryParseInternal(IParsingContextStream ctx)
+		{
+			return ctx.ParseText(Text) ? new ParsingNode(ctx.AcceptAndGetFragment(), "Text", null) : null;
+		}
+
+		/// <inheritdoc />
 		protected override void ApplyRuleDefinition(string name, SmartExpressionBrick content, bool recursion, bool freeze)
 		{
 		}
@@ -111,6 +118,6 @@ namespace QuickAccess.Parser.SmartExpressions.Bricks
 		}
 
 		/// <inheritdoc />
-		public override bool ProvidesRegularExpression => true;
+		public override MatchingLevel RegularExpressionMatchingLevel => MatchingLevel.Exact;
 	}
 }

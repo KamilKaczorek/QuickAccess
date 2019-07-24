@@ -28,70 +28,63 @@
 // 
 // =====================================================================
 // 
-// Project: QuickAccess.Parser
+// Project: QuickAccess.DataStructures
 // 
 // Author: Kamil Piotr Kaczorek
 // http://kamil.scienceontheweb.net
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
 
+using System;
 using System.Collections.Generic;
-using QuickAccess.DataStructures.Common.RegularExpression;
+using System.Linq;
 
-namespace QuickAccess.Parser.SmartExpressions.Bricks
+namespace QuickAccess.DataStructures.Common.RegularExpression
 {
-	public sealed class EmptyParsingBrick : SmartExpressionBrick
+	public enum MatchingLevel
 	{
-		public static readonly EmptyParsingBrick Instance = new EmptyParsingBrick(SX.DefaultAlgebra);
+		/// <summary>There is no regex representation of an object.</summary>
+		/// 
+		None = 0,
 
-		private EmptyParsingBrick(ISmartExpressionAlgebra algebra)
-		: base(algebra)
+		/// <summary>The regex defines only placeholder for the object expression (e.g.: ".+" when parsing float number).</summary>
+		/// 
+		Placeholder = 1,
+
+		/// <summary>The regex defines generalized pattern (not exact) (e.g. "[\d\.]+" when parsing float number)</summary>
+		Generalized = 2,
+
+		/// <summary>The regex defines exact pattern (e.g. "\d+(?:\.\d+)?" when parsing float number)</summary>
+		Exact = 3
+	}
+
+	public static class MatchingLevelExtensions
+	{
+		public static MatchingLevel GetMinimalMatchingLevel(
+			this IEnumerable<IRegularExpressionRepresentable> regularExpressionRepresentableItems)
 		{
+			return  regularExpressionRepresentableItems.Select(r => r.RegularExpressionMatchingLevel).GetMinimal();
 		}
 
-		/// <inheritdoc />
-		protected override void ApplyRuleDefinition(string name, SmartExpressionBrick content, bool recursion, bool freeze)
+		public static MatchingLevel GetMinimal(
+			this IEnumerable<MatchingLevel> source)
 		{
-		}
+			var min = MatchingLevel.Exact;
 
-		/// <inheritdoc />
-		public override string ExpressionId => "$";
-
-		/// <inheritdoc />
-		public override string ToRegularExpressionString(RegularExpressionBuildingContext ctx)
-		{
-			return string.Empty;
-		}
-
-		/// <inheritdoc />
-		public override bool Equals(SmartExpressionBrick other)
-		{
-			if (ReferenceEquals(other, this))
+			foreach (var matchingLevel in source)
 			{
-				return true;
+				if (matchingLevel == MatchingLevel.None)
+				{
+					return MatchingLevel.None;
+				}
+
+				if (min > matchingLevel)
+				{
+					min = matchingLevel;
+				}
 			}
 
-			if (ReferenceEquals(other, null))
-			{
-				return false;
-			}
-
-			return other.Equals(this);
+			return min;
 		}
-
-		/// <inheritdoc />
-		protected override IParsedExpressionNode TryParseInternal(IParsingContextStream ctx)
-		{
-			return new EmptyNode(ctx);
-		}
-
-		/// <inheritdoc />
-		public override string ToString()
-		{
-			return string.Empty;
-		}
-
-		/// <inheritdoc />
-		public override bool IsEmpty => true;
 	}
 }

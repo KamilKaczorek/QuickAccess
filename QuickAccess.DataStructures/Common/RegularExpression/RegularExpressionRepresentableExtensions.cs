@@ -28,18 +28,24 @@
 // 
 // =====================================================================
 // 
-// Project: QuickAccess.Parser
+// Project: QuickAccess.DataStructures
 // 
 // Author: Kamil Piotr Kaczorek
 // http://kamil.scienceontheweb.net
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
-
 namespace QuickAccess.DataStructures.Common.RegularExpression
 {
-	public interface IRegularExpressionProvider
+	public static class RegularExpressionRepresentableExtensions
 	{
-		string ToRegularExpressionString(RegularExpressionBuildingContext ctx);
-		bool ProvidesRegularExpression { get; }
+		public static bool IsRegularExpressionProvided(this IRegularExpressionRepresentable source)
+		{
+			return source.RegularExpressionMatchingLevel != MatchingLevel.None;
+		}
+
+		public static bool IsRegularExpressionProvided(this IRegularExpressionRepresentable source, MatchingLevel minimalMatchingLevel)
+		{
+			return source.RegularExpressionMatchingLevel >= minimalMatchingLevel;
+		}
 	}
 }

@@ -35,25 +35,11 @@
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
 
-using System;
-
 namespace QuickAccess.DataStructures.Common.RegularExpression
 {
-	[Flags]
-	public enum StandardCharactersRanges
+	public interface IRegularExpressionRepresentable
 	{
-		None = 0,
-		Not = 0x01,
-		UpperLetter = 0x02,
-		LowerLetter = 0x04,
-		Digit = 0x08,
-		Underscore = 0x10,
-		Letter = UpperLetter | LowerLetter,
-		LetterOrDigit = Letter | Digit,
-		WordCharacter = LetterOrDigit | Underscore,
-		NotWordCharacter = Not | WordCharacter,
-		NotLetter = Not | Letter,
-		NotDigit = Not | Digit,
-		NotUnderscore = Not | Underscore
+		string ToRegularExpressionString(RegularExpressionBuildingContext ctx);
+		MatchingLevel RegularExpressionMatchingLevel { get; }
 	}
 }

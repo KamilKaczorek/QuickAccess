@@ -34,64 +34,22 @@
 // http://kamil.scienceontheweb.net
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
-
-using System.Collections.Generic;
-using QuickAccess.DataStructures.Common.RegularExpression;
-
-namespace QuickAccess.Parser.SmartExpressions.Bricks
+namespace QuickAccess.Parser
 {
-	public sealed class EmptyParsingBrick : SmartExpressionBrick
+	/// <summary>
+	/// Extensions of <seealso cref="IParsingContextStream"/>.
+	/// </summary>
+	public static class ParsingContextStreamExtensions
 	{
-		public static readonly EmptyParsingBrick Instance = new EmptyParsingBrick(SX.DefaultAlgebra);
-
-		private EmptyParsingBrick(ISmartExpressionAlgebra algebra)
-		: base(algebra)
+		/// <summary>
+		/// Accepts the source context (by <see cref="IParsingContextStream.Accept"/>) and returns accepted fragment (<see cref="IParsingContextStream.GetAcceptedFragment"/>).
+		/// </summary>
+		/// <param name="source">The source.</param>
+		/// <returns>The accepted fragment.</returns>
+		public static ISourceCodeFragment AcceptAndGetFragment(this IParsingContextStream source)
 		{
+			source.Accept();
+			return source.GetAcceptedFragment();
 		}
-
-		/// <inheritdoc />
-		protected override void ApplyRuleDefinition(string name, SmartExpressionBrick content, bool recursion, bool freeze)
-		{
-		}
-
-		/// <inheritdoc />
-		public override string ExpressionId => "$";
-
-		/// <inheritdoc />
-		public override string ToRegularExpressionString(RegularExpressionBuildingContext ctx)
-		{
-			return string.Empty;
-		}
-
-		/// <inheritdoc />
-		public override bool Equals(SmartExpressionBrick other)
-		{
-			if (ReferenceEquals(other, this))
-			{
-				return true;
-			}
-
-			if (ReferenceEquals(other, null))
-			{
-				return false;
-			}
-
-			return other.Equals(this);
-		}
-
-		/// <inheritdoc />
-		protected override IParsedExpressionNode TryParseInternal(IParsingContextStream ctx)
-		{
-			return new EmptyNode(ctx);
-		}
-
-		/// <inheritdoc />
-		public override string ToString()
-		{
-			return string.Empty;
-		}
-
-		/// <inheritdoc />
-		public override bool IsEmpty => true;
 	}
 }

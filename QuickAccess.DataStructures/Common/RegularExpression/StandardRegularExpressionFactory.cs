@@ -163,46 +163,46 @@ namespace QuickAccess.DataStructures.Common.RegularExpression
 		}
 
 		/// <inheritdoc />
-		public string CreateCharRange(IRegularExpressionFactoryContext ctx, StandardCharactersRanges range)
+		public string CreateCharRange(IRegularExpressionFactoryContext ctx, StandardCharactersRange range)
 		{
-			if ((range & ~StandardCharactersRanges.NotWordCharacter) != StandardCharactersRanges.None)
+			if ((range & ~StandardCharactersRange.NotWordCharacter) != StandardCharactersRange.None)
 			{
 				throw new NotSupportedException($"Can't create character range: Specified range is not supported ({range})");
 			}
 
 			switch (range)
 			{
-				case StandardCharactersRanges.None:
-				case StandardCharactersRanges.Not:
+				case StandardCharactersRange.None:
+				case StandardCharactersRange.Not:
 					throw new InvalidOperationException($"Can't create character range: range is empty ({range}).");
-				case StandardCharactersRanges.Underscore:
+				case StandardCharactersRange.Underscore:
 					return "_";
-				case StandardCharactersRanges.WordCharacter:
+				case StandardCharactersRange.WordCharacter:
 					return @"\w";
-				case StandardCharactersRanges.NotWordCharacter:
+				case StandardCharactersRange.NotWordCharacter:
 					return @"\W";
-				case StandardCharactersRanges.NotUnderscore:
+				case StandardCharactersRange.NotUnderscore:
 					return "^_";
 			}
 
-			var regex = ((range & StandardCharactersRanges.Not) != StandardCharactersRanges.None) ? "[^" : "[";
+			var regex = ((range & StandardCharactersRange.Not) != StandardCharactersRange.None) ? "[^" : "[";
 
-			if ((range & StandardCharactersRanges.UpperLetter) != StandardCharactersRanges.None)
+			if ((range & StandardCharactersRange.UpperLetter) != StandardCharactersRange.None)
 			{
 				regex += "A-Z";
 			}
 
-			if ((range & StandardCharactersRanges.LowerLetter) != StandardCharactersRanges.None)
+			if ((range & StandardCharactersRange.LowerLetter) != StandardCharactersRange.None)
 			{
 				regex += "a-z";
 			}
 
-			if ((range & StandardCharactersRanges.Digit) != StandardCharactersRanges.None)
+			if ((range & StandardCharactersRange.Digit) != StandardCharactersRange.None)
 			{
 				regex += "0-9";
 			}
 
-			if ((range & StandardCharactersRanges.Underscore) != StandardCharactersRanges.None)
+			if ((range & StandardCharactersRange.Underscore) != StandardCharactersRange.None)
 			{
 				regex += "_";
 			}

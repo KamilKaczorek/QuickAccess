@@ -53,6 +53,20 @@ namespace QuickAccess.DataStructures.Common.Collections
 		}
 
 		[Pure]
+		public static IEnumerable<T> WhereNotNull<T>(this IEnumerable<T> source)
+		where T : class
+		{
+			return source.Where(item=> item != null);
+		}
+
+		[Pure]
+		public static T FirstNotNullOrDefault<T>(this IEnumerable<T> source)
+			where T : class
+		{
+			return source.FirstOrDefault(item => item != null);
+		}
+
+		[Pure]
 		public static IEnumerable<string> AsStrings(this string source)
 		{
 			return source.Select(item => item.ToString());

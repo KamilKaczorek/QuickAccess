@@ -39,8 +39,8 @@
 
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 
 namespace QuickAccess.Parser
@@ -126,10 +126,32 @@ namespace QuickAccess.Parser
             return count;
         }
 
+        public static bool IsContainedBy(this char source, ICollection<char> collection,
+            IEqualityComparer<char> comparer)
+        {
+            if (collection == null)
+            {
+                return false;
+            }
+
+            if (comparer == null)
+            {
+                return collection.Contains(source);
+            }
+
+            if (comparer is CharComparer cc)
+            {
+                return cc.IsCharContainedByCollection(source, collection);
+            }
+
+            return collection.Contains(source, comparer);
+        }
+
         public static int ParseWhileOneOf(this IParsingContextStream source, ISet<char> charSet, bool accept = false, IEqualityComparer<char> charComparer = null)
         {
             var count = 0;
-            while (source.HasNext && charSet.Contains(source.Next, charComparer))
+
+            while (source.HasNext && source.Next.IsContainedBy(charSet, charComparer))
             {
                 count++;
                 source.MoveNext();
@@ -145,7 +167,7 @@ namespace QuickAccess.Parser
 
         public static bool ParseOneOf(this IParsingContextStream source, ISet<char> charSet, bool accept = false, IEqualityComparer<char> charComparer = null)
         {
-            if (source.HasNext && charSet.Contains(source.Next, charComparer))
+            if (source.HasNext && source.Next.IsContainedBy(charSet, charComparer))
             {
                 source.MoveNext();
 
@@ -196,6 +218,31 @@ namespace QuickAccess.Parser
             }
 
             return false;
+        }
+
+        public static bool ParseText(this IParsingContextStream source, IEnumerable<char> text, IEqualityComparer<char> charComparer = null, bool accept = false)
+        {
+	        foreach (var ch in text)
+	        {
+		        if (!source.MoveNext())
+		        {
+			        return false;
+		        }
+
+		        var cur = source.Current;
+
+		        if (!(charComparer?.Equals(ch, cur) ?? ch == cur))
+		        {
+			        return false;
+		        }
+	        }
+
+	        if (accept)
+	        {
+				source.Accept();
+	        }
+
+	        return true;
         }
 
         public static bool ParseWhen(this IParsingContextStream source, Func<char, bool> predicate, bool accept = false)
@@ -259,7 +306,7 @@ namespace QuickAccess.Parser
                             }
 
                             if (Equals(currentTerm[charPosition], current, charComparer))
-                            {
+                            { 
                                 if (currentTerm.Length == charPosition + 1)
                                 {
                                     matchedTermIdx = termIdx;
@@ -339,7 +386,7 @@ namespace QuickAccess.Parser
                 ctx.Accept();
                 var fragment = ctx.GetAcceptedFragment();
 
-                value = double.Parse(fragment.ToString());
+                value = double.Parse(fragment.ToString(), CultureInfo.InvariantCulture);
 
                 return fragment;
             }
@@ -374,27 +421,6 @@ namespace QuickAccess.Parser
         private static bool Equals(char ch1, char ch2, IEqualityComparer<char> charComparer = null)
         {
             return (charComparer ?? CharComparer.CaseSensitive).Equals(ch1, ch2);
-        }
-
-
-        private sealed class EmptyParsedFragment : ISourceCodeFragment
-        {
-			public char this[int index] => throw new IndexOutOfRangeException($"Source code fragment is empty - can't access {index} character.");
-
-			public int Count => 0;
-
-            public int SourcePosition => -1;
-
-
-            public IEnumerator<char> GetEnumerator()
-            {
-                yield break;
-            }
-
-            IEnumerator IEnumerable.GetEnumerator()
-            {
-                yield break;
-            }
         }
     }
 }

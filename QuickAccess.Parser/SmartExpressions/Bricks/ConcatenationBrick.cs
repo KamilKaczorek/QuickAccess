@@ -42,8 +42,15 @@ namespace QuickAccess.Parser.SmartExpressions.Bricks
 {
 	public sealed class ConcatenationBrick : CompositeSmartExpressionBrick
 	{
+		
 		/// <inheritdoc />
-		public override bool ProvidesRegularExpression => Bricks.All(b => b.ProvidesRegularExpression);
+		public override MatchingLevel RegularExpressionMatchingLevel => Bricks.GetMinimalMatchingLevel();
+
+		/// <inheritdoc />
+		protected override IParsedExpressionNode TryParseInternal(IParsingContextStream ctx)
+		{
+			return Bricks.TryAggregateParse(ctx, SmartExpression.ExpressionType.Composition);
+		}
 
 		public override string ExpressionId => string.Join(string.Empty, Bricks.Select(b => b.ExpressionId));
 

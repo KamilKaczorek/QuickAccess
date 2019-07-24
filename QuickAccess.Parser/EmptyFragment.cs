@@ -35,63 +35,57 @@
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
 
+using System;
+using System.Collections;
 using System.Collections.Generic;
-using QuickAccess.DataStructures.Common.RegularExpression;
 
-namespace QuickAccess.Parser.SmartExpressions.Bricks
+namespace QuickAccess.Parser
 {
-	public sealed class EmptyParsingBrick : SmartExpressionBrick
+	/// <summary>
+	/// The implementation of the source code fragment.
+	/// <seealso cref="ISourceCode" />
+	/// </summary>
+	/// <seealso cref="ISourceCodeFragment" />
+	/// <seealso cref="ISourceCodeFragmentFactory" />
+	/// <seealso cref="IEnumerable{T}" />
+	public sealed class EmptyFragment : ISourceCodeFragment
 	{
-		public static readonly EmptyParsingBrick Instance = new EmptyParsingBrick(SX.DefaultAlgebra);
+		/// <inheritdoc />
+		public int SourcePosition { get; }
 
-		private EmptyParsingBrick(ISmartExpressionAlgebra algebra)
-		: base(algebra)
+		/// <inheritdoc />
+		public int Count => 0;
+
+		///<inheritdoc />
+		public char this[int index] => throw new IndexOutOfRangeException();
+
+		/// <summary>
+		/// Initializes the new instance of the <see cref="ISourceCodeFragment" /> type.
+		/// </summary>
+		/// <param name="offset">The absolute source code offset, where the fragment starts.</param>
+		public EmptyFragment(int offset)
 		{
+			SourcePosition = offset;
 		}
 
-		/// <inheritdoc />
-		protected override void ApplyRuleDefinition(string name, SmartExpressionBrick content, bool recursion, bool freeze)
+		public IEnumerator<char> GetEnumerator()
 		{
+			yield break;
 		}
 
-		/// <inheritdoc />
-		public override string ExpressionId => "$";
-
-		/// <inheritdoc />
-		public override string ToRegularExpressionString(RegularExpressionBuildingContext ctx)
+		IEnumerator IEnumerable.GetEnumerator()
 		{
-			return string.Empty;
+			yield break;
 		}
 
-		/// <inheritdoc />
-		public override bool Equals(SmartExpressionBrick other)
+		public override int GetHashCode()
 		{
-			if (ReferenceEquals(other, this))
-			{
-				return true;
-			}
-
-			if (ReferenceEquals(other, null))
-			{
-				return false;
-			}
-
-			return other.Equals(this);
+			return SourcePosition;
 		}
 
-		/// <inheritdoc />
-		protected override IParsedExpressionNode TryParseInternal(IParsingContextStream ctx)
-		{
-			return new EmptyNode(ctx);
-		}
-
-		/// <inheritdoc />
 		public override string ToString()
 		{
 			return string.Empty;
 		}
-
-		/// <inheritdoc />
-		public override bool IsEmpty => true;
 	}
 }

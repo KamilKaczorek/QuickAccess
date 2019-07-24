@@ -36,8 +36,10 @@
 #endregion
 
 using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using QuickAccess.DataStructures.Common.RegularExpression;
 using QuickAccess.Parser.SmartExpressions;
@@ -100,8 +102,20 @@ namespace QuickAccess.Parser.Tests
 
 			Assert.AreEqual(expressionParsed, res);
 
+			var source = new StringSourceCode(new ParsingContextStreamFactory(), new SourceCodeFragmentFactory(), expression);
 
-		
+			var rootNode = functionInvocation.TryParse(source.GetFurtherContext());
+
+			if (expressionParsed)
+			{
+				rootNode.Should().NotBeNull();
+			}
+			else
+			{
+				rootNode.Should().BeNull();
+			}
+
+
 
 			// * anything
 			// + nothing

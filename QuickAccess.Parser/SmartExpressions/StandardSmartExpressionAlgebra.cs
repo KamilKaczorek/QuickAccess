@@ -109,7 +109,7 @@ namespace QuickAccess.Parser.SmartExpressions
 			return false;
 		}
 
-		public SmartExpressionBrick Anything => CreateRulePlaceholder(StandardSmartExpressionRuleNames.Anything, null);
+		public SmartExpressionBrick Anything => CreateRulePlaceholder(SmartExpression.StandardRuleName.Anything, null);
 
 		/// <inheritdoc />
 		public SmartExpressionBrick Empty => EmptyParsingBrick.Instance;
@@ -117,23 +117,23 @@ namespace QuickAccess.Parser.SmartExpressions
 		/// <inheritdoc />
 		public SmartExpressionBegin Start => new SmartExpressionBegin(this);
 		/// <inheritdoc />
-		public SmartExpressionBrick WhiteSpace => CreateRulePlaceholder(StandardSmartExpressionRuleNames.WhiteSpace, (Start | ' ' | '\t').OneOrMore());
+		public SmartExpressionBrick WhiteSpace => CreateRulePlaceholder(SmartExpression.StandardRuleName.WhiteSpace, (Start | ' ' | '\t').OneOrMore());
 		/// <inheritdoc />
-		public SmartExpressionBrick OptionalWhiteSpace => CreateRulePlaceholder(StandardSmartExpressionRuleNames.OptionalWhiteSpace, ~WhiteSpace);
+		public SmartExpressionBrick OptionalWhiteSpace => CreateRulePlaceholder(SmartExpression.StandardRuleName.OptionalWhiteSpace, ~WhiteSpace);
 		/// <inheritdoc />
-		public SmartExpressionBrick CustomSequence => CreateRulePlaceholder(StandardSmartExpressionRuleNames.CustomSequence, Empty);
+		public SmartExpressionBrick CustomSequence => CreateRulePlaceholder(SmartExpression.StandardRuleName.CustomSequence, Empty);
 		/// <inheritdoc />
-		public SmartExpressionBrick NextLine => CreateRulePlaceholder(StandardSmartExpressionRuleNames.NextLine, OptionalWhiteSpace + Environment.NewLine);
+		public SmartExpressionBrick NextLine => CreateRulePlaceholder(SmartExpression.StandardRuleName.NextLine, OptionalWhiteSpace + Environment.NewLine);
 		/// <inheritdoc />
-		public SmartExpressionBrick Letter => CreateRulePlaceholder(StandardSmartExpressionRuleNames.Letter, new StandardCharacterRangeBrick(this, StandardCharactersRanges.Letter));
+		public SmartExpressionBrick Letter => CreateRulePlaceholder(SmartExpression.StandardRuleName.Letter, new StandardCharacterRangeBrick(this, StandardCharactersRange.Letter));
 		/// <inheritdoc />
-		public SmartExpressionBrick UpperLetter => CreateRulePlaceholder(StandardSmartExpressionRuleNames.UpperLetter, new StandardCharacterRangeBrick(this, StandardCharactersRanges.UpperLetter));
+		public SmartExpressionBrick UpperLetter => CreateRulePlaceholder(SmartExpression.StandardRuleName.UpperLetter, new StandardCharacterRangeBrick(this, StandardCharactersRange.UpperLetter));
 		/// <inheritdoc />
-		public SmartExpressionBrick LowerLetter => CreateRulePlaceholder(StandardSmartExpressionRuleNames.LowerLetter, new StandardCharacterRangeBrick(this, StandardCharactersRanges.LowerLetter));
+		public SmartExpressionBrick LowerLetter => CreateRulePlaceholder(SmartExpression.StandardRuleName.LowerLetter, new StandardCharacterRangeBrick(this, StandardCharactersRange.LowerLetter));
 		/// <inheritdoc />
-		public SmartExpressionBrick Symbol => CreateRulePlaceholder(StandardSmartExpressionRuleNames.Symbol, null);
+		public SmartExpressionBrick Symbol => CreateRulePlaceholder(SmartExpression.StandardRuleName.Symbol, null);
 		/// <inheritdoc />
-		public SmartExpressionBrick Digit => CreateRulePlaceholder(StandardSmartExpressionRuleNames.Digit, new StandardCharacterRangeBrick(this, StandardCharactersRanges.Digit));
+		public SmartExpressionBrick Digit => CreateRulePlaceholder(SmartExpression.StandardRuleName.Digit, new StandardCharacterRangeBrick(this, StandardCharactersRange.Digit));
 		/// <inheritdoc />
 		public SmartExpressionBrick Current => new CurrentRulePlaceholderBrick(this);
 		

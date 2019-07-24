@@ -37,6 +37,7 @@
 
 #endregion
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using QuickAccess.DataStructures.Graphs.Model;
@@ -50,7 +51,7 @@ namespace QuickAccess.DataStructures.Graphs.Algorithms
 	public sealed class BreadthFirstSearch
 		: IGraphSearch
 	{
-		/// <inheritdoc />
+        /// <inheritdoc />
 		[Pure]
 		public VertexSearchMap<int> GetSearchMapFrom<TEdgeData>(
 			GraphConnectivityDefinition<TEdgeData> graph,
@@ -61,19 +62,18 @@ namespace QuickAccess.DataStructures.Graphs.Algorithms
 
 			if (graph.ContainsVertexAt(startVertexIndex))
 			{
-				var queue = new Queue<int>();
+				var queue = new Queue();
 
 				queue.Enqueue(startVertexIndex);
 				destToSourceMap = new Dictionary<int, int>();
 
-				while (queue.Count > 0)
+				while (!queue.IsEmpty)
 				{
 					var source = queue.Dequeue();
-
 					var adj = graph[source];
-					foreach (var destination in filterAdjacentVerticesCallback == null
-						? adj.AdjacentIndexes
-						: filterAdjacentVerticesCallback.Invoke(source, adj))
+                    var adjacent = filterAdjacentVerticesCallback?.Invoke(source, adj) ?? adj.AdjacentIndexes;
+                        
+					foreach (var destination in adjacent)
 					{
 						if (destination == source && startVertexIndex != source)
 						{
@@ -102,5 +102,65 @@ namespace QuickAccess.DataStructures.Graphs.Algorithms
 
 			return new VertexSearchMap<int>(startVertexIndex, destToSourceMap);
 		}
-	}
+
+        private sealed class Queue
+        {
+            private QueueItem _head;
+            private QueueItem _tail;
+
+            public Queue()
+            {
+                _head = null;
+                _tail = null;
+            }
+
+            public void Enqueue(int index)
+            {
+                _tail = new QueueItem(index, ref _head, ref _tail);
+            }
+
+            public bool IsEmpty => _head == null;
+
+            public int Dequeue()
+            {
+                if(_head == null)
+                {
+                    throw new InvalidOperationException("Queue is empty - can't dequeue.");
+                }
+
+                var h = _head;
+                _head = h.Next;
+
+                if (_head == null)
+                {
+                    _tail = null;
+                }
+
+                return h.Index;
+            }
+
+            private class QueueItem
+            {
+                public QueueItem(int index, ref QueueItem head, ref QueueItem tail)
+                {
+                
+                    Index = index;
+                    Next = null;
+
+                    if (head == null)
+                    {
+                        head = this;
+                    }
+                    else
+                    {
+                        tail.Next = this;
+                    }
+                }
+
+                public int Index { get; }
+                public QueueItem Next { get; private set; }
+            }
+
+        }
+    }
 }

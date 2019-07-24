@@ -42,7 +42,8 @@ using QuickAccess.DataStructures.Common.RegularExpression;
 namespace QuickAccess.Parser.SmartExpressions
 {
 	public abstract class SmartExpressionBrick
-		: IRegularExpressionProvider,
+		: IExpressionParser,
+		  IRegularExpressionRepresentable,
 		  ICodeOperatorAlgebraicDomain<SmartExpressionBrick, ISmartExpressionAlgebra>,
 		  IEquatable<SmartExpressionBrick>
 	{
@@ -170,20 +171,42 @@ namespace QuickAccess.Parser.SmartExpressions
 
 		public virtual string ToRegularExpressionString(RegularExpressionBuildingContext ctx)
 		{
-			if (ProvidesRegularExpression)
+			var matchingLevel = RegularExpressionMatchingLevel;
+			if (matchingLevel != MatchingLevel.None)
 			{
 				throw new InvalidOperationException(
-					$"{nameof(ProvidesRegularExpression)} returns true but {nameof(ToRegularExpressionString)} method is not overloaded.");
+					$"{nameof(RegularExpressionMatchingLevel)} returns {matchingLevel} but {nameof(ToRegularExpressionString)} method is not overloaded.");
 			}
 
 			throw new NotSupportedException($"Conversion to regular expression is not supported for {GetType()}.");
 		}
 
-		public virtual bool ProvidesRegularExpression => false;
+		/// <inheritdoc />
+		public virtual MatchingLevel RegularExpressionMatchingLevel => MatchingLevel.None;
 
 		/// <inheritdoc />
 		public abstract bool Equals(SmartExpressionBrick other);
 
+		/// <inheritdoc />
+		public IParsedExpressionNode TryParse(ISourceCode sourceCode)
+		{
+			using (var ctx = sourceCode.GetFurtherContext())
+			{
+				var res = TryParseInternal(ctx);
+
+				if (res != null)
+				{
+					ctx.Accept();
+				}
+				
+				return res;
+			}
+		}
+
+		/// <summary>Tries the parse internal.</summary>
+		/// <param name="parsingContext">The source.</param>
+		/// <returns></returns>
+		protected abstract IParsedExpressionNode TryParseInternal(IParsingContextStream parsingContext);
 
 	}
 }

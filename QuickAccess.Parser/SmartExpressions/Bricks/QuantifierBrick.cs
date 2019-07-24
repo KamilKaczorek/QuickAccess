@@ -36,6 +36,8 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
+using System.Security.Cryptography;
 using QuickAccess.DataStructures.CodeOperatorAlgebra;
 using QuickAccess.DataStructures.Common.RegularExpression;
 
@@ -101,6 +103,50 @@ namespace QuickAccess.Parser.SmartExpressions.Bricks
 			}
 
 			return other is QuantifierBrick qb && qb.Min == Min && qb.Max == Max && qb.Content.Equals(Content);
+		}
+
+		/// <inheritdoc />
+		protected override IParsedExpressionNode TryParseInternal(IParsingContextStream ctx)
+		{
+			if (Min == 1 && Max == 1)
+			{
+				return Content.TryParse(ctx);
+			}
+
+			if (Min == 0 && Max == 1)
+			{
+				return Content.TryParse(ctx) ?? new EmptyNode(ctx);
+			}
+
+			List<IParsedExpressionNode> nodes = null;
+
+			
+			for (var idx = 0; idx <= Max; idx++)
+			{
+				var res = idx < Max ? Content.TryParse(ctx) : null;
+
+				if (res == null)
+				{
+					if (idx >= Min)
+					{
+						var fragment = ctx.AcceptAndGetFragment();
+						return nodes != null
+							? (IParsedExpressionNode)new CompositeNode(fragment, nodes, SmartExpression.ExpressionType.Composition, null)
+							: new EmptyNode(ctx);
+					}
+					
+					return null;
+				}
+
+				nodes = nodes ?? new List<IParsedExpressionNode>((int)Math.Min(Math.Max(Min, 16), Max));
+
+				if (!EmptyNode.IsEmptyNode(res))
+				{
+					nodes.Add(res);
+				}
+			}
+
+			throw new InvalidOperationException();
 		}
 
 		/// <inheritdoc />

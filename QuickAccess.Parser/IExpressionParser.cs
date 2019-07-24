@@ -37,6 +37,8 @@
 
 #endregion
 
+using System.Data;
+
 namespace QuickAccess.Parser
 {
     /// <summary>
