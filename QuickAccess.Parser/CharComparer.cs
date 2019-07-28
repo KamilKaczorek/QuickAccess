@@ -88,7 +88,7 @@ namespace QuickAccess.Parser
             
         public int GetHashCode(char obj)
         {
-            return obj.GetHashCode();
+            return char.ToLowerInvariant(obj).GetHashCode();
         }
     }
 }

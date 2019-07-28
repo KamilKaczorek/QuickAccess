@@ -54,11 +54,22 @@ namespace QuickAccess.Parser
         ITermDefinitionsRepository,
         ICompiler
     {
+        public static class ExpressionTypeId
+        {
+            public const string UnaryOperator = "math_un_oper";
+            public const string BinaryOperator = "math_bin_oper";
+            public const string Function = "math_function";
+            public const string Value = "math_value";
+            public const string Variable = "math_var";
+            public const string Constant = "math_const";
+        }
+
         private readonly List<BinaryOperatorTermDefinition> _binaryOperators = new List<BinaryOperatorTermDefinition>();
-        private readonly Dictionary<string, Dictionary<int, Func<object[], object>>> _functionsByNameByArgCount;
+        private readonly Dictionary<IReadOnlyList<char>, Dictionary<int, Func<object[], object>>> _functionsByNameByArgCount;
         private readonly IExpressionParser _parser;
         private readonly List<UnaryOperatorTermDefinition> _unaryOperators = new List<UnaryOperatorTermDefinition>();
-        private readonly Dictionary<string, Func<object>> _variables;
+        private readonly Dictionary<IReadOnlyList<char>, Func<object>> _variables;
+        private readonly Dictionary<IReadOnlyList<char>, object> _constants;
 
         /// <inheritdoc />
         IReadOnlyList<IBinaryOperatorTermDefinition> ITermDefinitionsRepository.BinaryOperators => _binaryOperators;
@@ -74,11 +85,12 @@ namespace QuickAccess.Parser
         public MathExpressionCompiler(IEqualityComparer<char> charComparer, IExpressionParserFactory parserFactory)
         {
             charComparer = charComparer ?? CharComparer.CaseSensitive;
-            var comparer = charComparer.ToStringComparer();
+            var comparer = new SourceCodeFragmentContentComparer(charComparer);
 
-            _functionsByNameByArgCount = new Dictionary<string, Dictionary<int, Func<object[], object>>>(comparer);
+            _functionsByNameByArgCount = new Dictionary<IReadOnlyList<char>, Dictionary<int, Func<object[], object>>>(comparer);
 
-            _variables = new Dictionary<string, Func<object>>(comparer);
+            _variables = new Dictionary<IReadOnlyList<char>, Func<object>>(comparer);
+            _constants = new Dictionary<IReadOnlyList<char>, object>(comparer);
 
             _parser = parserFactory.Create(this, this, charComparer);
         }
@@ -94,20 +106,20 @@ namespace QuickAccess.Parser
         /// <inheritdoc />
         IParsedExpressionNode IGrammarProductsFactory.CreateOperatorNode(
             ISourceCodeFragment operatorTerm,
-            IBinaryOperatorTermDefinition oper,
+            IBinaryOperatorTermDefinition @operator,
             IParsedExpressionNode exp1,
             IParsedExpressionNode exp2)
         {
-            return GetFunction(operatorTerm, "biranyoperator", new[] {exp1, exp2});
+            return GetFunction(operatorTerm, ExpressionTypeId.BinaryOperator, new[] {exp1, exp2});
         }
 
         /// <inheritdoc />
         IParsedExpressionNode IGrammarProductsFactory.CreateOperatorNode(
             ISourceCodeFragment operatorTerm,
-            IUnaryOperatorTermDefinition oper,
+            IUnaryOperatorTermDefinition @operator,
             IParsedExpressionNode exp)
         {
-            return GetFunction(operatorTerm, "unaryoperator", new[] {exp});
+            return GetFunction(operatorTerm, ExpressionTypeId.UnaryOperator, new[] {exp});
         }
 
         /// <inheritdoc />
@@ -115,18 +127,28 @@ namespace QuickAccess.Parser
             ISourceCodeFragment functionName,
             IEnumerable<IParsedExpressionNode> arguments)
         {
-            return GetFunction(functionName, "function", arguments);
+            return GetFunction(functionName, ExpressionTypeId.Function, arguments);
         }
 
         /// <inheritdoc />
         IParsedExpressionNode IGrammarProductsFactory.CreateVariableNode(ISourceCodeFragment variable)
         {
-            if (!_variables.TryGetValue(variable.ToString(), out var v))
+            if (_variables.TryGetValue(variable, out var v))
             {
-                return null;
+                return new MathExpressionParameterlessFunctionNode(ExpressionTypeId.Variable, variable, v);
             }
 
-            return new MathExpressionParameterlessFunctionNode("variable", variable, v);
+            if (_constants.TryGetValue(variable, out var c))
+            {
+                return new MathExpressionValueNode(
+                    ExpressionTypeId.Value,
+                    variable,
+                    c,
+                    "float");
+            }
+
+            return null;
+
         }
 
         /// <inheritdoc />
@@ -143,7 +165,32 @@ namespace QuickAccess.Parser
         /// <param name="func">The function to evaluate variable value.</param>
         public void DefineVariable<T>(string name, Func<T> func)
         {
-            _variables.Add(name, () => func.Invoke());
+            var chars = new StringCharacters(name);
+
+            if (_variables.ContainsKey(chars) || _constants.ContainsKey(chars))
+            {
+                throw new ArgumentException($"Variable or constant of the specified name '{name}' is already defined.", nameof(name));
+            }
+
+            _variables[chars] = (() => func.Invoke());
+        }
+
+        /// <summary>
+        /// Adds variable definition to the compiler definitions.
+        /// </summary>
+        /// <typeparam name="T">The type of variable</typeparam>
+        /// <param name="name">The variable name.</param>
+        /// <param name="constValue">The constant value.</param>
+        public void DefineConstant<T>(string name, T constValue)
+        {
+            var chars = new StringCharacters(name);
+
+            if (_variables.ContainsKey(chars) || _constants.ContainsKey(chars))
+            {
+                throw new ArgumentException($"Variable or constant of the specified name '{name}' is already defined.", nameof(name));
+            }
+
+            _constants[chars] = constValue;
         }
 
         /// <summary>
@@ -154,10 +201,18 @@ namespace QuickAccess.Parser
         /// <param name="paramsCount">The number of function parameters.</param>
         public void DefineFunction(string name, Func<object[], object> function, int paramsCount)
         {
-            if (!_functionsByNameByArgCount.TryGetValue(name, out var funByArgCount))
+            var c = new StringCharacters(name);
+            if (!_functionsByNameByArgCount.TryGetValue(c, out var funByArgCount))
             {
                 funByArgCount = new Dictionary<int, Func<object[], object>>();
-                _functionsByNameByArgCount[name] = funByArgCount;
+                _functionsByNameByArgCount[c] = funByArgCount;
+            }
+            else
+            {
+                if (funByArgCount.ContainsKey(paramsCount))
+                {
+                    throw new ArgumentException($"Function '{name}'({paramsCount} params) is already defined.", nameof(name));
+                }
             }
 
             funByArgCount[paramsCount] = function;
@@ -231,10 +286,10 @@ namespace QuickAccess.Parser
             }
 
             return new MathExpressionValueNode(
-                "value",
+                ExpressionTypeId.Value,
                 fragment,
                 value,
-                isFloat ? "ufloat" : "uint");
+                isFloat ? @"u_float" : @"uint");
         }
 
         private IParsedExpressionNode GetFunction(
@@ -242,7 +297,7 @@ namespace QuickAccess.Parser
             string expressionTypeId,
             IEnumerable<IParsedExpressionNode> arguments)
         {
-            if (!_functionsByNameByArgCount.TryGetValue(functionName.ToString(), out var functionByArgsCount))
+            if (!_functionsByNameByArgCount.TryGetValue(functionName, out var functionByArgsCount))
             {
                 return null;
             }

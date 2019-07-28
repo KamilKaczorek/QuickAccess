@@ -49,7 +49,7 @@ namespace QuickAccess.Parser
     /// </summary>
     /// <seealso cref="ParsedExpressionNode" />
     /// <seealso cref="IExecutableExpressionNode" />
-    public sealed class MathExpressionParameterlessFunctionNode : ParsedExpressionNode, IExecutableExpressionNode
+    public sealed class MathExpressionParameterlessFunctionNode : TerminalExpressionNode, IExecutableExpressionNode
     {
         private readonly Func<object> _function;
 
@@ -65,7 +65,7 @@ namespace QuickAccess.Parser
             ISourceCodeFragment functionNameFragment,
             Func<object> function,
             string valueTypeId = null)
-            : base(expressionTypeId, functionNameFragment, null, valueTypeId)
+            : base(expressionTypeId, functionNameFragment, valueTypeId)
         {
             _function = function;            
         }

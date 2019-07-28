@@ -47,7 +47,7 @@ namespace QuickAccess.Parser
     /// </summary>
     /// <seealso cref="ParsedExpressionNode" />
     /// <seealso cref="IExecutableExpressionNode" />
-    public sealed class MathExpressionValueNode : ParsedExpressionNode,
+    public sealed class MathExpressionValueNode : TerminalExpressionNode,
         IExecutableExpressionNode
     {
         private readonly object _value;
@@ -60,7 +60,7 @@ namespace QuickAccess.Parser
         /// <param name="value">The value.</param>
         /// <param name="valueTypeId">The value type identifier.</param>
         public MathExpressionValueNode(string expressionTypeId, ISourceCodeFragment valueFragment, object value, string valueTypeId = null)
-            : base(expressionTypeId, valueFragment, null, valueTypeId)
+            : base(expressionTypeId, valueFragment, valueTypeId)
         {
             _value = value;
         }

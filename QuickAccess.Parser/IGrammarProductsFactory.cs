@@ -53,13 +53,13 @@ namespace QuickAccess.Parser
         /// Creates the binary operator node.
         /// </summary>
         /// <param name="operatorTerm">The binary operator term.</param>
-        /// <param name="oper">The operator term definition.</param>
+        /// <param name="operator">The operator term definition.</param>
         /// <param name="exp1">The left expression.</param>
         /// <param name="exp2">The right expression.</param>
         /// <returns>The binary operator expression or <c>null</c> if operator not found.</returns>
         IParsedExpressionNode CreateOperatorNode(
             ISourceCodeFragment operatorTerm,
-            IBinaryOperatorTermDefinition oper,
+            IBinaryOperatorTermDefinition @operator,
             IParsedExpressionNode exp1,
             IParsedExpressionNode exp2);
 
@@ -67,12 +67,12 @@ namespace QuickAccess.Parser
         /// Creates the unary operator node.
         /// </summary>
         /// <param name="operatorTerm">The unary operator term.</param>
-        /// <param name="oper">The unary operator definition.</param>
+        /// <param name="operator">The unary operator definition.</param>
         /// <param name="exp">The argument.</param>
         /// <returns>The unary operator expression or <c>null</c> if operator not found.</returns>
         IParsedExpressionNode CreateOperatorNode(
             ISourceCodeFragment operatorTerm,
-            IUnaryOperatorTermDefinition oper,
+            IUnaryOperatorTermDefinition @operator,
             IParsedExpressionNode exp);
 
         /// <summary>

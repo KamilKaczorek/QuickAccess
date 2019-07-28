@@ -38,6 +38,7 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace QuickAccess.Parser.Tests
@@ -45,28 +46,46 @@ namespace QuickAccess.Parser.Tests
 	[TestClass]
 	public class MathExpressionCompilerIntegrationTest
 	{
+        private MathExpressionCompiler SetupCompiler(IEqualityComparer<char> comparer)
+        {
+            var compiler = new MathExpressionCompiler(comparer, new MathExpressionParserFactory());
+
+            compiler.DefineOperator<double>("+", (x, y) => x + y, 0);
+            compiler.DefineOperator<double>("-", (x, y) => x - y, 0);
+            compiler.DefineOperator<double>("*", (x, y) => x * y, 10);
+            compiler.DefineOperator<double>("/", (x, y) => x / y, 10);
+            compiler.DefineOperator<double>("^", Math.Pow, 20);
+            compiler.DefineOperator<double>("+", x => x);
+            compiler.DefineOperator<double>("-", x => -x);
+
+            compiler.DefineFunction<double>("pow", Math.Pow);
+            compiler.DefineFunction<double>("sin", Math.Sin);
+            compiler.DefineFunction<double>("cos", Math.Cos);
+            compiler.DefineFunction<double>("ceiling", Math.Ceiling);
+            compiler.DefineFunction<double>("floor", Math.Floor);
+            compiler.DefineFunction<double>("abs", Math.Abs);
+
+            compiler.DefineVariable("One", () => 1.0);
+            compiler.DefineConstant("PI", Math.PI);
+
+            return compiler;
+        }
+
+        private StringSourceCode SetupSource(string sourceCode)
+        {
+            var source = new StringSourceCode(new ParsingContextStreamFactory(), new SourceCodeFragmentFactory(), sourceCode);
+
+            return source;
+        }
+
 		[TestMethod]
 		public void ON_Compile_WHEN_Expression_Is_Correct_SHOULD_Return_Executable_Expression_Node_That_Gives_Proper_Result()
 		{
 			// Arrange
-			var sourceCode = "sin(90*PI/180.0)*2^(1+1)*-1e-1";
-			var compiler = new MathExpressionCompiler(CharComparer.CaseSensitive, new MathExpressionParserFactory());
-			compiler.DefineOperator<double>("+", (x, y) => x + y, 0);
-			compiler.DefineOperator<double>("-", (x, y) => x - y, 0);
-			compiler.DefineOperator<double>("*", (x, y) => x * y, 10);
-			compiler.DefineOperator<double>("/", (x, y) => x / y, 10);
-			compiler.DefineOperator<double>("^", Math.Pow, 20);
-			compiler.DefineOperator<double>("+", x => x);
-			compiler.DefineOperator<double>("-", x => -x);
-			compiler.DefineFunction<double>("pow", Math.Pow);
-			compiler.DefineFunction<double>("sin", Math.Sin);
-			compiler.DefineFunction<double>("cos", Math.Cos);
-			compiler.DefineFunction<double>("ceiling", Math.Ceiling);
-			compiler.DefineFunction<double>("floor", Math.Floor);
-			compiler.DefineFunction<double>("abs", Math.Abs);
-			compiler.DefineVariable("PI", () => Math.PI);
+            var compiler = SetupCompiler(CharComparer.CaseSensitive);
+			var source = SetupSource("sin(90*PI/180.0)*2^(1+One)*-1e-1");
 
-			var source = new StringSourceCode(new ParsingContextStreamFactory(), new SourceCodeFragmentFactory(), sourceCode);
+			
 			// Act
 			var res = compiler.Compile(source);
 			// Assert
@@ -76,5 +95,40 @@ namespace QuickAccess.Parser.Tests
 			var calcRes = (double) res.Execute();
 			Assert.AreEqual(-0.4, calcRes, 0.0000001);
 		}
+
+        [TestMethod]
+        public void ON_Compile_WHEN_CaseSensitive_AND_WrongCase_SHOULD_Return_Error()
+        {
+            // Arrange
+            var compiler = SetupCompiler(CharComparer.CaseSensitive);
+            var source = SetupSource("Sin(90*PI/180.0)*2^(1+One)*-1e-1");
+
+			
+            // Act
+            var res = compiler.Compile(source);
+            // Assert
+            Assert.IsNull(res);
+            var error = source.GetError();
+            Assert.IsNotNull(error);
+
+        }
+
+        [TestMethod]
+        public void ON_Compile_WHEN_IgnoreCase_AND_Expression_Is_Correct_SHOULD_Return_Executable_Expression_Node_That_Gives_Proper_Result()
+        {
+            // Arrange
+            var compiler = SetupCompiler(CharComparer.CaseInsensitive);
+            var source = SetupSource("Sin(90*pi/180.0)*2^(1+oNe)*-1E-1");
+
+			
+            // Act
+            var res = compiler.Compile(source);
+            // Assert
+            Assert.IsNotNull(res);
+            var error = source.GetError();
+            Assert.IsNull(error);
+            var calcRes = (double) res.Execute();
+            Assert.AreEqual(-0.4, calcRes, 0.0000001);
+        }
 	}
 }

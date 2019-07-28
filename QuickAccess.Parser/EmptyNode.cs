@@ -78,6 +78,6 @@ namespace QuickAccess.Parser
 		public ISourceCodeFragment Fragment => _emptyFragment;
 
 		/// <inheritdoc />
-		public IReadOnlyList<IParsedExpressionNode> SubNodes => null;
+		public IReadOnlyList<IParsedExpressionNode> SubNodes => EmptySubNodes.Instance;
 	}
 }

@@ -64,7 +64,7 @@ namespace QuickAccess.Parser
         {
             ExpressionTypeId = expressionTypeId;
             Fragment = fragment;
-            SubNodes = subNodes?.ToArray() ?? Array.Empty<IParsedExpressionNode>();
+            SubNodes = (IReadOnlyList<IParsedExpressionNode>)subNodes?.ToArray() ?? EmptySubNodes.Instance;
             ValueTypeId = valueTypeId;
         }
 

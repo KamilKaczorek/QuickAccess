@@ -38,7 +38,10 @@
 #endregion
 
 
+using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace QuickAccess.Parser
 {
@@ -56,5 +59,99 @@ namespace QuickAccess.Parser
         /// The source position.
         /// </value>
         int SourcePosition { get; }
+    }
+
+    public sealed class StringCharacters : IReadOnlyList<char>
+    {
+        private readonly string _text;
+
+        public StringCharacters(string text)
+        {
+            _text = text;
+        }
+
+        public IEnumerator<char> GetEnumerator()
+        {
+            return _text.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return _text.GetEnumerator();
+        }
+
+        public int Count => _text.Length;
+
+        public char this[int index] => _text[index];
+
+        public override string ToString()
+        {
+            return _text;
+        }
+    }
+
+    public sealed class SourceCodeFragmentContentComparer : IEqualityComparer<IReadOnlyList<char>>
+    {
+        private readonly IEqualityComparer<char> _comparer;
+
+        public SourceCodeFragmentContentComparer(IEqualityComparer<char> comparer = null)
+        {
+            _comparer = comparer ?? CharComparer.CaseSensitive;
+        }
+
+        public bool Equals(IReadOnlyList<char> x, IReadOnlyList<char> y)
+        {
+            if (x is null || y is null)
+            {
+                return false;
+            }
+
+            var count = x.Count;
+
+            if (count != y.Count)
+            {
+                return false;
+            }
+
+            for (var idx = count-1; idx >= 0; --idx)
+            {
+                if (!_comparer.Equals(x[idx], y[idx]))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private int GetHashCode(IReadOnlyList<char> fragment, int index, int mul)
+        {
+            unchecked
+            {
+                return _comparer.GetHashCode(fragment[index])*mul;
+            }
+        }
+
+        public int GetHashCode(IReadOnlyList<char> obj)
+        {
+            if (obj.Count == 0)
+            {
+                return 0;
+            }
+            unchecked
+            {
+                switch (obj.Count)
+                {
+                    case 1:
+                        return 313 ^ GetHashCode(obj, 0, 277);
+                    case 2:
+                        return 626 ^ GetHashCode(obj, 0, 277) ^ GetHashCode(obj, 1, 557);
+                    case 3:
+                        return 939 ^ GetHashCode(obj, 0, 277) ^ GetHashCode(obj, 1, 557) ^ GetHashCode(obj, 2, 997);
+                    default:
+                        return (obj.Count * 313) ^ GetHashCode(obj, 0, 277) ^ GetHashCode(obj, 1, 557) ^ GetHashCode(obj, obj.Count-1, 997);
+                }
+            }
+        }
     }
 }
