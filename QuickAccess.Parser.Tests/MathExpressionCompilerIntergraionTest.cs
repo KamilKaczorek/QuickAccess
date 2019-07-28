@@ -39,6 +39,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace QuickAccess.Parser.Tests
@@ -46,11 +48,6 @@ namespace QuickAccess.Parser.Tests
 	[TestClass]
 	public class MathExpressionCompilerIntegrationTest
 	{
-        private static double Sum8(double a, double b, double c, double d, double e, double f, double g, double h)
-        {
-            return a + b + c + d + e + f + g + h;
-        }
-
         private MathExpressionCompiler SetupCompiler(IEqualityComparer<char> comparer)
         {
             var compiler = new MathExpressionCompiler(comparer, new MathExpressionParserFactory());
@@ -122,7 +119,7 @@ namespace QuickAccess.Parser.Tests
         }
 
         [TestMethod]
-        public void ON_Compile_WHEN_IgnoreCase_AND_Expression_Is_Correct_SHOULD_Return_Executable_Expression_Node_That_Gives_Proper_Result()
+        public async Task ON_Compile_WHEN_IgnoreCase_AND_Expression_Is_Correct_SHOULD_Return_Executable_Expression_Node_That_Gives_Proper_Result()
         {
             // Arrange
             var compiler = SetupCompiler(CharComparer.CaseInsensitive);
@@ -137,8 +134,13 @@ namespace QuickAccess.Parser.Tests
             var error = source.GetError();
             Assert.IsNull(error);
 
-            var calcRes = (double) res.Execute();
+            var calcRes = (double) await res.ExecuteAsync(CancellationToken.None);
             Assert.AreEqual(-36.4, calcRes, 0.0000001);
         }
-	}
+
+        private static double Sum8(double a, double b, double c, double d, double e, double f, double g, double h)
+        {
+            return a + b + c + d + e + f + g + h;
+        }
+    }
 }

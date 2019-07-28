@@ -87,7 +87,15 @@ namespace QuickAccess.Parser
         {
             if (SubNodes != null && SubNodes.Count > 0)
             {
-                var arguments = SubNodes.Select(n => ((IExecutableExpressionNode) n).Execute()).ToArray();
+                var count = SubNodes.Count;
+                var arguments = new object[count];
+
+                for (var idx = 0; idx < count; ++idx)
+                {
+                    var node = (IExecutableExpressionNode) SubNodes[idx];
+                    arguments[idx] = node.Execute();
+                }
+
                 return _function.Invoke(arguments);
             }
 
@@ -99,7 +107,16 @@ namespace QuickAccess.Parser
         {
             if (SubNodes != null && SubNodes.Count > 0)
             {
-                var args = await Task.WhenAll(SubNodes.Select(n => ((IExecutableExpressionNode) n).ExecuteAsync(cancellationToken)));
+                var count = SubNodes.Count;
+                var tasks = new Task<object>[count];
+
+                for (var idx = 0; idx < count; ++idx)
+                {
+                    var node = (IExecutableExpressionNode) SubNodes[idx];
+                    tasks[idx] = node.ExecuteAsync(cancellationToken);
+                }
+
+                var args = await Task.WhenAll(tasks);
 
                 return _function.Invoke(args);
             }
