@@ -46,6 +46,11 @@ namespace QuickAccess.Parser.Tests
 	[TestClass]
 	public class MathExpressionCompilerIntegrationTest
 	{
+        private static double Sum8(double a, double b, double c, double d, double e, double f, double g, double h)
+        {
+            return a + b + c + d + e + f + g + h;
+        }
+
         private MathExpressionCompiler SetupCompiler(IEqualityComparer<char> comparer)
         {
             var compiler = new MathExpressionCompiler(comparer, new MathExpressionParserFactory());
@@ -64,6 +69,9 @@ namespace QuickAccess.Parser.Tests
             compiler.DefineFunction<double>("ceiling", Math.Ceiling);
             compiler.DefineFunction<double>("floor", Math.Floor);
             compiler.DefineFunction<double>("abs", Math.Abs);
+            compiler.DefineFunction<double>("sum", (x, y) => x + y);
+            compiler.DefineFunction<double>("sum", Sum8);
+            
 
             compiler.DefineVariable("One", () => 1.0);
             compiler.DefineConstant("PI", Math.PI);
@@ -118,17 +126,19 @@ namespace QuickAccess.Parser.Tests
         {
             // Arrange
             var compiler = SetupCompiler(CharComparer.CaseInsensitive);
-            var source = SetupSource("Sin(90*pi/180.0)*2^(1+oNe)*-1E-1");
+            var source = SetupSource("Sin(90*pi/180.0)*2^(1+oNe)*-1E-1-Sum(2^3, 3+4, 3*2, 6-1, 16/4, One*3, floor(2.6), sum(-2, 3))");
 
-			
             // Act
             var res = compiler.Compile(source);
+
             // Assert
             Assert.IsNotNull(res);
+
             var error = source.GetError();
             Assert.IsNull(error);
+
             var calcRes = (double) res.Execute();
-            Assert.AreEqual(-0.4, calcRes, 0.0000001);
+            Assert.AreEqual(-36.4, calcRes, 0.0000001);
         }
 	}
 }

@@ -201,6 +201,7 @@ namespace QuickAccess.Parser
         /// <param name="paramsCount">The number of function parameters.</param>
         public void DefineFunction(string name, Func<object[], object> function, int paramsCount)
         {
+            
             var c = new StringCharacters(name);
             if (!_functionsByNameByArgCount.TryGetValue(c, out var funByArgCount))
             {
@@ -246,13 +247,73 @@ namespace QuickAccess.Parser
         }
 
         /// <summary>
+        /// Adds the 8 parameter function definition to the compiler definitions.
+        /// </summary>
+        /// <param name="name">The function name.</param>
+        /// <param name="function">The function delegate that evaluates the function value.</param>
+        public void DefineFunction<T>(string name, Func<T, T, T, T, T, T, T, T, T> function)
+        {
+            DefineFunction(name, a => function.Invoke((T)a[0], (T)a[1], (T)a[2], (T)a[3], (T)a[4], (T)a[5], (T)a[6], (T)a[7]), 8);
+        }
+
+        /// <summary>
+        /// Adds the 7 parameter function definition to the compiler definitions.
+        /// </summary>
+        /// <param name="name">The function name.</param>
+        /// <param name="function">The function delegate that evaluates the function value.</param>
+        public void DefineFunction<T>(string name, Func<T, T, T, T, T, T, T, T> function)
+        {
+            DefineFunction(name, a => function.Invoke((T)a[0], (T)a[1], (T)a[2], (T)a[3], (T)a[4], (T)a[5], (T)a[6]), 7);
+        }
+
+        /// <summary>
+        /// Adds the 6 parameter function definition to the compiler definitions.
+        /// </summary>
+        /// <param name="name">The function name.</param>
+        /// <param name="function">The function delegate that evaluates the function value.</param>
+        public void DefineFunction<T>(string name, Func<T, T, T, T, T, T, T> function)
+        {
+            DefineFunction(name, a => function.Invoke((T)a[0], (T)a[1], (T)a[2], (T)a[3], (T)a[4], (T)a[5]), 6);
+        }
+
+        /// <summary>
+        /// Adds the 5 parameter function definition to the compiler definitions.
+        /// </summary>
+        /// <param name="name">The function name.</param>
+        /// <param name="function">The function delegate that evaluates the function value.</param>
+        public void DefineFunction<T>(string name, Func<T, T, T, T, T, T> function)
+        {
+            DefineFunction(name, a => function.Invoke((T)a[0], (T)a[1], (T)a[2], (T)a[3], (T)a[4]), 5);
+        }
+
+        /// <summary>
+        /// Adds the 4 parameter function definition to the compiler definitions.
+        /// </summary>
+        /// <param name="name">The function name.</param>
+        /// <param name="function">The function delegate that evaluates the function value.</param>
+        public void DefineFunction<T>(string name, Func<T, T, T, T, T> function)
+        {
+            DefineFunction(name, a => function.Invoke((T)a[0], (T)a[1], (T)a[2], (T)a[3]), 4);
+        }
+
+        /// <summary>
+        /// Adds the 3 parameter function definition to the compiler definitions.
+        /// </summary>
+        /// <param name="name">The function name.</param>
+        /// <param name="function">The function delegate that evaluates the function value.</param>
+        public void DefineFunction<T>(string name, Func<T, T, T, T> function)
+        {
+            DefineFunction(name, a => function.Invoke((T) a[0], (T) a[1], (T)a[2]), 3);
+        }
+
+        /// <summary>
         /// Adds the 2 parameter function definition to the compiler definitions.
         /// </summary>
         /// <param name="name">The function name.</param>
         /// <param name="function">The function delegate that evaluates the function value.</param>
         public void DefineFunction<T>(string name, Func<T, T, T> function)
         {
-            DefineFunction(name, args => function.Invoke((T) args[0], (T) args[1]), 2);
+            DefineFunction(name, a => function.Invoke((T) a[0], (T) a[1]), 2);
         }
 
         /// <summary>
@@ -262,7 +323,7 @@ namespace QuickAccess.Parser
         /// <param name="function">The function delegate that evaluates the function value.</param>
         public void DefineFunction<T>(string name, Func<T, T> function)
         {
-            DefineFunction(name, args => function.Invoke((T) args[0]), 1);
+            DefineFunction(name, a => function.Invoke((T) a[0]), 1);
         }
 
         /// <summary>
