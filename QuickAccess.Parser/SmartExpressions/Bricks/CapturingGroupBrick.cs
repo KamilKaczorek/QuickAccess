@@ -35,8 +35,9 @@
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
 
-using QuickAccess.DataStructures.CodeOperatorAlgebra;
+using QuickAccess.DataStructures.Common.Guards;
 using QuickAccess.DataStructures.Common.RegularExpression;
+using QuickAccess.Parser.Product;
 
 namespace QuickAccess.Parser.SmartExpressions.Bricks
 {
@@ -44,23 +45,25 @@ namespace QuickAccess.Parser.SmartExpressions.Bricks
 	{
 		/// <inheritdoc />
 		public override string Name => GroupName;
-		public string GroupName { get; }
+
+        public string GroupName => _expressionType.Name;
+
+		
 		public SmartExpressionBrick Content { get; }
+
+        private readonly ExpressionTypeDescriptor _expressionType;
 
 		/// <inheritdoc />
 		public override bool IsEmpty => Content.IsEmpty;
 
-		private CapturingGroupBrick(ISmartExpressionAlgebra algebra, CapturingGroupBrick other, string groupName, bool freeze)
-		 : this(algebra, other.Content, groupName, freeze)
-		{
-		}
-
-		public CapturingGroupBrick(ISmartExpressionAlgebra algebra, SmartExpressionBrick content, string groupName, bool freeze) 
+		public CapturingGroupBrick(ExpressionTypeDescriptor expressionType, ISmartExpressionAlgebra algebra, SmartExpressionBrick content, bool freeze) 
 			: base(algebra)
-		{
+        {
+			Guard.ArgNotNull(expressionType, nameof(expressionType));
+
+            _expressionType = expressionType;
 			Content = content;
-			GroupName = groupName;
-			ApplyRuleDefinition(Content, GroupName, Content, true, freeze);
+            ApplyRuleDefinition(Content, GroupName, content, true, freeze);
 		}
 
 		/// <inheritdoc />
@@ -74,17 +77,18 @@ namespace QuickAccess.Parser.SmartExpressions.Bricks
 			ApplyRuleDefinition(Content, name, content, recursion, freeze);
 		}
 
-		/// <inheritdoc />
-		public override string ExpressionId => Content.ExpressionId;
+        public CapturingGroupBrick Clone(ISmartExpressionAlgebra algebra, string groupName, bool freeze = false)
+        {
+            var expressionType = string.Equals(groupName, _expressionType.Name)
+                ? _expressionType
+                : ExpressionTypeDescriptor.Create(groupName, _expressionType.ValueTypeId, _expressionType.DefinesExpressionClass);
 
-		public CapturingGroupBrick Clone(ISmartExpressionAlgebra algebra, string groupName, bool freeze = false)
-		{
-			return new CapturingGroupBrick(algebra.GetHighestPrioritizedAlgebra((SmartExpressionBrick)this), Content, groupName, freeze);
+			return new CapturingGroupBrick(expressionType, algebra.GetHighestPrioritizedAlgebra(this), Content, freeze);
 		}
 
 		public CapturingGroupBrick Clone(ISmartExpressionAlgebra algebra, bool freeze = false)
 		{
-			return new CapturingGroupBrick(algebra.GetHighestPrioritizedAlgebra((SmartExpressionBrick)this), Content, GroupName, freeze);
+			return new CapturingGroupBrick(_expressionType, algebra.GetHighestPrioritizedAlgebra(this), Content, freeze);
 		}
 
 		public override string ToRegularExpressionString(RegularExpressionBuildingContext ctx)
@@ -106,15 +110,37 @@ namespace QuickAccess.Parser.SmartExpressions.Bricks
 		}
 
 		/// <inheritdoc />
-		protected override IParsedExpressionNode TryParseInternal(IParsingContextStream ctx)
+		protected override IParsingProduct TryParseInternal(IParsingContextStream ctx)
 		{
-			return Content.TryParse(ctx);
-		}
+			var res = Content.TryParse(ctx);
+
+            if (res == null)
+            {
+                return null;
+            }
+
+            var overwriteExpressionType = res.ExpressionType.ValueTypeId != null && _expressionType.ValueTypeId == null;
+
+            var expressionType = overwriteExpressionType
+                ? ExpressionTypeDescriptor.Create(_expressionType.Name, res.ExpressionType.ValueTypeId,
+                    _expressionType.DefinesExpressionClass) : _expressionType;
+
+            var node = ctx.Accept().CreateExpressionForAcceptedFragment(
+                expressionType,
+                res.ToList());
+
+			return node;
+        }
 
 		/// <inheritdoc />
 		public override string ToString()
 		{
-			return $"{GroupName} ::= {Content}";
+            if (Content is CapturingGroupBrick cgb)
+            {
+                return $"<{GroupName}> ::= <{cgb.GroupName}>\n{Content}";
+            }
+
+			return $"<{GroupName}> ::= {Content}";
 		}
 	}
 }

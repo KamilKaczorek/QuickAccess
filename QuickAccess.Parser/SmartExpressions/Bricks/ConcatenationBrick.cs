@@ -37,22 +37,22 @@
 
 using System.Linq;
 using QuickAccess.DataStructures.Common.RegularExpression;
+using QuickAccess.Parser.Product;
 
 namespace QuickAccess.Parser.SmartExpressions.Bricks
 {
 	public sealed class ConcatenationBrick : CompositeSmartExpressionBrick
 	{
-		
 		/// <inheritdoc />
 		public override MatchingLevel RegularExpressionMatchingLevel => Bricks.GetMinimalMatchingLevel();
 
 		/// <inheritdoc />
-		protected override IParsedExpressionNode TryParseInternal(IParsingContextStream ctx)
+		protected override IParsingProduct TryParseInternal(IParsingContextStream ctx)
 		{
-			return Bricks.TryAggregateParse(ctx, SmartExpression.ExpressionType.Composition);
+			return Bricks.TryAggregateParse(ctx);
 		}
 
-		public override string ExpressionId => string.Join(string.Empty, Bricks.Select(b => b.ExpressionId));
+		//public override string ExpressionId => string.Join(string.Empty, Bricks.Select(b => b.ExpressionId));
 
 		public ConcatenationBrick(ISmartExpressionAlgebra algebra, SmartExpressionBrick b1, SmartExpressionBrick b2)
 			: base(algebra, b1, b2, CanMakeFlat)

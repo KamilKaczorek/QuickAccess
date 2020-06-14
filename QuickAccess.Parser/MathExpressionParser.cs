@@ -40,6 +40,7 @@
 
 using System;
 using System.Collections.Generic;
+using QuickAccess.Parser.Product;
 
 namespace QuickAccess.Parser
 {
@@ -82,274 +83,256 @@ namespace QuickAccess.Parser
         }
 
         /// <inheritdoc />
-        public IParsedExpressionNode TryParse(ISourceCode src)
+        public IParsingProduct TryParse(ISourceCode src)
         {
-            using (var ctx = src.GetFurtherContext())
+            using var ctx = src.GetFurtherContext();
+            var res = ParseExpression(ctx);
+
+            if (res == null)
             {
-                var res = ParseExpression(ctx);
-
-                if (res == null)
-                {
-                    return null;
-                }
-
-                ctx.ParseWhiteSpace();
-
-                if (ctx.HasNext)
-                {
-                    ctx.SetError(ParsingErrors.UnexpectedSymbol);
-
-                    return null;
-                }
-
-                ctx.Accept();
-                return res;
+                return null;
             }
+
+            ctx.ParseWhiteSpace();
+
+            if (ctx.HasNext)
+            {
+                ctx.SetError(ParsingErrors.UnexpectedSymbol);
+
+                return null;
+            }
+
+            ctx.Accept();
+            return res;
         }
 
         // Expression = OpChainExpression
-        private IParsedExpressionNode ParseExpression(ISourceCode src)
+        private IParsingProduct ParseExpression(ISourceCode src)
         {
             return ParseOperatorChainExp(src);
         }
 
         // UnaryExpression = ('(', Expression, ')') | UnaryOperatorExpression | Function | Value | Variable
-        private IParsedExpressionNode ParseUnaryExpression(ISourceCode src)
+        private IParsingProduct ParseUnaryExpression(ISourceCode src)
         {
-            using (var ctx = src.GetFurtherContext())
+            using var ctx = src.GetFurtherContext();
+            ctx.ParseWhiteSpace();
+
+            var res = ParseInBrackets(ctx, ParseExpression) ??
+                      ParseUnaryOperatorExpression(ctx) ??
+                      ParseFunction(ctx) ??
+                      ParseValue(ctx) ??
+                      ParseVariable(ctx);
+
+            if (res != null)
             {
                 ctx.ParseWhiteSpace();
-
-                var res = ParseInBrackets(ctx, ParseExpression) ??
-                          ParseUnaryOperatorExpression(ctx) ??
-                          ParseFunction(ctx) ??
-                          ParseValue(ctx) ??
-                          ParseVariable(ctx);
-
-                if (res != null)
-                {
-                    ctx.ParseWhiteSpace();
-                    ctx.Accept();
-                }
-
-                return res;
+                ctx.Accept();
             }
+
+            return res;
         }
 
         // Value = ? value parsed by the IGrammarProductsFactory ?
-        private IParsedExpressionNode ParseValue(ISourceCode src)
+        private IParsingProduct ParseValue(ISourceCode src)
         {
             return _grammarProductsFactory.ParseValue(src);
         }
 
         // UnaryOperatorExpression = UnaryOperator, UnaryExpression
-        private IParsedExpressionNode ParseUnaryOperatorExpression(ISourceCode src)
+        private IParsingProduct ParseUnaryOperatorExpression(ISourceCode src)
         {
-            using (var ctx = src.GetFurtherContext())
+            using var ctx = src.GetFurtherContext();
+            ctx.ParseWhiteSpace();
+
+            var operFragment = ParseTerm(ctx, _repository.UnaryOperators, out var oper);
+
+            if (operFragment == null)
             {
-                ctx.ParseWhiteSpace();
-
-                var operFragment = ParseTerm(ctx, _repository.UnaryOperators, out var oper);
-
-                if (operFragment == null)
-                {
-                    return null;
-                }
-
-                var exp = ParseUnaryExpression(ctx);
-
-                if (exp == null)
-                {
-                    return null;
-                }
-
-                var opExp = _grammarProductsFactory.CreateOperatorNode(operFragment, oper, exp);
-
-                if (opExp == null)
-                {
-                    ctx.SetError(ParsingErrors.UnexpectedSymbol);
-                    return null;
-                }
-                ctx.Accept();
-                return opExp;
+                return null;
             }
+
+            var exp = ParseUnaryExpression(ctx);
+
+            if (exp == null)
+            {
+                return null;
+            }
+
+            var opExp = _grammarProductsFactory.CreateOperatorNode(operFragment, oper, exp);
+
+            if (opExp == null)
+            {
+                ctx.SetError(ParsingErrors.UnexpectedSymbol);
+                return null;
+            }
+            ctx.Accept();
+            return opExp;
         }
 
         // Variable = Name & ? one of defined variables ?
-        private IParsedExpressionNode ParseVariable(ISourceCode src)
+        private IParsingProduct ParseVariable(ISourceCode src)
         {
-            using (var ctx = src.GetFurtherContext())
+            using var ctx = src.GetFurtherContext();
+            var fragment = ParseName(ctx);
+
+            if (fragment == null)
             {
-                var fragment = ParseName(ctx);
-
-                if (fragment == null)
-                {
-                    return null;
-                }
-
-                var variableNode = _grammarProductsFactory.CreateVariableNode(fragment);
-
-                if (variableNode == null)
-                {
-                    ctx.SetError(ParsingErrors.UndefinedVariable);    
-                    return null;
-                }
-
-                ctx.Accept();
-                return variableNode;
+                return null;
             }
+
+            var variableNode = _grammarProductsFactory.CreateVariableNode(fragment);
+
+            if (variableNode == null)
+            {
+                ctx.SetError(ParsingErrors.UndefinedVariable);    
+                return null;
+            }
+
+            ctx.Accept();
+            return variableNode;
         }
 
         // Name = Letter, [{Letter|Digit}]
         private ISourceCodeFragment ParseName(ISourceCode src)
         {
-            using (var ctx = src.GetFurtherContext())
+            using var ctx = src.GetFurtherContext();
+            if (!char.IsLetter(ctx.Next))
             {
-                if (!char.IsLetter(ctx.Next))
-                {
-                    ctx.SetError(ParsingErrors.NameLiteralExpected);
-                    return null;
-                }
-
-                ctx.ParseWhile(char.IsLetterOrDigit, true);
-
-
-                return ctx.GetAcceptedFragment();
+                ctx.SetError(ParsingErrors.NameLiteralExpected);
+                return null;
             }
+
+            ctx.ParseWhile(char.IsLetterOrDigit, true);
+
+
+            return ctx.GetAcceptedFragmentOrEmpty();
         }
 
         // Function  = Name, '(', [ArgList], ')'
         // FunctionName = ? one of defined functions in IGrammarProductsFactory ?
-        private IParsedExpressionNode ParseFunction(ISourceCode src)
+        private IParsingProduct ParseFunction(ISourceCode src)
         {
-            using (var ctx = src.GetFurtherContext())
+            using var ctx = src.GetFurtherContext();
+            var fragment = ParseName(ctx);
+
+            if (fragment == null)
             {
-                var fragment = ParseName(ctx);
-
-                if (fragment == null)
-                {
-                    return null;
-                }
-
-                ctx.ParseWhiteSpace();
-                var nodes = ParseInBrackets(ctx, s => ParseArgList(s));
-
-                if (nodes == null)
-                {
-                    return null;
-                }
-
-                var opExp = _grammarProductsFactory.CreateFunctionInvocationNode(fragment, nodes);
-
-                if (opExp == null)
-                {
-                    ctx.SetError(ParsingErrors.UndefinedFunction);
-                    return null;
-                }
-                ctx.Accept();
-                return opExp;
+                return null;
             }
+
+            ctx.ParseWhiteSpace();
+            var nodes = ParseInBrackets(ctx, s => ParseArgList(s));
+
+            if (nodes == null)
+            {
+                return null;
+            }
+
+            var opExp = _grammarProductsFactory.CreateFunctionInvocationNode(fragment, nodes);
+
+            if (opExp == null)
+            {
+                ctx.SetError(ParsingErrors.UndefinedFunction);
+                return null;
+            }
+            ctx.Accept();
+            return opExp;
         }
 
         // ArgList = [Expression, {separator, Expression}]
-        private IList<IParsedExpressionNode> ParseArgList(ISourceCode src, char separator = ',')
+        private IList<IParsingProduct> ParseArgList(ISourceCode src, char separator = ',')
         {
-            var arguments = new List<IParsedExpressionNode>();
-            using (var ctx = src.GetFurtherContext())
+            var arguments = new List<IParsingProduct>();
+            using var ctx = src.GetFurtherContext();
+            var first = true;
+            while (true)
             {
-                var first = true;
-                while (true)
+                ctx.ParseWhiteSpace();
+                var arg = ParseOperatorChainExp(ctx);
+
+                if (arg == null)
                 {
-                    ctx.ParseWhiteSpace();
-                    var arg = ParseOperatorChainExp(ctx);
-
-                    if (arg == null)
-                    {
-                        if (first)
-                        {
-                            break;
-                        }
-
-                        return null;
-                    }
-
-                    first = false;
-                    arguments.Add(arg);
-
-                    ctx.ParseWhiteSpace();
-
-
-                    if (ctx.HasNext && ctx.Next == separator)
-                    {
-                        ctx.MoveNext();
-                    }
-                    else
+                    if (first)
                     {
                         break;
                     }
+
+                    return null;
                 }
 
-                ctx.Accept();
+                first = false;
+                arguments.Add(arg);
+
+                ctx.ParseWhiteSpace();
+
+
+                if (ctx.HasNext && ctx.Next == separator)
+                {
+                    ctx.MoveNext();
+                }
+                else
+                {
+                    break;
+                }
             }
+
+            ctx.Accept();
 
             return arguments;
         }
 
         // OpChainExp = UnaryExpression, [BinaryOperator, OpChainExp]
         // BinaryOperator = ? one of operators provided by ITermDefinitionsRepository instance ?
-        private IParsedExpressionNode ParseOperatorChainExp(ISourceCode src)
+        private IParsingProduct ParseOperatorChainExp(ISourceCode src)
         {
-            using (var ctx = src.GetFurtherContext())
+            using var ctx = src.GetFurtherContext();
+            var chain = new BinaryOperatorsChain();
+
+            while (true)
             {
-                var chain = new BinaryOperatorsChain();
+                ctx.ParseWhiteSpace();
+                var expression = ParseUnaryExpression(ctx);
 
-                while (true)
+                if (expression == null)
                 {
-                    ctx.ParseWhiteSpace();
-                    var expression = ParseUnaryExpression(ctx);
-
-                    if (expression == null)
-                    {
-                        ctx.SetError(ParsingErrors.ExpressionExpected);
-                        return null;
-                    }
-
-                    chain.Add(expression);
-                    ctx.ParseWhiteSpace();
-                    var opFragment = ParseTerm(ctx, _repository.BinaryOperators, out var oper);
-
-                    if (opFragment == null)
-                    {
-                        break;
-                    }
-
-                    chain.Add(oper, opFragment);
+                    ctx.SetError(ParsingErrors.ExpressionExpected);
+                    return null;
                 }
 
-                ctx.Accept();
+                chain.Add(expression);
+                ctx.ParseWhiteSpace();
+                var opFragment = ParseTerm(ctx, _repository.BinaryOperators, out var oper);
 
-                return chain.EvaluateExpressionTree(_grammarProductsFactory.CreateOperatorNode);
-            }          
+                if (opFragment == null)
+                {
+                    break;
+                }
+
+                chain.Add(oper, opFragment);
+            }
+
+            ctx.Accept();
+
+            return chain.EvaluateExpressionTree(_grammarProductsFactory.CreateOperatorNode);
         }
 
         // Term = ? one of specified terms ?
         private ISourceCodeFragment ParseTerm<T>(ISourceCode src, IReadOnlyList<T> terms, out T term)
             where T : class, ITermDefinition
-        {    
-            using (var ctx = src.GetFurtherContext())
+        {
+            using var ctx = src.GetFurtherContext();
+            var idx = ctx.ParseLongestMatchingString(terms.Count, i => terms[i].Term, true, _charsComparer);
+
+            if (idx < 0)
             {
-                var idx = ctx.ParseLongestMatchingString(terms.Count, i => terms[i].Term, true, _charsComparer);
-
-                if (idx < 0)
-                {
-                    ctx.SetError(ParsingErrors.UnexpectedSymbol);
-                    term = null;
-                    return null;
-                }
-
-                term = terms[idx];
-                return ctx.GetAcceptedFragment();
+                ctx.SetError(ParsingErrors.UnexpectedSymbol);
+                term = null;
+                return null;
             }
+
+            term = terms[idx];
+            return ctx.GetAcceptedFragmentOrEmpty();
         }
 
         // InBrackets = '('? the generic body ?')'
@@ -360,37 +343,35 @@ namespace QuickAccess.Parser
             char close = ')')
             where T : class
         {
-            using (var ctx = src.GetFurtherContext())
+            using var ctx = src.GetFurtherContext();
+            ctx.ParseWhiteSpace();
+            ctx.MoveNext();
+
+            if (ctx.Current != open)
+            {
+                ctx.Rollback();
+                ctx.SetError(ParsingErrors.OpenBracketExpected);
+                return null;
+            }
+
+            ctx.ParseWhiteSpace();
+            var res = bracketsBodyParser.Invoke(ctx);
+
+            if (res != null)
             {
                 ctx.ParseWhiteSpace();
                 ctx.MoveNext();
 
-                if (ctx.Current != open)
+                if (ctx.Current != close)
                 {
-                    ctx.Rollback();
-                    ctx.SetError(ParsingErrors.OpenBracketExpected);
+                    ctx.SetError(ParsingErrors.CloseBracketExpected);
                     return null;
                 }
 
-                ctx.ParseWhiteSpace();
-                var res = bracketsBodyParser.Invoke(ctx);
-
-                if (res != null)
-                {
-                    ctx.ParseWhiteSpace();
-                    ctx.MoveNext();
-
-                    if (ctx.Current != close)
-                    {
-                        ctx.SetError(ParsingErrors.CloseBracketExpected);
-                        return null;
-                    }
-
-                    ctx.Accept();
-                }
-
-                return res;
+                ctx.Accept();
             }
+
+            return res;
         }
     }
 }

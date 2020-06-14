@@ -35,8 +35,8 @@
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
 
-using QuickAccess.DataStructures.Common;
 using QuickAccess.DataStructures.Common.RegularExpression;
+using QuickAccess.Parser.Product;
 
 namespace QuickAccess.Parser.SmartExpressions.Bricks
 {
@@ -55,20 +55,17 @@ namespace QuickAccess.Parser.SmartExpressions.Bricks
 		{
 		}
 
-		/// <inheritdoc />
-		public override string ExpressionId => $"${SmartExpression.StandardRuleName.Letter}";
-
-		/// <inheritdoc />
+        /// <inheritdoc />
 		public override bool Equals(SmartExpressionBrick other)
 		{
 			return other is StandardCharacterRangeBrick lb && lb._range == _range;
 		}
 
 		/// <inheritdoc />
-		protected override IParsedExpressionNode TryParseInternal(IParsingContextStream ctx)
+		protected override IParsingProduct TryParseInternal(IParsingContextStream ctx)
 		{
 			return ctx.MoveNext() && ctx.Current.IsFromRange(_range)
-				? new ParsingNode(ctx.AcceptAndGetFragment(), "char", null)
+				? ctx.Accept().CreateTermForAcceptedFragment(SmartExpression.ExpressionTypes.CharTerm)
 				: null;
 		}
 
@@ -80,5 +77,10 @@ namespace QuickAccess.Parser.SmartExpressions.Bricks
 
 		/// <inheritdoc />
 		public override MatchingLevel RegularExpressionMatchingLevel => MatchingLevel.Exact;
-	}
+
+        public override string ToString()
+        {
+            return $"{_range}";
+        }
+    }
 }

@@ -35,11 +35,11 @@
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using QuickAccess.DataStructures.Common.RegularExpression;
+using QuickAccess.Parser.Product;
 
 namespace QuickAccess.Parser.SmartExpressions.Bricks
 {
@@ -98,9 +98,9 @@ namespace QuickAccess.Parser.SmartExpressions.Bricks
 		}
 
 		/// <inheritdoc />
-		protected override IParsedExpressionNode TryParseInternal(IParsingContextStream ctx)
+		protected override IParsingProduct TryParseInternal(IParsingContextStream ctx)
 		{
-			return ctx.ParseText(Text) ? new ParsingNode(ctx.AcceptAndGetFragment(), "Text", null) : null;
+			return ctx.ParseText(Text) ? ctx.Accept().CreateTermForAcceptedFragment(SmartExpression.ExpressionTypes.TextTerm) : null;
 		}
 
 		/// <inheritdoc />
@@ -108,16 +108,18 @@ namespace QuickAccess.Parser.SmartExpressions.Bricks
 		{
 		}
 
-		/// <inheritdoc />
-		public override string ExpressionId => $"${Text}$";
-
-		/// <inheritdoc />
+        /// <inheritdoc />
 		public override string ToRegularExpressionString(RegularExpressionBuildingContext ctx)
 		{
-			return ctx.Factory.StringToRegex(ctx.Context, Text);
+			return ctx.Factory.StringToRegex(Text);
 		}
 
 		/// <inheritdoc />
 		public override MatchingLevel RegularExpressionMatchingLevel => MatchingLevel.Exact;
-	}
+
+        public override string ToString()
+        {
+            return $"'{Text}'";
+        }
+    }
 }

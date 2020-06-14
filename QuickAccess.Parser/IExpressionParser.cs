@@ -37,7 +37,7 @@
 
 #endregion
 
-using System.Data;
+using QuickAccess.Parser.Product;
 
 namespace QuickAccess.Parser
 {
@@ -53,6 +53,6 @@ namespace QuickAccess.Parser
         /// </summary>
         /// <param name="src">The parsing source.</param>
         /// <returns>The not <c>null</c> expression node if successful; otherwise <c>null</c>.</returns>
-        IParsedExpressionNode TryParse(ISourceCode src);
+        IParsingProduct TryParse(ISourceCode src);
     }
 }

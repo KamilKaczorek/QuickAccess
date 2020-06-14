@@ -2,6 +2,7 @@
 using System.Linq;
 using QuickAccess.DataStructures.CodeOperatorAlgebra;
 using QuickAccess.DataStructures.Common.RegularExpression;
+using QuickAccess.Parser.Product;
 using QuickAccess.Parser.SmartExpressions.Bricks;
 
 namespace QuickAccess.Parser.SmartExpressions
@@ -41,44 +42,31 @@ namespace QuickAccess.Parser.SmartExpressions
 		/// <inheritdoc />
 		public string GetBinaryOperatorDescription(OverloadableCodeBinarySymmetricOperator binaryOperator)
 		{
-			switch (binaryOperator)
-			{
-				case OverloadableCodeBinarySymmetricOperator.Mul:
-					return "Concatenates left and right expression with 'Anything' in between.";
-				case OverloadableCodeBinarySymmetricOperator.Div:
-					return "Concatenates left and right expression with 'next line' in between.";
-				case OverloadableCodeBinarySymmetricOperator.Mod:
-					return "Concatenates left and right expression placing 'custom pattern' in between.";
-				case OverloadableCodeBinarySymmetricOperator.Sum:
-					return "Concatenates left and right expression.";
-				case OverloadableCodeBinarySymmetricOperator.Sub:
-					return "Concatenates left and right expression, where the right one is defined as positive lookahead.";
-				case OverloadableCodeBinarySymmetricOperator.And:
-					return "Concatenates left and right expression with optional, multiple white space in between.";
-				case OverloadableCodeBinarySymmetricOperator.XOr:
-					return "Concatenates left and right expression with (non optional) white space in between.";
-				case OverloadableCodeBinarySymmetricOperator.Or:
-					return "Creates alternation from left and right expression.";
-				default:
-					throw new NotSupportedException($"Operator {binaryOperator} is not supported.");
-			}
-		}
+            return binaryOperator switch
+            {
+                OverloadableCodeBinarySymmetricOperator.Mul => "Concatenates left and right expression with 'Anything' in between.",
+                OverloadableCodeBinarySymmetricOperator.Div => "Concatenates left and right expression with 'next line' in between.",
+                OverloadableCodeBinarySymmetricOperator.Mod => "Concatenates left and right expression placing 'custom pattern' in between.",
+                OverloadableCodeBinarySymmetricOperator.Sum => "Concatenates left and right expression.",
+                OverloadableCodeBinarySymmetricOperator.Sub => "Concatenates left and right expression, where the right one is defined as positive lookahead.",
+                OverloadableCodeBinarySymmetricOperator.And => "Concatenates left and right expression with optional, multiple white space in between.",
+                OverloadableCodeBinarySymmetricOperator.XOr => "Concatenates left and right expression with (non optional) white space in between.",
+                OverloadableCodeBinarySymmetricOperator.Or => "Creates alternation from left and right expression.",
+                _ => throw new NotSupportedException($"Operator {binaryOperator} is not supported."),
+            };
+        }
 
 		/// <inheritdoc />
 		public string GetUnaryOperatorDescription(OverloadableCodeUnarySymmetricOperator unaryOperator)
 		{
-			switch (unaryOperator)
-			{
-				case OverloadableCodeUnarySymmetricOperator.BitwiseComplement:
-					return "Wraps expression with quantifier 0-1";
-				case OverloadableCodeUnarySymmetricOperator.LogicalNegation:
-					return "Creates negated expression.";
-				case OverloadableCodeUnarySymmetricOperator.Minus:
-					return "Creates positive lookahead from expression.";
-				default:
-					throw new NotSupportedException($"Operator {unaryOperator} is not supported.");
-			}
-		}
+            return unaryOperator switch
+            {
+                OverloadableCodeUnarySymmetricOperator.BitwiseComplement => "Wraps expression with quantifier 0-1",
+                OverloadableCodeUnarySymmetricOperator.LogicalNegation => "Creates negated expression.",
+                OverloadableCodeUnarySymmetricOperator.Minus => "Creates positive lookahead from expression.",
+                _ => throw new NotSupportedException($"Operator {unaryOperator} is not supported."),
+            };
+        }
 
 		/// <inheritdoc />
 		public bool TryEvaluateOperatorResult(object left,
@@ -118,12 +106,18 @@ namespace QuickAccess.Parser.SmartExpressions
 		public SmartExpressionBegin Start => new SmartExpressionBegin(this);
 		/// <inheritdoc />
 		public SmartExpressionBrick WhiteSpace => CreateRulePlaceholder(SmartExpression.StandardRuleName.WhiteSpace, (Start | ' ' | '\t').OneOrMore());
+        /// <inheritdoc />
+		public SmartExpressionBrick WhiteSpaceOrNewLine => CreateRulePlaceholder(SmartExpression.StandardRuleName.WhiteSpaceOrNewLine, (Start | ' ' | '\t' | '\n' | '\r').OneOrMore());
+
 		/// <inheritdoc />
 		public SmartExpressionBrick OptionalWhiteSpace => CreateRulePlaceholder(SmartExpression.StandardRuleName.OptionalWhiteSpace, ~WhiteSpace);
+        /// <inheritdoc />
+		public SmartExpressionBrick OptionalWhiteSpaceOrNewLine => CreateRulePlaceholder(SmartExpression.StandardRuleName.OptionalWhiteSpaceOrNewLine, ~WhiteSpaceOrNewLine);
+
 		/// <inheritdoc />
 		public SmartExpressionBrick CustomSequence => CreateRulePlaceholder(SmartExpression.StandardRuleName.CustomSequence, Empty);
 		/// <inheritdoc />
-		public SmartExpressionBrick NextLine => CreateRulePlaceholder(SmartExpression.StandardRuleName.NextLine, OptionalWhiteSpace + Environment.NewLine);
+		public SmartExpressionBrick NewLine => CreateRulePlaceholder(SmartExpression.StandardRuleName.NewLine, OptionalWhiteSpace + (Start | '\n' | '\r').OneOrMore());
 		/// <inheritdoc />
 		public SmartExpressionBrick Letter => CreateRulePlaceholder(SmartExpression.StandardRuleName.Letter, new StandardCharacterRangeBrick(this, StandardCharactersRange.Letter));
 		/// <inheritdoc />
@@ -142,30 +136,25 @@ namespace QuickAccess.Parser.SmartExpressions
 			Priority = priority;
 		}
 
-		public SmartExpressionBrick DefineRule(SmartExpressionBrick parsingBrick, string ruleName, bool blockFromRuleOverwriting)
-		{
-			return new CapturingGroupBrick(this, parsingBrick, ruleName, blockFromRuleOverwriting);
+		public SmartExpressionBrick DefineRule(SmartExpressionBrick parsingBrick, ExpressionTypeDescriptor expressionType, bool blockFromRuleOverwriting)
+        {
+            return new CapturingGroupBrick(expressionType, this, parsingBrick, blockFromRuleOverwriting);
 		}
 
 		/// <inheritdoc />
-		public SmartExpressionBrick DefineSealedRule(SmartExpressionBrick content, string ruleName)
+		public SmartExpressionBrick DefineSealedRule(SmartExpressionBrick content, ExpressionTypeDescriptor expressionType)
 		{
-			return DefineRule(content, ruleName, blockFromRuleOverwriting: true);
+			return DefineRule(content, expressionType, blockFromRuleOverwriting: true);
 		}
 
-		/// <inheritdoc />
+        /// <inheritdoc />
 		public SmartExpressionBrick CreateRulePlaceholder(string ruleName, SmartExpressionBrick defaultExpression)
 		{
-			return new RulePlaceholderBrick(this.GetHighestPrioritizedAlgebra<SmartExpressionBrick, ISmartExpressionAlgebra>(defaultExpression), ruleName, defaultExpression);
+			return new RulePlaceholderBrick(this.GetHighestPrioritizedAlgebra<SmartExpressionBrick, SmartExpressionBrick, ISmartExpressionAlgebra>(defaultExpression), ruleName, defaultExpression);
 		}
 
-		/// <inheritdoc />
-		public SmartExpressionBrick CreatePositiveLookahead(SmartExpressionBrick content)
-		{
-			throw new NotImplementedException();
-		}
-
-		public SmartExpressionBrick CreateQuantifierBrick(SmartExpressionBrick content, long min, long max)
+        /// <inheritdoc />
+        public SmartExpressionBrick CreateQuantifierBrick(SmartExpressionBrick content, long min, long max)
 		{
 			EvaluateArguments(ref content);
 
@@ -188,54 +177,42 @@ namespace QuickAccess.Parser.SmartExpressions
 		}
 
 		/// <inheritdoc />
-		public SmartExpressionBrick DefineRule(SmartExpressionBrick content, string ruleName)
+		public SmartExpressionBrick DefineRule(SmartExpressionBrick content, ExpressionTypeDescriptor expressionType)
 		{
-			return DefineRule(content, ruleName, blockFromRuleOverwriting: false);
+			return DefineRule(content, expressionType, blockFromRuleOverwriting: false);
 		}
 
 		public SmartExpressionBrick EvaluateOperatorResult(SmartExpressionBrick left, OverloadableCodeBinarySymmetricOperator binaryOperator, SmartExpressionBrick right)
 		{
 			EvaluateArguments(ref left, ref right);
 
-			switch (binaryOperator)
-			{
-				case OverloadableCodeBinarySymmetricOperator.Mul:
-					return Concatenate(left, SX.Anything, right);
-				case OverloadableCodeBinarySymmetricOperator.Div:
-					return Concatenate(left, SX.NextLine, right);
-				case OverloadableCodeBinarySymmetricOperator.Mod:
-					return Concatenate(left, SX.CustomSequence, right);
-				case OverloadableCodeBinarySymmetricOperator.Sum:
-					return Concatenate(left, right);
-				case OverloadableCodeBinarySymmetricOperator.Sub:
-					return Concatenate(left, CreatePositiveLookahead(right));
-				case OverloadableCodeBinarySymmetricOperator.And:
-					return Concatenate(left, SX.OptionalWhiteSpace, right);
-				case OverloadableCodeBinarySymmetricOperator.XOr:
-					return Concatenate(left, SX.WhiteSpace, right);
-				case OverloadableCodeBinarySymmetricOperator.Or:
-					return CreateAlternation(left, right);
-				default:
-					throw new NotSupportedException($"Operator {binaryOperator} is not supported for two arguments of type {nameof(SmartExpressionBrick)}.");
-			}
-		}
+            return binaryOperator switch
+            {
+                OverloadableCodeBinarySymmetricOperator.Mul => Concatenate(left, SX.Anything, right),
+                OverloadableCodeBinarySymmetricOperator.Div => Concatenate(left, SX.NewLine, right),
+                OverloadableCodeBinarySymmetricOperator.Mod => Concatenate(left, SX.CustomSequence, right),
+                OverloadableCodeBinarySymmetricOperator.Sum => Concatenate(left, right),
+                OverloadableCodeBinarySymmetricOperator.And => Concatenate(left, SX.OptionalWhiteSpace, right),
+                OverloadableCodeBinarySymmetricOperator.XOr => Concatenate(left, SX.WhiteSpace, right),
+                OverloadableCodeBinarySymmetricOperator.Or => CreateAlternation(left, right),
+                _ => throw new NotSupportedException($"{nameof(SmartExpressionBrick)} doesn't support binary operator '{binaryOperator.GetSymbol()}' ({binaryOperator})."),
+            };
+        }
+
+        private const long MaxQuantification = int.MaxValue;
 		
 		public SmartExpressionBrick EvaluateOperatorResult(OverloadableCodeUnarySymmetricOperator unaryOperator, SmartExpressionBrick arg)
 		{
 			EvaluateArguments(ref arg);
 
-			switch (unaryOperator)
-			{
-				case OverloadableCodeUnarySymmetricOperator.Minus:
-					return CreatePositiveLookahead(arg);
-				case OverloadableCodeUnarySymmetricOperator.LogicalNegation:
-					throw new NotImplementedException();
-				case OverloadableCodeUnarySymmetricOperator.BitwiseComplement:
-					return CreateQuantifierBrick(arg, 0, 1);
-				default:
-					throw new NotSupportedException($"Operator {unaryOperator} is not supported for argument of type {nameof(SmartExpressionBrick)}.");
-			}
-		}
+            return unaryOperator switch
+            {
+                OverloadableCodeUnarySymmetricOperator.BitwiseComplement => CreateQuantifierBrick(arg, 0, 1),
+                OverloadableCodeUnarySymmetricOperator.Increment => CreateQuantifierBrick(arg, 1, MaxQuantification),
+
+                _ => throw new NotSupportedException($"{nameof(SmartExpressionBrick)} doesn't support unary operator '{unaryOperator.GetSymbol()}' ({unaryOperator})."),
+            };
+        }
 
 		private SmartExpressionBrick Concatenate(SmartExpressionBrick left, SmartExpressionBrick right)
 		{

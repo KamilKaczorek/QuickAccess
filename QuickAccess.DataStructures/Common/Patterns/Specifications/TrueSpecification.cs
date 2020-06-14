@@ -67,7 +67,7 @@ namespace QuickAccess.DataStructures.Common.Patterns.Specifications
 		/// <inheritdoc />
 		public override string ToString()
 		{
-			return OverloadableCodeOperator.TrueOperator.ToCodeRepresentation();
+			return OverloadableCodeOperator.TrueOperator.GetSymbol();
 		}
 	}
 }

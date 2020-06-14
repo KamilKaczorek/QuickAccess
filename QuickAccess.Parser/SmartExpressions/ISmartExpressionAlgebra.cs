@@ -36,15 +36,15 @@
 #endregion
 
 using QuickAccess.DataStructures.CodeOperatorAlgebra;
+using QuickAccess.Parser.Product;
 
 namespace QuickAccess.Parser.SmartExpressions
 {
-	public interface ISmartExpressionAlgebra : ICodeOperatorSymmetricAlgebra<SmartExpressionBrick>
+	public interface ISmartExpressionAlgebra : IDefineCodeOperatorSymmetricAlgebra<SmartExpressionBrick>
 	{
-		SmartExpressionBrick CreatePositiveLookahead(SmartExpressionBrick content);
 		SmartExpressionBrick CreateQuantifierBrick(SmartExpressionBrick content, long min, long max);
-		SmartExpressionBrick DefineRule(SmartExpressionBrick content, string ruleName);
-		SmartExpressionBrick DefineSealedRule(SmartExpressionBrick content, string ruleName);
+		SmartExpressionBrick DefineRule(SmartExpressionBrick content, ExpressionTypeDescriptor expressionType);
+		SmartExpressionBrick DefineSealedRule(SmartExpressionBrick content, ExpressionTypeDescriptor expressionType);
 		SmartExpressionBrick CreateRulePlaceholder(string ruleName, SmartExpressionBrick defaultExpression);
 		SmartExpressionBrick Current { get; }
 
@@ -52,9 +52,11 @@ namespace QuickAccess.Parser.SmartExpressions
 		SmartExpressionBrick Anything { get; }
 		SmartExpressionBrick Empty { get; }
 		SmartExpressionBrick WhiteSpace { get; }
+		SmartExpressionBrick WhiteSpaceOrNewLine { get; }
 		SmartExpressionBrick OptionalWhiteSpace { get; }
+		SmartExpressionBrick OptionalWhiteSpaceOrNewLine { get; }
 		SmartExpressionBrick CustomSequence { get; }
-		SmartExpressionBrick NextLine { get; }
+		SmartExpressionBrick NewLine { get; }
 		SmartExpressionBrick Letter { get; }
 		SmartExpressionBrick UpperLetter { get; }
 		SmartExpressionBrick LowerLetter { get; }

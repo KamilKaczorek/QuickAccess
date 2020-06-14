@@ -78,7 +78,7 @@ namespace QuickAccess.Parser.Tests
 
         private StringSourceCode SetupSource(string sourceCode)
         {
-            var source = new StringSourceCode(new ParsingContextStreamFactory(), new SourceCodeFragmentFactory(), sourceCode);
+            var source = new StringSourceCode(new ParsingContextStreamFactory(), new SourceCodeFragmentFactory(), new ProductFactory(),  sourceCode);
 
             return source;
         }

@@ -36,26 +36,61 @@
 #endregion
 
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 
 namespace QuickAccess.DataStructures.Common.RegularExpression
 {
-	public interface IRegularExpressionFactory
-	{
-		string CreateAlternation(IRegularExpressionFactoryContext ctx, IEnumerable<string> alternativeRegexs);
-		string CreateNamedGroup(IRegularExpressionFactoryContext ctx, string groupName, string groupContentRegex, out string factualGroupName);
-		string CreateQuantifier(IRegularExpressionFactoryContext ctx, long min, long max, string quantifiedContentRegex);
-		string CreateNonCapturingGroup(IRegularExpressionFactoryContext ctx, string groupContentRegex);
-		string CreatePositiveLookaheadGroup(IRegularExpressionFactoryContext ctx, string groupContentRegex);
-		string CreateNegativeLookaheadGroup(IRegularExpressionFactoryContext ctx, string groupContentRegex);
-		string CreateRecursiveGroupCall(IRegularExpressionFactoryContext ctx, string regexGroupName);
-		string CreateCapturingGroup(IRegularExpressionFactoryContext ctx, string groupContentRegex);
-		string CreateCharRange(IRegularExpressionFactoryContext ctx, StandardCharactersRange range);
-		string CreateCharSet(IRegularExpressionFactoryContext ctx, IEnumerable<char> characters);
-		string CreateCharRange(IRegularExpressionFactoryContext ctx, char firstCharacter, char lastCharacter);
-		string GetWordCharacter(IRegularExpressionFactoryContext ctx);
-		string GetDigitCharacter(IRegularExpressionFactoryContext ctx);
-		string CharToRegex(IRegularExpressionFactoryContext ctx, char ch);
-		string StringToRegex(IRegularExpressionFactoryContext ctx, string text);
-		string CreateNot(IRegularExpressionFactoryContext ctx, string negatedContentRegex);
-	}
+    public interface IRegularExpressionFactory
+    {
+
+        [Pure]
+        string CreateAlternation(IRegularExpressionFactoryContext ctx, IEnumerable<string> alternativeRegexs);
+
+        [Pure]
+        string CreateNamedGroup(IRegularExpressionFactoryContext ctx, string groupName, string groupContentRegex,
+            out string factualGroupName);
+
+        [Pure]
+        string CreateQuantifier(IRegularExpressionFactoryContext ctx, long min, long max,
+            string quantifiedContentRegex);
+
+        [Pure]
+        string CreateNonCapturingGroup(IRegularExpressionFactoryContext ctx, string groupContentRegex);
+
+        [Pure]
+        string CreatePositiveLookaheadGroup(IRegularExpressionFactoryContext ctx, string groupContentRegex);
+
+        [Pure]
+        string CreateNegativeLookaheadGroup(IRegularExpressionFactoryContext ctx, string groupContentRegex);
+
+        [Pure]
+        string CreateRecursiveGroupCall(IRegularExpressionFactoryContext ctx, string regexGroupName);
+
+        [Pure]
+        string CreateCapturingGroup(IRegularExpressionFactoryContext ctx, string groupContentRegex);
+
+        [Pure]
+        string CreateCharRange(IRegularExpressionFactoryContext ctx, StandardCharactersRange range);
+
+        [Pure]
+        string CreateCharSet(IRegularExpressionFactoryContext ctx, IEnumerable<char> characters);
+
+        [Pure]
+        string CreateCharRange(IRegularExpressionFactoryContext ctx, char firstCharacter, char lastCharacter);
+
+        [Pure]
+        string GetWordCharacter(IRegularExpressionFactoryContext ctx);
+
+        [Pure]
+        string GetDigitCharacter(IRegularExpressionFactoryContext ctx);
+
+        [Pure]
+        string CharToRegex(char ch);
+
+        [Pure]
+        string StringToRegex(string text);
+
+        [Pure]
+        string CreateNot(IRegularExpressionFactoryContext ctx, string negatedContentRegex);
+    }
 }

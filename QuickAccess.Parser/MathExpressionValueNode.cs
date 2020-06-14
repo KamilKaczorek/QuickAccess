@@ -39,13 +39,14 @@
 
 using System.Threading;
 using System.Threading.Tasks;
+using QuickAccess.Parser.Product;
 
 namespace QuickAccess.Parser
 {
 	/// <summary>
     /// The math expression value node.
     /// </summary>
-    /// <seealso cref="ParsedExpressionNode" />
+    /// <seealso cref="ParsingProduct" />
     /// <seealso cref="IExecutableExpressionNode" />
     public sealed class MathExpressionValueNode : TerminalExpressionNode,
         IExecutableExpressionNode
@@ -60,7 +61,7 @@ namespace QuickAccess.Parser
         /// <param name="value">The value.</param>
         /// <param name="valueTypeId">The value type identifier.</param>
         public MathExpressionValueNode(string expressionTypeId, ISourceCodeFragment valueFragment, object value, string valueTypeId = null)
-            : base(expressionTypeId, valueFragment, valueTypeId)
+            : base(ExpressionTypeDescriptor.CreateExpressionClass(expressionTypeId, valueTypeId), valueFragment)
         {
             _value = value;
         }

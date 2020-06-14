@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
     <LangVersion>latest</LangVersion>
     <AssemblyVersion>1.6.0.0</AssemblyVersion>
     <Version>1.4.0</Version>
@@ -10,11 +10,21 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="ParserBuilder\**" />
+    <EmbeddedResource Remove="ParserBuilder\**" />
+    <None Remove="ParserBuilder\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\QuickAccess.DataStructures\QuickAccess.DataStructures.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="ParserBuilder\" />
+    <Folder Include="Code\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="JetBrains.Annotations" Version="2020.1.0" />
   </ItemGroup>
 
 </Project>

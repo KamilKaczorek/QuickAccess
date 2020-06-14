@@ -36,9 +36,9 @@
 #endregion
 
 using System;
-using QuickAccess.DataStructures.CodeOperatorAlgebra;
 using QuickAccess.DataStructures.Common.Freezable;
 using QuickAccess.DataStructures.Common.RegularExpression;
+using QuickAccess.Parser.Product;
 
 namespace QuickAccess.Parser.SmartExpressions.Bricks
 {
@@ -54,17 +54,16 @@ namespace QuickAccess.Parser.SmartExpressions.Bricks
 		public bool IsFrozen => _rule.IsFrozen;
 
 		public RulePlaceholderBrick(ISmartExpressionAlgebra algebra, string ruleName)
-		: base(algebra)
+		: this(algebra, ruleName, null)
 		{
-			RuleName = ruleName;
-			_rule = new FreezableValue<Tuple<SmartExpressionBrick, bool>>();
+			
 		}
 
 		public RulePlaceholderBrick(ISmartExpressionAlgebra algebra, string ruleName, SmartExpressionBrick defaultRule)
 		: base(algebra.GetHighestPrioritizedAlgebra(defaultRule))
 		{
 			RuleName = ruleName;
-			_rule = new FreezableValue<Tuple<SmartExpressionBrick, bool>>(Tuple.Create(defaultRule, false));
+			_rule = defaultRule != null ? new FreezableValue<Tuple<SmartExpressionBrick, bool>>(Tuple.Create(defaultRule, false)) : new FreezableValue<Tuple<SmartExpressionBrick, bool>>();
 		}
 
 		/// <inheritdoc />
@@ -88,15 +87,12 @@ namespace QuickAccess.Parser.SmartExpressions.Bricks
 		}
 
 		/// <inheritdoc />
-		protected override IParsedExpressionNode TryParseInternal(IParsingContextStream ctx)
+		protected override IParsingProduct TryParseInternal(IParsingContextStream ctx)
 		{
 			return Content.TryParse(ctx);
 		}
 
-		/// <inheritdoc />
-		public override string ExpressionId => IsRecursion ? $"RULE${RuleName}$" : Content?.ExpressionId;
-
-		/// <inheritdoc />
+        /// <inheritdoc />
 		public override string ToRegularExpressionString(RegularExpressionBuildingContext  ctx)
 		{
 			if (!_rule.IsSet)

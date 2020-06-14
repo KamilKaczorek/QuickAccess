@@ -38,11 +38,31 @@ namespace QuickAccess.DataStructures.CodeOperatorAlgebra
 {
 	public enum OverloadableCodeUnarySymmetricOperator
 	{
+		/// <summary>
+		/// <c>x++</c>
+		/// </summary>
 		Increment = OverloadableCodeOperator.Increment,
+		/// <summary>
+		/// <c>x--</c>
+		/// </summary>
 		Decrement = OverloadableCodeOperator.Decrement,
+		/// <summary>
+		/// <c>+x</c>
+		/// </summary>
 		Plus = OverloadableCodeOperator.Plus,
+		/// <summary>
+		/// <c>-x</c>
+		/// </summary>
 		Minus =  OverloadableCodeOperator.Minus,
+		/// <summary>
+		/// <c>!x</c>
+		/// </summary>
 		LogicalNegation = OverloadableCodeOperator.LogicalNegation,
+		/// <summary>
+		/// <c>~x</c>
+		/// </summary>
 		BitwiseComplement = OverloadableCodeOperator.BitwiseComplement
 	}
+
+
 }

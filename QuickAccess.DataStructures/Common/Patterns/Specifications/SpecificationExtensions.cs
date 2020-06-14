@@ -36,19 +36,102 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
+using System.Diagnostics.Contracts;
+using System.Linq;
 
 namespace QuickAccess.DataStructures.Common.Patterns.Specifications
 {
 	public static class SpecificationExtensions
 	{
+        [Pure]
 		public static Specification<T> ToSpecification<T>(this ISpecification<T> source)
 		{
 			return source is Specification<T> spec ? spec : new WrappedSpecification<T, T>(DefaultSpecificationAlgebra<T>.Instance, source);
 		}
 
+        [Pure]
 		public static Specification<T> ToSpecification<T>(this Func<T, bool> source)
 		{
 			return source is Specification<T> spec ? spec : new PredicateSpecification<T>(DefaultSpecificationAlgebra<T>.Instance, source);
 		}
-	}
+
+		[Pure]
+        public static IEnumerable<T> Satisfying<T>(this IEnumerable<T> source, ISpecification<T> specification)
+        {
+            return source.Where(specification.IsSatisfiedBy);
+        }
+
+        [Pure]
+        public static IEnumerable<T> NotSatisfying<T>(this IEnumerable<T> source, ISpecification<T> specification)
+        {
+            return source.Where(pX => !specification.IsSatisfiedBy(pX));
+        }
+
+        [Pure]
+        public static T SingleOrDefaultSatisfying<T>(this IEnumerable<T> source, ISpecification<T> specification)
+        {
+            return source.SingleOrDefault(specification.IsSatisfiedBy);
+        }
+
+        [Pure]
+        public static T SingleSatisfying<T>(this IEnumerable<T> source, ISpecification<T> specification)
+        {
+            return source.Single(specification.IsSatisfiedBy);
+        }
+
+        [Pure]
+        public static T FirstSatisfying<T>(this IEnumerable<T> source, ISpecification<T> specification)
+        {
+            return source.First(specification.IsSatisfiedBy);
+        }
+
+        [Pure]
+        public static T FirstOrDefaultSatisfying<T>(this IEnumerable<T> source, ISpecification<T> specification)
+        {
+            return source.First(specification.IsSatisfiedBy);
+        }
+
+        [Pure]
+        public static T LastSatisfying<T>(this IEnumerable<T> source, ISpecification<T> specification)
+        {
+            return source.Last(specification.IsSatisfiedBy);
+        }
+
+        [Pure]
+        public static T LastOrDefaultSatisfying<T>(this IEnumerable<T> source, ISpecification<T> specification)
+        {
+            return source.LastOrDefault(specification.IsSatisfiedBy);
+        }
+
+        [Pure]
+        public static int CountOfSatisfying<T>(this IEnumerable<T> source, ISpecification<T> specification)
+        {
+            return source.Count(specification.IsSatisfiedBy);
+        }
+
+        [Pure]
+        public static bool AnySatisfying<T>(this IEnumerable<T> source, ISpecification<T> specification)
+        {
+            return source.Any(specification.IsSatisfiedBy);
+        }
+
+        [Pure]
+        public static bool AllSatisfying<T>(this IEnumerable<T> source, ISpecification<T> specification)
+        {
+            return source.All(specification.IsSatisfiedBy);
+        }
+
+        [Pure]
+        public static int CountOfNotSatisfying<T>(this IEnumerable<T> source, ISpecification<T> specification)
+        {
+            return source.Count(pX => !specification.IsSatisfiedBy(pX));
+        }
+
+        [Pure]
+        public static ILookup<bool, T> ToLookupBySpecificationResult<T>(this IEnumerable<T> source, ISpecification<T> specification)
+        {
+            return source.ToLookup(specification.IsSatisfiedBy);
+        }
+    }
 }

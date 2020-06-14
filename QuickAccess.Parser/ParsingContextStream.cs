@@ -39,6 +39,8 @@
 
 
 using System;
+using System.Collections.Generic;
+using QuickAccess.Parser.Product;
 
 namespace QuickAccess.Parser
 {
@@ -52,15 +54,62 @@ namespace QuickAccess.Parser
     public sealed class ParsingContextStream : IParsingContextStream,
         IParsingContextStreamParent
     {
+        private readonly IParsingProductFactory _productFactory;
         private IParsingContextStreamParent _parent;
         private readonly int _initialOffset;
-        private int _internalOffset;
-        private int _acceptedPosition;
-        private int _position;
         private readonly int _maxDeep;
 
+        private int _internalOffset;
+        private int _position;
+        private int _relativeAcceptedPosition;
+
+        private int RelativeAcceptedPosition
+        {
+            get => _relativeAcceptedPosition;
+            set
+            {
+                if (_relativeAcceptedPosition == value)
+                {
+                    return;
+                }
+
+                if (value < 0)
+                {
+                    _relativeAcceptedPosition = -1;
+                    return;
+                }
+
+                _relativeAcceptedPosition = value;
+            }
+        }
 
         private int Offset => _initialOffset + _internalOffset;
+
+        private int CurrentIndex => Offset + _position;
+
+        /// <inheritdoc />
+        int IParsingContextStreamParent.Length => _parent.Length;
+
+        /// <inheritdoc />
+        char IParsingContextStreamParent.this[int idx] => _parent[idx];
+
+        
+        /// <inheritdoc />
+        public IParsingProduct CreateExpressionForAcceptedFragment(ExpressionTypeDescriptor expressionType,
+            IReadOnlyCollection<IParsingProduct> subNodes)
+        {
+            var fragment = GetAcceptedFragmentOrEmpty();
+            var product = _productFactory.CreateExpression(expressionType, fragment, subNodes);
+            return product;
+        }
+
+        /// <inheritdoc />
+        public IParsingProduct CreateTermForAcceptedFragment(ExpressionTypeDescriptor expressionType)
+        {
+            var fragment = GetAcceptedFragmentOrEmpty();
+            var product = _productFactory.CreateTerm(expressionType, fragment);
+            return product;
+        }
 
         /// <inheritdoc />
         public bool HasNext => CurrentIndex + 1 < _parent.Length;
@@ -74,24 +123,21 @@ namespace QuickAccess.Parser
         /// <inheritdoc />
         public char Next => !HasNext ? ParserExtensions.NullChar : _parent[CurrentIndex + 1];
 
-        private int CurrentIndex => Offset + _position;
-
         /// <inheritdoc />
-        int IParsingContextStreamParent.Length => _parent.Length;
-
-        /// <inheritdoc />
-        char IParsingContextStreamParent.this[int idx] => _parent[idx];
+        public int AcceptedPosition => RelativeAcceptedPosition < 0 ? -1 : RelativeAcceptedPosition + Offset;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ParsingContextStream"/> class.
         /// </summary>
         /// <param name="parent">The parent context.</param>
+        /// <param name="productFactory">The product factory.</param>
         /// <param name="offset">The context absolute offset within the source code.</param>
         /// <param name="maxDeep">The maximum deep of parented contexts.</param>
-        public ParsingContextStream(IParsingContextStreamParent parent, int offset, int maxDeep)
+        public ParsingContextStream(IParsingContextStreamParent parent, IParsingProductFactory productFactory, int offset, int maxDeep)
         {
             _initialOffset = offset;
             _maxDeep = maxDeep;
+            _productFactory = productFactory;
             _internalOffset = 0;
             _parent = parent;
             Rollback();
@@ -135,14 +181,14 @@ namespace QuickAccess.Parser
                 maxDeep--;
             }
 
-            return new ParsingContextStream(this, CurrentIndex + 1, maxDeep);
+            return new ParsingContextStream(this, _productFactory, CurrentIndex + 1, maxDeep);
         }
 
         /// <inheritdoc />
         public void Rollback()
         {
             _internalOffset = 0;
-            _acceptedPosition = -1;
+            RelativeAcceptedPosition = -1;
             _position = -1;
         }
 
@@ -168,20 +214,21 @@ namespace QuickAccess.Parser
         }
 
         /// <inheritdoc />
-        public void Accept()
+        public IParsingContextStream Accept()
         {
-            _acceptedPosition = _position;
+            RelativeAcceptedPosition = _position;
+            return this;
         }
 
         /// <inheritdoc />
-        public ISourceCodeFragment GetAcceptedFragment()
+        public ISourceCodeFragment GetAcceptedFragmentOrEmpty()
         {
-            if (_acceptedPosition < 0)
+            if (RelativeAcceptedPosition < 0)
             {
                 return ParserExtensions.EmptyFragment;
             }
 
-            var len = Math.Min(_acceptedPosition + 1, _parent.Length - Offset);
+            var len = Math.Min(RelativeAcceptedPosition + 1, _parent.Length - Offset);
 
             return len <= 0 ? ParserExtensions.EmptyFragment : _parent.GetFragment(Offset, len);
         }
@@ -193,14 +240,11 @@ namespace QuickAccess.Parser
         }
 
         /// <inheritdoc />
-        public int AcceptedPosition => _acceptedPosition < 0 ? -1 : _acceptedPosition + Offset;
-
-        /// <inheritdoc />
         public void Dispose()
         {
-            if (_acceptedPosition >= 0)
+            if (RelativeAcceptedPosition >= 0)
             {
-                _parent.AcceptChildPosition(_acceptedPosition + Offset);
+                _parent.AcceptChildPosition(RelativeAcceptedPosition + Offset);
             }
 
             _parent = DisposedParsedContextStreamParent.Instance;
@@ -209,31 +253,40 @@ namespace QuickAccess.Parser
         /// <inheritdoc />
         public bool Equals(IParsingContextStream other)
         {
-	        if (ReferenceEquals(other, null))
-	        {
-		        return false;
-	        }
+            if (ReferenceEquals(other, null))
+            {
+                return false;
+            }
 
-	        if (ReferenceEquals(other, this))
-	        {
-		        return true;
-	        }
+            if (ReferenceEquals(other, this))
+            {
+                return true;
+            }
 
-	        return other.AcceptedPosition == this.AcceptedPosition && other.HasNext == this.HasNext && other.Current == this.Current &&
-	                other.GetAcceptedFragment() == this.GetAcceptedFragment();
+            return other.AcceptedPosition == this.AcceptedPosition && other.HasNext == this.HasNext &&
+                   other.Current == this.Current &&
+                   other.GetAcceptedFragmentOrEmpty() == this.GetAcceptedFragmentOrEmpty();
         }
 
         /// <inheritdoc />
         public int CompareTo(IParsingContextStream other)
         {
-	        return this.AcceptedPosition.CompareTo(other?.AcceptedPosition ?? -1);
-        }        
+            return this.AcceptedPosition.CompareTo(other?.AcceptedPosition ?? -1);
+        }
+
+        public const string ToStringDefaultDisposedTag = "<DISPOSED>";
+        public const string ToStringDefaultCurrentPositionTag = "»»";
 
         public override string ToString()
         {
+            return ToString(ToStringDefaultCurrentPositionTag);
+        }
+
+        public string ToString(string currentPositionTag, string disposedTag = ToStringDefaultDisposedTag)
+        {
             if (_parent == DisposedParsedContextStreamParent.Instance)
             {
-                return "Disposed";
+                return disposedTag;
             }
 
             var len = EndOfStream ? _parent.Length - Offset : _position + 1;
@@ -245,7 +298,7 @@ namespace QuickAccess.Parser
 
             var str2 = _parent.GetString(pos, _parent.Length - pos);
 
-            return str1 + "»»»" + str2;
+            return $"{str1}{currentPositionTag}{str2}";
         }
     }
 }

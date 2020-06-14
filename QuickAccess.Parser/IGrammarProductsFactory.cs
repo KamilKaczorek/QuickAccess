@@ -38,6 +38,7 @@
 #endregion
 
 using System.Collections.Generic;
+using QuickAccess.Parser.Product;
 
 namespace QuickAccess.Parser
 {
@@ -57,11 +58,11 @@ namespace QuickAccess.Parser
         /// <param name="exp1">The left expression.</param>
         /// <param name="exp2">The right expression.</param>
         /// <returns>The binary operator expression or <c>null</c> if operator not found.</returns>
-        IParsedExpressionNode CreateOperatorNode(
+        IParsingProduct CreateOperatorNode(
             ISourceCodeFragment operatorTerm,
             IBinaryOperatorTermDefinition @operator,
-            IParsedExpressionNode exp1,
-            IParsedExpressionNode exp2);
+            IParsingProduct exp1,
+            IParsingProduct exp2);
 
         /// <summary>
         /// Creates the unary operator node.
@@ -70,10 +71,10 @@ namespace QuickAccess.Parser
         /// <param name="operator">The unary operator definition.</param>
         /// <param name="exp">The argument.</param>
         /// <returns>The unary operator expression or <c>null</c> if operator not found.</returns>
-        IParsedExpressionNode CreateOperatorNode(
+        IParsingProduct CreateOperatorNode(
             ISourceCodeFragment operatorTerm,
             IUnaryOperatorTermDefinition @operator,
-            IParsedExpressionNode exp);
+            IParsingProduct exp);
 
         /// <summary>
         /// Creates the function invocation node.
@@ -81,16 +82,16 @@ namespace QuickAccess.Parser
         /// <param name="functionName">Name of the function.</param>
         /// <param name="arguments">The function arguments.</param>
         /// <returns>The function expression or <c>null</c> if function not found.</returns>
-        IParsedExpressionNode CreateFunctionInvocationNode(
+        IParsingProduct CreateFunctionInvocationNode(
             ISourceCodeFragment functionName,
-            IEnumerable<IParsedExpressionNode> arguments);
+            IEnumerable<IParsingProduct> arguments);
 
         /// <summary>
         /// Creates the variable node.
         /// </summary>
         /// <param name="variable">The variable.</param>
         /// <returns>The variable node or <c>null</c> if variable not defined.</returns>
-        IParsedExpressionNode CreateVariableNode(
+        IParsingProduct CreateVariableNode(
             ISourceCodeFragment variable);
 
         /// <summary>
@@ -99,6 +100,6 @@ namespace QuickAccess.Parser
         /// </summary>
         /// <param name="src">The source.</param>
         /// <returns>The value node or <c>null</c> if value not parsed.</returns>
-        IParsedExpressionNode ParseValue(ISourceCode src);
+        IParsingProduct ParseValue(ISourceCode src);
     }
 }

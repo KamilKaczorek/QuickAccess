@@ -41,6 +41,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using QuickAccess.Parser.Product;
 
 namespace QuickAccess.Parser
 {
@@ -84,7 +85,7 @@ namespace QuickAccess.Parser
         /// <param name="parserFactory">The parser factory.</param>
         public MathExpressionCompiler(IEqualityComparer<char> charComparer, IExpressionParserFactory parserFactory)
         {
-            charComparer = charComparer ?? CharComparer.CaseSensitive;
+            charComparer ??= CharComparer.CaseSensitive;
             var comparer = new SourceCodeFragmentContentComparer(charComparer);
 
             _functionsByNameByArgCount = new Dictionary<IReadOnlyList<char>, Dictionary<int, Func<object[], object>>>(comparer);
@@ -104,34 +105,34 @@ namespace QuickAccess.Parser
 
 
         /// <inheritdoc />
-        IParsedExpressionNode IGrammarProductsFactory.CreateOperatorNode(
+        IParsingProduct IGrammarProductsFactory.CreateOperatorNode(
             ISourceCodeFragment operatorTerm,
             IBinaryOperatorTermDefinition @operator,
-            IParsedExpressionNode exp1,
-            IParsedExpressionNode exp2)
+            IParsingProduct exp1,
+            IParsingProduct exp2)
         {
             return GetFunction(operatorTerm, ExpressionTypeId.BinaryOperator, new[] {exp1, exp2});
         }
 
         /// <inheritdoc />
-        IParsedExpressionNode IGrammarProductsFactory.CreateOperatorNode(
+        IParsingProduct IGrammarProductsFactory.CreateOperatorNode(
             ISourceCodeFragment operatorTerm,
             IUnaryOperatorTermDefinition @operator,
-            IParsedExpressionNode exp)
+            IParsingProduct exp)
         {
             return GetFunction(operatorTerm, ExpressionTypeId.UnaryOperator, new[] {exp});
         }
 
         /// <inheritdoc />
-        IParsedExpressionNode IGrammarProductsFactory.CreateFunctionInvocationNode(
+        IParsingProduct IGrammarProductsFactory.CreateFunctionInvocationNode(
             ISourceCodeFragment functionName,
-            IEnumerable<IParsedExpressionNode> arguments)
+            IEnumerable<IParsingProduct> arguments)
         {
             return GetFunction(functionName, ExpressionTypeId.Function, arguments);
         }
 
         /// <inheritdoc />
-        IParsedExpressionNode IGrammarProductsFactory.CreateVariableNode(ISourceCodeFragment variable)
+        IParsingProduct IGrammarProductsFactory.CreateVariableNode(ISourceCodeFragment variable)
         {
             if (_variables.TryGetValue(variable, out var v))
             {
@@ -152,7 +153,7 @@ namespace QuickAccess.Parser
         }
 
         /// <inheritdoc />
-        IParsedExpressionNode IGrammarProductsFactory.ParseValue(ISourceCode src)
+        IParsingProduct IGrammarProductsFactory.ParseValue(ISourceCode src)
         {
             return ParseUnsignedNumber(src);
         }
@@ -337,7 +338,7 @@ namespace QuickAccess.Parser
         }
 
         // UnsignedNumber = ( ({Digit},'.', [{Digit}]) | ({Digit}, ['.']) | '.', {Digit} ), [('E'|'e'), ['+'|'-'], {Digit}]
-        private IParsedExpressionNode ParseUnsignedNumber(ISourceCode src)
+        private IParsingProduct ParseUnsignedNumber(ISourceCode src)
         {
             var fragment = src.ParseUnsignedNumber(out var value, out var isFloat);
 
@@ -353,23 +354,23 @@ namespace QuickAccess.Parser
                 isFloat ? @"u_float" : @"uint");
         }
 
-        private IParsedExpressionNode GetFunction(
+        private IParsingProduct GetFunction(
             ISourceCodeFragment functionName,
             string expressionTypeId,
-            IEnumerable<IParsedExpressionNode> arguments)
+            IEnumerable<IParsingProduct> arguments)
         {
             if (!_functionsByNameByArgCount.TryGetValue(functionName, out var functionByArgsCount))
             {
                 return null;
             }
 
-            var args = arguments?.ToArray() ?? Array.Empty<IParsedExpressionNode>();
+            var args = arguments?.ToArray() ?? Array.Empty<IParsingProduct>();
             if (!functionByArgsCount.TryGetValue(args.Length, out var func))
             {
                 return null;
             }
 
-            return new MathExpressionFunctionNode(expressionTypeId, functionName, args, func);
+            return new MathExpressionFunctionNode(ExpressionTypeDescriptor.CreateExpressionClass(expressionTypeId), functionName, args, func);
         }
     }
 }

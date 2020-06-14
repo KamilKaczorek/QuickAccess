@@ -36,24 +36,31 @@
 #endregion
 
 using System;
+using System.Threading;
 using QuickAccess.DataStructures.CodeOperatorAlgebra;
 using QuickAccess.DataStructures.Common.RegularExpression;
+using QuickAccess.Parser.Product;
 
 namespace QuickAccess.Parser.SmartExpressions
 {
-	public abstract class SmartExpressionBrick
-		: IExpressionParser,
-		  IRegularExpressionRepresentable,
-		  ICodeOperatorAlgebraicDomain<SmartExpressionBrick, ISmartExpressionAlgebra>,
-		  IEquatable<SmartExpressionBrick>
-	{
+    public abstract class SmartExpressionBrick
+		:  IExpressionParser, 
+            IRegularExpressionRepresentable, 
+            IDefineAlgebraicDomain<SmartExpressionBrick, ISmartExpressionAlgebra>, 
+            IEquatable<SmartExpressionBrick>
+    {
+        private static int _idCounter = 0;
+        public const string AnonymousNamePrefix = "Anonym";
+
 		protected SmartExpressionBrick(ISmartExpressionAlgebra algebra)
-		{
+        {
+            Id = Interlocked.Increment(ref _idCounter);
+
 			Algebra = algebra ?? SX.DefaultAlgebra;
 		}
 
-		public virtual string Name => GetType().Name;
-
+		public int Id { get; }
+		public virtual string Name => $"{AnonymousNamePrefix}{Id}";
 
 		/// <inheritdoc />
 		public ISmartExpressionAlgebra Algebra { get; }
@@ -63,9 +70,22 @@ namespace QuickAccess.Parser.SmartExpressions
 
 		public SmartExpressionBrick this[long count] => Algebra.CreateQuantifierBrick(this, count, count);
 
+        /// <inheritdoc />
+        public virtual MatchingLevel RegularExpressionMatchingLevel => MatchingLevel.None;
+
 		public virtual bool IsEmpty => false;
 
-		public static SmartExpressionBrick operator *(SmartExpressionBrick left, SmartExpressionBrick right)
+        protected abstract void ApplyRuleDefinition(string name, SmartExpressionBrick content, bool recursion, bool freeze);
+
+        /// <summary>Tries the parse internal.</summary>
+        /// <param name="parsingContext">The source.</param>
+        /// <returns></returns>
+        protected abstract IParsingProduct TryParseInternal(IParsingContextStream parsingContext);
+
+        /// <inheritdoc />
+        public abstract bool Equals(SmartExpressionBrick other);
+
+        public static SmartExpressionBrick operator *(SmartExpressionBrick left, SmartExpressionBrick right)
 		{
 			return SX.DefaultAlgebra.GetOperatorResultOfHighestPrioritizedAlgebra(left, OverloadableCodeBinarySymmetricOperator.Mul, right);
 		}
@@ -83,11 +103,6 @@ namespace QuickAccess.Parser.SmartExpressions
 		public static SmartExpressionBrick operator +(SmartExpressionBrick left, SmartExpressionBrick right)
 		{
 			return SX.DefaultAlgebra.GetOperatorResultOfHighestPrioritizedAlgebra(left, OverloadableCodeBinarySymmetricOperator.Sum, right);
-		}
-
-		public static SmartExpressionBrick operator -(SmartExpressionBrick left, SmartExpressionBrick right)
-		{
-			return SX.DefaultAlgebra.GetOperatorResultOfHighestPrioritizedAlgebra(left, OverloadableCodeBinarySymmetricOperator.Sub, right);
 		}
 
 		public static SmartExpressionBrick operator &(SmartExpressionBrick left, SmartExpressionBrick right)
@@ -110,11 +125,6 @@ namespace QuickAccess.Parser.SmartExpressions
 			return SX.DefaultAlgebra.EvaluateOperatorResult(OverloadableCodeUnarySymmetricOperator.Increment, arg);
 		}
 
-		public static SmartExpressionBrick operator --(SmartExpressionBrick arg)
-		{
-			return SX.DefaultAlgebra.EvaluateOperatorResult(OverloadableCodeUnarySymmetricOperator.Decrement, arg);
-		}
-
 		public static SmartExpressionBrick operator +(SmartExpressionBrick arg)
 		{
 			return SX.DefaultAlgebra.EvaluateOperatorResult(OverloadableCodeUnarySymmetricOperator.Plus, arg);
@@ -123,11 +133,6 @@ namespace QuickAccess.Parser.SmartExpressions
 		public static SmartExpressionBrick operator -(SmartExpressionBrick arg)
 		{
 			return SX.DefaultAlgebra.EvaluateOperatorResult(OverloadableCodeUnarySymmetricOperator.Minus, arg);
-		}
-
-		public static SmartExpressionBrick operator !(SmartExpressionBrick arg)
-		{
-			return SX.DefaultAlgebra.EvaluateOperatorResult(OverloadableCodeUnarySymmetricOperator.LogicalNegation, arg);
 		}
 
 		public static SmartExpressionBrick operator ~(SmartExpressionBrick arg)
@@ -155,8 +160,6 @@ namespace QuickAccess.Parser.SmartExpressions
 			ApplyRuleDefinition(name, content, recursion: false, freeze: true);
 		}
 
-		protected abstract void ApplyRuleDefinition(string name, SmartExpressionBrick content, bool recursion, bool freeze);
-
 		protected static void ApplyRuleDefinition(SmartExpressionBrick target,
 		                                          string name,
 		                                          SmartExpressionBrick content,
@@ -165,9 +168,6 @@ namespace QuickAccess.Parser.SmartExpressions
 		{
 			target.ApplyRuleDefinition(name, content, recursion, freeze);
 		}
-
-
-		public abstract string ExpressionId { get; }
 
 		public virtual string ToRegularExpressionString(RegularExpressionBuildingContext ctx)
 		{
@@ -182,31 +182,17 @@ namespace QuickAccess.Parser.SmartExpressions
 		}
 
 		/// <inheritdoc />
-		public virtual MatchingLevel RegularExpressionMatchingLevel => MatchingLevel.None;
+		public IParsingProduct TryParse(ISourceCode sourceCode)
+        {
+            using var ctx = sourceCode.GetFurtherContext();
+            var res = TryParseInternal(ctx);
 
-		/// <inheritdoc />
-		public abstract bool Equals(SmartExpressionBrick other);
-
-		/// <inheritdoc />
-		public IParsedExpressionNode TryParse(ISourceCode sourceCode)
-		{
-			using (var ctx = sourceCode.GetFurtherContext())
-			{
-				var res = TryParseInternal(ctx);
-
-				if (res != null)
-				{
-					ctx.Accept();
-				}
+            if (res != null)
+            {
+                ctx.Accept();
+            }
 				
-				return res;
-			}
-		}
-
-		/// <summary>Tries the parse internal.</summary>
-		/// <param name="parsingContext">The source.</param>
-		/// <returns></returns>
-		protected abstract IParsedExpressionNode TryParseInternal(IParsingContextStream parsingContext);
-
-	}
+            return res;
+        }
+    }
 }

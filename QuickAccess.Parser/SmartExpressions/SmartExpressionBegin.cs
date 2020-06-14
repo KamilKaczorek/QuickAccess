@@ -54,7 +54,7 @@ namespace QuickAccess.Parser.SmartExpressions
 			return algebra.EvaluateOperatorResult(algebra.OptionalWhiteSpace, OverloadableCodeBinarySymmetricOperator.Sum, right);
 		}
 
-		public static SmartExpressionBrick operator +(SmartExpressionBegin left, SmartExpressionBrick right)
+		public static SmartExpressionBrick operator +(SmartExpressionBegin _, SmartExpressionBrick right)
 		{
 			return right;
 		}
@@ -71,7 +71,7 @@ namespace QuickAccess.Parser.SmartExpressions
 			return algebra.EvaluateOperatorResult(algebra.Anything, OverloadableCodeBinarySymmetricOperator.Sum, right);
 		}
 
-		public static SmartExpressionBrick operator |(SmartExpressionBegin left, SmartExpressionBrick right)
+		public static SmartExpressionBrick operator |(SmartExpressionBegin _, SmartExpressionBrick right)
 		{
 			return right;
 		}

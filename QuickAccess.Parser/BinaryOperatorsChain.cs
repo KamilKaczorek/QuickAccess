@@ -38,6 +38,7 @@
 #endregion
 
 using System;
+using QuickAccess.Parser.Product;
 
 namespace QuickAccess.Parser
 {
@@ -59,7 +60,7 @@ namespace QuickAccess.Parser
 		public bool IsEmpty => _first == null;
 
 		/// <inheritdoc />
-		public void Add(IParsedExpressionNode expression)
+		public void Add(IParsingProduct expression)
 		{
 			if (IsEmpty)
 			{
@@ -84,9 +85,9 @@ namespace QuickAccess.Parser
 		}
 
 		/// <inheritdoc />
-		public IParsedExpressionNode EvaluateExpressionTree(
-			Func<ISourceCodeFragment, IBinaryOperatorTermDefinition, IParsedExpressionNode, IParsedExpressionNode,
-				IParsedExpressionNode> createOperatorNode)
+		public IParsingProduct EvaluateExpressionTree(
+			Func<ISourceCodeFragment, IBinaryOperatorTermDefinition, IParsingProduct, IParsingProduct,
+				IParsingProduct> createOperatorNode)
 		{
 			if (IsEmpty)
 			{
@@ -108,7 +109,7 @@ namespace QuickAccess.Parser
 		{
 			public abstract bool IsExpression { get; }
 
-			public abstract ListNode AddNext(IParsedExpressionNode expression);
+			public abstract ListNode AddNext(IParsingProduct expression);
 
 			public abstract ListNode AddNext(
 				IBinaryOperatorTermDefinition definition,
@@ -117,22 +118,22 @@ namespace QuickAccess.Parser
 
 		private sealed class ExpressionListNode : ListNode
 		{
-			private readonly IParsedExpressionNode _expression;
+			private readonly IParsingProduct _expression;
 
 			public OperatorListNode Next { get; private set; }
 			public override bool IsExpression => true;
 
 			private bool IsLast => Next == null;
 			private ExpressionListNode NextExpressionNode => Next?.Next;
-			private IParsedExpressionNode NextExpression => NextExpressionNode?._expression;
+			private IParsingProduct NextExpression => NextExpressionNode?._expression;
 
-			public ExpressionListNode(IParsedExpressionNode expression, OperatorListNode next = null)
+			public ExpressionListNode(IParsingProduct expression, OperatorListNode next = null)
 			{
 				_expression = expression ?? throw new ArgumentNullException(nameof(expression));
 				Next = next;
 			}
 
-			public override ListNode AddNext(IParsedExpressionNode expression)
+			public override ListNode AddNext(IParsingProduct expression)
 			{
 				throw new InvalidOperationException(
 					"Last item is an expression => can't chain expression to expression, operator expected.");
@@ -144,12 +145,12 @@ namespace QuickAccess.Parser
 				return Next;
 			}
 
-			public IParsedExpressionNode EvaluateExpressionTree(
+			public IParsingProduct EvaluateExpressionTree(
 				Func<
 					ISourceCodeFragment,
 					IBinaryOperatorTermDefinition,
-					IParsedExpressionNode,
-					IParsedExpressionNode, IParsedExpressionNode> createOperatorNode)
+					IParsingProduct,
+					IParsingProduct, IParsingProduct> createOperatorNode)
 			{
 				if (IsLast)
 				{
@@ -205,7 +206,7 @@ namespace QuickAccess.Parser
 				_codeFragment = codeFragment ?? throw new ArgumentNullException(nameof(codeFragment));
 			}
 
-			public override ListNode AddNext(IParsedExpressionNode expression)
+			public override ListNode AddNext(IParsingProduct expression)
 			{
 				Next = new ExpressionListNode(expression);
 				return Next;
@@ -217,14 +218,14 @@ namespace QuickAccess.Parser
 					"Last item is an operator => can't chain operator to operator, expression expected.");
 			}
 
-			public IParsedExpressionNode CreateOperatorTreeNode(
-				IParsedExpressionNode exp1,
-				IParsedExpressionNode exp2,
+			public IParsingProduct CreateOperatorTreeNode(
+				IParsingProduct exp1,
+				IParsingProduct exp2,
 				Func<
 					ISourceCodeFragment,
 					IBinaryOperatorTermDefinition,
-					IParsedExpressionNode,
-					IParsedExpressionNode, IParsedExpressionNode> createOperatorNode
+					IParsingProduct,
+					IParsingProduct, IParsingProduct> createOperatorNode
 			)
 			{
 				return createOperatorNode(_codeFragment, _definition, exp1, exp2);

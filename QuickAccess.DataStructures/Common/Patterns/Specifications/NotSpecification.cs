@@ -47,7 +47,7 @@ namespace QuickAccess.DataStructures.Common.Patterns.Specifications
 		/// <inheritdoc />
 		public NotSpecification(ISpecificationAlgebra<T> algebra, ISpecification<T> argument) 
 			: base(
-				algebra.GetHighestPrioritizedAlgebra<Specification<T>, ISpecificationAlgebra<T>>((argument as ICodeOperatorAlgebraicDomain<Specification<T>, ISpecificationAlgebra<T>>)?.Algebra), 
+				algebra.GetHighestPrioritizedAlgebra<Specification<T>, ISpecificationAlgebra<T>>((argument as IDefineAlgebraicDomain<Specification<T>, ISpecificationAlgebra<T>>)?.Algebra), 
 					null)
 		{
 			_argument = argument;

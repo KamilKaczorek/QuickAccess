@@ -35,12 +35,16 @@
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
 
+using System.Diagnostics;
 using QuickAccess.DataStructures.Common.RegularExpression;
+using QuickAccess.Parser.Product;
+using static QuickAccess.Parser.SmartExpressions.SmartExpression;
 
 namespace QuickAccess.Parser.SmartExpressions.Bricks
 {
 	public sealed class CharBrick : SmartExpressionBrick
 	{
+		
 		public char Character { get; }
 
 		public CharBrick(ISmartExpressionAlgebra algebra, char character)
@@ -61,21 +65,26 @@ namespace QuickAccess.Parser.SmartExpressions.Bricks
 		}
 
 		/// <inheritdoc />
-		protected override IParsedExpressionNode TryParseInternal(IParsingContextStream ctx)
+		[DebuggerStepThrough]
+		protected override IParsingProduct TryParseInternal(IParsingContextStream ctx)
 		{
-			return ctx.ParseChar(Character) ? new ParsingNode(ctx.GetAcceptedFragment(), "char", null) : null;
+			return ctx.ParseChar(Character, true) ? ctx.Accept().CreateTermForAcceptedFragment(ExpressionTypes.CharTerm) : null;
 		}
 
-		/// <inheritdoc />
-		public override string ExpressionId => $"${Character}";
-
-		/// <inheritdoc />
+        /// <inheritdoc />
 		public override string ToRegularExpressionString(RegularExpressionBuildingContext ctx)
 		{
-			return ctx.Factory.CharToRegex(ctx.Context, Character);
+			return ctx.Factory.CharToRegex(Character);
 		}
 
 		/// <inheritdoc />
 		public override MatchingLevel RegularExpressionMatchingLevel => MatchingLevel.Exact;
-	}
+
+        public override string ToString()
+        {
+            var ch = RegularExpressionBuildingContext.StandardFactory.CharToRegex(Character);
+
+			return $"'{ch}'";
+        }
+    }
 }

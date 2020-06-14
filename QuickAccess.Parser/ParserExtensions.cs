@@ -220,6 +220,12 @@ namespace QuickAccess.Parser
             return false;
         }
 
+        public static bool ParseText(this IParsingContextStream source, IEnumerable<char> text,
+            bool accept, IEqualityComparer<char> charComparer = null)
+        {
+            return ParseText(source, text, charComparer, accept);
+        }
+
         public static bool ParseText(this IParsingContextStream source, IEnumerable<char> text, IEqualityComparer<char> charComparer = null, bool accept = false)
         {
 	        foreach (var ch in text)
@@ -343,53 +349,51 @@ namespace QuickAccess.Parser
         // UnsignedNumber = ( ({Digit},'.', [{Digit}]) | ({Digit}, ['.']) | '.', {Digit} ), [('E'|'e'), ['+'|'-'], {Digit}]
         public static ISourceCodeFragment ParseUnsignedNumber(this ISourceCode src, out double value, out bool isFloat)
         {
-            using (var ctx = src.GetFurtherContext())
-            {
-                value = 0D;
+            using var ctx = src.GetFurtherContext();
+            value = 0D;
       
-                var intLength = ctx.ParseDigits();
-                isFloat = false;
-                if (ctx.ParseChar('.'))
+            var intLength = ctx.ParseDigits();
+            isFloat = false;
+            if (ctx.ParseChar('.'))
+            {
+                isFloat = true;
+                var fractionLength = ctx.ParseDigits();
+
+                if (fractionLength + intLength == 0)
                 {
-                    isFloat = true;
-                    var fractionLength = ctx.ParseDigits();
-
-                    if (fractionLength + intLength == 0)
-                    {
-                        ctx.SetError(ParsingErrors.DigitExpected);
-                        return null;
-                    }
+                    ctx.SetError(ParsingErrors.DigitExpected);
+                    return null;
                 }
-                else
-                {
-                    if (intLength == 0)
-                    {
-                        ctx.SetError(ParsingErrors.DigitExpected);
-                        return null;
-                    }
-                }
-
-                if (ctx.ParseChar('e', 'E'))
-                {
-                    isFloat = true;
-                    var containsExpSign = ctx.ParseChar('+', '-');
-
-                    var expLength = ctx.ParseDigits();
-
-                    if (expLength == 0)
-                    {
-                        ctx.SetError(containsExpSign ? ParsingErrors.DigitExpected : ParsingErrors.DigitOrPlusMinusExpected);
-                        return null;
-                    }
-                }
-
-                ctx.Accept();
-                var fragment = ctx.GetAcceptedFragment();
-
-                value = double.Parse(fragment.ToString(), CultureInfo.InvariantCulture);
-
-                return fragment;
             }
+            else
+            {
+                if (intLength == 0)
+                {
+                    ctx.SetError(ParsingErrors.DigitExpected);
+                    return null;
+                }
+            }
+
+            if (ctx.ParseChar('e', 'E'))
+            {
+                isFloat = true;
+                var containsExpSign = ctx.ParseChar('+', '-');
+
+                var expLength = ctx.ParseDigits();
+
+                if (expLength == 0)
+                {
+                    ctx.SetError(containsExpSign ? ParsingErrors.DigitExpected : ParsingErrors.DigitOrPlusMinusExpected);
+                    return null;
+                }
+            }
+
+            ctx.Accept();
+            var fragment = ctx.GetAcceptedFragmentOrEmpty();
+
+            value = double.Parse(fragment.ToString(), CultureInfo.InvariantCulture);
+
+            return fragment;
         }
 
         public static bool Equals(this ISourceCodeFragment source, string text, IEqualityComparer<char> charComparer = null)

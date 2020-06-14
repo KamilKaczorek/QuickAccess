@@ -40,6 +40,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using QuickAccess.Parser.Product;
 
 namespace QuickAccess.Parser
 {
@@ -69,7 +70,22 @@ namespace QuickAccess.Parser
 	/// <seealso cref="ISourceCode" />
 	/// <seealso cref="IEnumerator{T}" />
 	public interface IParsingContextStream : ISourceCode, IDisposable, IEquatable<IParsingContextStream>, IComparable<IParsingContextStream>
-	{
+    {
+		/// <summary>
+		/// Creates the expression for the accepted fragment.
+		/// </summary>
+		/// <param name="subNodes">The expression sub nodes.</param>
+		/// <param name="expressionType">The descriptor of the type of expression.</param>
+		/// <returns></returns>
+        IParsingProduct CreateExpressionForAcceptedFragment(ExpressionTypeDescriptor expressionType, IReadOnlyCollection<IParsingProduct> subNodes);
+
+        /// <summary>
+        /// Creates the expression for the accepted fragment.
+        /// </summary>
+        /// <param name="expressionType">The descriptor of the type of expression.</param>
+        /// <returns></returns>
+        IParsingProduct CreateTermForAcceptedFragment(ExpressionTypeDescriptor expressionType);
+
 		/// <summary>
 		/// Gets a value indicating whether the stream contains next character. 
 		/// (the current character is not last one and the current position is not end of stream).
@@ -131,7 +147,7 @@ namespace QuickAccess.Parser
 
 		/// <summary>
 		/// Advances the internal offset of the current stream context to the current position.
-		/// The <see cref="GetAcceptedFragment"/> will return the fragment from the offset position.
+		/// The <see cref="GetAcceptedFragmentOrEmpty"/> will return the fragment from the offset position.
 		/// <remarks>
 		/// Execution of the <see cref="Rollback"/> method resets the internal offset to the initial position.
 		/// </remarks>
@@ -142,11 +158,12 @@ namespace QuickAccess.Parser
 		/// Accepts parsed fragment of the current stream from the offset position to the current position.
 		/// On <see cref="IDisposable.Dispose"/> the parent context position will be set to accepted position, unless the 
 		/// acceptance will be rolled back by <see cref="IEnumerator.Reset"/> method.
-		/// The <see cref="GetAcceptedFragment"/> will return accepted fragment.
+		/// The <see cref="GetAcceptedFragmentOrEmpty"/> will return accepted fragment.
 		/// <seealso cref="SetOffsetToCurrent"/>
 		/// <seealso cref="ParsingContextStreamExtensions.AcceptAndGetFragment"/>
+		/// <returns>Instance for fluent API</returns>
 		/// </summary>
-		void Accept();
+		IParsingContextStream Accept();
 
 		/// <summary>
 		/// Gets the accepted fragment of the current stream, from the offset position to the accepted position.
@@ -158,7 +175,7 @@ namespace QuickAccess.Parser
 		/// Accepted fragment. If the fragment was not accepted, then empty fragment.
 		/// </returns>
 		[Pure]
-		ISourceCodeFragment GetAcceptedFragment();
+		ISourceCodeFragment GetAcceptedFragmentOrEmpty();
 
 		/// <summary>
 		/// Sets the parsing error at current position.

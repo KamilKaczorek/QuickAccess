@@ -36,8 +36,8 @@
 #endregion
 
 using System.Linq;
-using QuickAccess.DataStructures.Common.Collections;
 using QuickAccess.DataStructures.Common.RegularExpression;
+using QuickAccess.Parser.Product;
 
 namespace QuickAccess.Parser.SmartExpressions.Bricks
 {
@@ -47,7 +47,7 @@ namespace QuickAccess.Parser.SmartExpressions.Bricks
 		public override MatchingLevel RegularExpressionMatchingLevel => Bricks.GetMinimalMatchingLevel();
 
 		/// <inheritdoc />
-		protected override IParsedExpressionNode TryParseInternal(IParsingContextStream ctx)
+		protected override IParsingProduct TryParseInternal(IParsingContextStream ctx)
 		{
 			return Bricks.TryAlternativeParse(ctx);
 		}
@@ -80,8 +80,5 @@ namespace QuickAccess.Parser.SmartExpressions.Bricks
 		{
 			return ctx.Factory.CreateAlternation(ctx.Context, Bricks.Select(b => b.ToRegularExpressionString(ctx)));
 		}
-
-		/// <inheritdoc />
-		public override string ExpressionId => $"${string.Join("|", Bricks.Select(b => b.ExpressionId))})";
 	}
 }

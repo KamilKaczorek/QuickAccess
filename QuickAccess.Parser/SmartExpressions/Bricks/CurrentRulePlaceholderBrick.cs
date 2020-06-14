@@ -38,6 +38,7 @@
 using System.Collections.Generic;
 using QuickAccess.DataStructures.Common.Freezable;
 using QuickAccess.DataStructures.Common.RegularExpression;
+using QuickAccess.Parser.Product;
 
 namespace QuickAccess.Parser.SmartExpressions.Bricks
 {
@@ -56,7 +57,7 @@ namespace QuickAccess.Parser.SmartExpressions.Bricks
 		}
 
 		/// <inheritdoc />
-		protected override IParsedExpressionNode TryParseInternal(IParsingContextStream ctx)
+		protected override IParsingProduct TryParseInternal(IParsingContextStream ctx)
 		{
 			return Content.TryParse(ctx);
 		}
@@ -72,10 +73,7 @@ namespace QuickAccess.Parser.SmartExpressions.Bricks
 			_rule.Set(name, content);
 		}
 
-		/// <inheritdoc />
-		public override string ExpressionId => $"${RuleName}";
-
-		/// <inheritdoc />
+        /// <inheritdoc />
 		public override string ToRegularExpressionString(RegularExpressionBuildingContext ctx)
 		{
 			return ctx.Factory.CreateRecursiveGroupCall(ctx.Context, RuleName);

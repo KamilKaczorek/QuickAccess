@@ -43,36 +43,37 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using QuickAccess.Parser.Product;
 
 namespace QuickAccess.Parser
 {
     /// <summary>
     /// The expression node that represents the math function.
-    /// The parameters are defined by <see cref="ParsedExpressionNode.SubNodes"/>.
+    /// The parameters are defined by <see cref="ParsingProduct.SubNodes"/>.
     /// <seealso cref="MathExpressionParameterlessFunctionNode"/>
     /// </summary>
-    /// <seealso cref="ParsedExpressionNode" />
+    /// <seealso cref="ParsingProduct" />
     /// <seealso cref="IExecutableExpressionNode" />
-    public sealed class MathExpressionFunctionNode : ParsedExpressionNode, IExecutableExpressionNode
+    public sealed class MathExpressionFunctionNode : ParsingProduct, IExecutableExpressionNode
     {
         private readonly Func<object[], object> _function;
+
+        public override ParsingProductType ProductType => ParsingProductType.Expression;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MathExpressionFunctionNode"/> class.
         /// </summary>
-        /// <param name="expressionTypeId">The expression type identifier.</param>
+        /// <param name="expressionType"></param>
         /// <param name="functionNameFragment">The function name fragment.</param>
         /// <param name="subNodes">The sub nodes (parameters).</param>
         /// <param name="function">The delegate to calculate function value.</param>
-        /// <param name="valueTypeId">The value type identifier.</param>
         /// <exception cref="ArgumentException">null sub node</exception>
         public MathExpressionFunctionNode(
-            string expressionTypeId,
+            ExpressionTypeDescriptor expressionType,
             ISourceCodeFragment functionNameFragment,
-            IEnumerable<IParsedExpressionNode> subNodes,
-            Func<object[], object> function,
-            string valueTypeId = null)
-            : base(expressionTypeId, functionNameFragment, subNodes, valueTypeId)
+            IEnumerable<IParsingProduct> subNodes,
+            Func<object[], object> function)
+            : base(expressionType, functionNameFragment, subNodes)
         {
             _function = function;
 

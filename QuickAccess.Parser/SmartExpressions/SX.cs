@@ -35,6 +35,8 @@
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
 
+using QuickAccess.DataStructures.Common.Guards;
+using QuickAccess.Parser.Product;
 using QuickAccess.Parser.SmartExpressions.Bricks;
 
 namespace QuickAccess.Parser.SmartExpressions
@@ -46,8 +48,10 @@ namespace QuickAccess.Parser.SmartExpressions
 		public static SmartExpressionBrick Anything => DefaultAlgebra.Anything;
 		public static SmartExpressionBrick WhiteSpace => DefaultAlgebra.WhiteSpace;
 		public static SmartExpressionBrick OptionalWhiteSpace => DefaultAlgebra.OptionalWhiteSpace;
+		public static SmartExpressionBrick WhiteSpaceOrNewLine => DefaultAlgebra.WhiteSpaceOrNewLine;
+		public static SmartExpressionBrick OptionalWhiteSpaceOrNewLine => DefaultAlgebra.OptionalWhiteSpaceOrNewLine;
 		public static SmartExpressionBrick CustomSequence => DefaultAlgebra.CustomSequence;
-		public static SmartExpressionBrick NextLine => DefaultAlgebra.NextLine;
+		public static SmartExpressionBrick NewLine => DefaultAlgebra.NewLine;
 		public static SmartExpressionBrick Letter => DefaultAlgebra.Letter;
 		public static SmartExpressionBrick UpperLetter => DefaultAlgebra.UpperLetter;
 		public static SmartExpressionBrick LowerLetter => DefaultAlgebra.LowerLetter;
@@ -69,14 +73,26 @@ namespace QuickAccess.Parser.SmartExpressions
 
 		public static SmartExpressionBrick Optional(this string text) => ToTextSequence(text)[0, 1];
 
+
+        private static ExpressionTypeDescriptor CreateExpressionType(string ruleName, string valueTypeId = null)
+        {
+            if (string.IsNullOrEmpty(ruleName))
+            {
+				Guard.ArgNullOrEmpty(valueTypeId, nameof(valueTypeId));
+				return ExpressionTypeDescriptor.Undefined;
+            }
+
+            return ExpressionTypeDescriptor.CreateExpressionClass(ruleName, valueTypeId);
+        }
+
 		public static SmartExpressionBrick DefinesRule(this string text, string patternName)
 		{
-			return DefaultAlgebra.DefineRule(ToTextSequence(text), patternName);
+			return DefaultAlgebra.DefineRule(ToTextSequence(text), CreateExpressionType(patternName));
 		}
 
 		public static SmartExpressionBrick DefinesSealedRule(this string text, string patternName)
 		{
-			return DefaultAlgebra.DefineSealedRule(ToTextSequence(text), patternName);
+			return DefaultAlgebra.DefineSealedRule(ToTextSequence(text), CreateExpressionType(patternName));
 		}
 
 		public static SmartExpressionBrick ZeroOrMore(this SmartExpressionBrick source) => source[0, SX.Max];
@@ -85,15 +101,25 @@ namespace QuickAccess.Parser.SmartExpressions
 
 		public static SmartExpressionBrick Optional(this SmartExpressionBrick source) => source[0, 1];
 
-		public static SmartExpressionBrick DefinesRule(this SmartExpressionBrick source, string patternName)
+		public static SmartExpressionBrick DefinesRule(this SmartExpressionBrick source, string patternName, string valueTypeId = null)
 		{
-			return DefaultAlgebra.DefineRule(source, patternName);
+			return DefaultAlgebra.DefineRule(source, CreateExpressionType(patternName, valueTypeId));
 		}
 
-		public static SmartExpressionBrick DefinesSealedRule(this SmartExpressionBrick source, string patternName)
+		public static SmartExpressionBrick DefinesSealedRule(this SmartExpressionBrick source, string patternName, string valueTypeId = null)
 		{
-			return DefaultAlgebra.DefineSealedRule(source, patternName);
+			return DefaultAlgebra.DefineSealedRule(source, CreateExpressionType(patternName, valueTypeId));
 		}
+
+        public static SmartExpressionBrick DefinesRule(this SmartExpressionBrick source, ExpressionTypeDescriptor expressionType)
+        {
+            return DefaultAlgebra.DefineRule(source, expressionType);
+        }
+
+        public static SmartExpressionBrick DefinesSealedRule(this SmartExpressionBrick source, ExpressionTypeDescriptor expressionType)
+        {
+            return DefaultAlgebra.DefineSealedRule(source, expressionType);
+        }
 
 		public static SmartExpressionBrick Exact(this string text)
 		{

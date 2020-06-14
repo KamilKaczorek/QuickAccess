@@ -46,9 +46,9 @@ namespace QuickAccess.Parser
     public sealed class ParsingContextStreamFactory : IParsingContextStreamFactory
     {
         /// <inheritdoc />
-        public IParsingContextStream Create(IParsingContextStreamParent parent, int offset, int maxDeep)
+        public IParsingContextStream Create(IParsingContextStreamParent parent, IParsingProductFactory productFactory, int offset, int maxDeep)
         {
-            return new ParsingContextStream(parent, offset, maxDeep);
+            return new ParsingContextStream(parent, productFactory, offset, maxDeep);
         }
     }
 }

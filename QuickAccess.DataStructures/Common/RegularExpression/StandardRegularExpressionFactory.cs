@@ -42,26 +42,28 @@ using System.Text;
 
 namespace QuickAccess.DataStructures.Common.RegularExpression
 {
-	public class StandardRegularExpressionFactory : IRegularExpressionFactory
+    public class StandardRegularExpressionFactory : IRegularExpressionFactory
 	{
-		public string CharToRegex(IRegularExpressionFactoryContext ctx, char ch)
+        private readonly IDefineSpecialCharacters _specialCharactersDefinition;
+
+        public StandardRegularExpressionFactory(IDefineSpecialCharacters specialCharactersDefinition)
+        {
+            _specialCharactersDefinition = specialCharactersDefinition;
+        }
+
+        public string CharToRegex(char ch)
 		{
-			return ctx.IsSpecialCharacter(ch) ? $@"\{ch}" : ctx.IsTab(ch) ? @"\t" : ch.ToString();
+			return _specialCharactersDefinition.IsSpecialCharacter(ch) ? $@"\{ch}" : _specialCharactersDefinition.IsTab(ch) ? @"\t" : ch.ToString();
 		}
 
-		public string CharsToRegex(IRegularExpressionFactoryContext ctx, IEnumerable<char> chars)
+		public string StringToRegex(string text)
 		{
-			return string.Join(string.Empty, chars.Select(ch => CharToRegex(ctx, ch)));
-		}
-
-		public string StringToRegex(IRegularExpressionFactoryContext ctx, string text)
-		{
-			var specialCount = text.Count(ch => ctx.IsSpecialCharacter(ch) || ctx.IsTab(ch));
+			var specialCount = text.Count(ch => _specialCharactersDefinition.IsSpecialCharacter(ch) || _specialCharactersDefinition.IsTab(ch));
 			var sb = new StringBuilder(specialCount+text.Length);
 
 			foreach (var ch in text)
 			{
-				sb.Append(CharToRegex(ctx, ch));
+				sb.Append(CharToRegex(ch));
 			}
 
 			return sb.ToString();
@@ -215,7 +217,7 @@ namespace QuickAccess.DataStructures.Common.RegularExpression
 		/// <inheritdoc />
 		public string CreateCharSet(IRegularExpressionFactoryContext ctx, IEnumerable<char> characters)
 		{
-			return $"[{CharsToRegex(ctx, characters)}]";
+			return $"[{this.CharsToRegex(characters)}]";
 		}
 
 		/// <inheritdoc />
@@ -230,10 +232,10 @@ namespace QuickAccess.DataStructures.Common.RegularExpression
 
 			if (firstCharacter == lastCharacter)
 			{
-				return CharToRegex(ctx, firstCharacter);
+				return CharToRegex(firstCharacter);
 			}
 
-			return $"[{CharToRegex(ctx, firstCharacter)}-{CharToRegex(ctx, lastCharacter)}]";
+			return $"[{CharToRegex(firstCharacter)}-{CharToRegex(lastCharacter)}]";
 		}
 
 		/// <inheritdoc />

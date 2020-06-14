@@ -50,6 +50,7 @@ namespace QuickAccess.Parser
     public class StringSourceCode : ISourceCode,
         IParsingContextStreamParent
     {
+        private readonly IParsingProductFactory _productFactory;
         private readonly IParsingContextStreamFactory _contextStreamFactory;
         private readonly ISourceCodeFragmentFactory _sourceCodeFragmentFactory;
         private readonly string _codeBuffer;
@@ -70,6 +71,7 @@ namespace QuickAccess.Parser
         /// </summary>
         /// <param name="contextStreamFactory">The context stream factory.</param>
         /// <param name="sourceCodeFragmentFactory">The source code fragment factory.</param>
+        /// <param name="productFactory">The product factory.</param>
         /// <param name="sourceCodeBuffer">The buffer that contains the source code.</param>
         /// <param name="maxContextStackSize">
         /// Maximum size of the context stack - defines the maximum depth of the parented parsing context chain.
@@ -82,10 +84,11 @@ namespace QuickAccess.Parser
         /// The length of the source code - defines where the source code ends.
         /// By default is <c>-1</c> - the source code ends with a source string.
         /// </param>
-        public StringSourceCode(IParsingContextStreamFactory contextStreamFactory, ISourceCodeFragmentFactory sourceCodeFragmentFactory, string sourceCodeBuffer, int offset = 0, int length = -1, int maxContextStackSize = -1)
+        public StringSourceCode(IParsingContextStreamFactory contextStreamFactory, ISourceCodeFragmentFactory sourceCodeFragmentFactory, IParsingProductFactory productFactory, string sourceCodeBuffer, int offset = 0, int length = -1, int maxContextStackSize = -1)
         {
             _errorPos = -1;
             _codeBuffer = sourceCodeBuffer;
+            _productFactory = productFactory;
             _sourceCodeFragmentFactory = sourceCodeFragmentFactory;
             _contextStreamFactory = contextStreamFactory;
             _maxContextStackSize = maxContextStackSize;
@@ -129,7 +132,7 @@ namespace QuickAccess.Parser
         /// <inheritdoc />
         public IParsingContextStream GetFurtherContext()
         {
-            return _contextStreamFactory.Create(this, _bufferOffset, _maxContextStackSize);
+            return _contextStreamFactory.Create(this, _productFactory, _bufferOffset, _maxContextStackSize);
         }
 
 

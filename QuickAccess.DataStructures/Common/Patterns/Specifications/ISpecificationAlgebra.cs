@@ -39,7 +39,7 @@ using QuickAccess.DataStructures.CodeOperatorAlgebra;
 
 namespace QuickAccess.DataStructures.Common.Patterns.Specifications
 {
-	public interface ISpecificationAlgebra<T> : ICodeOperatorSymmetricAlgebra<Specification<T>>
+	public interface ISpecificationAlgebra<T> : IDefineCodeOperatorSymmetricAlgebra<Specification<T>>
 	{
 		Specification<T> GetNegation(ISpecification<T> arg);
 		ISpecificationAlgebra<TDest> OfCandidate<TDest>();

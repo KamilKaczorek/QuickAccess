@@ -36,11 +36,14 @@
 #endregion
 namespace QuickAccess.DataStructures.Common.RegularExpression
 {
-	public struct RegularExpressionBuildingContext
+	public class RegularExpressionBuildingContext
 	{
+		public static readonly IDefineSpecialCharacters RegexSpecialCharactersDefinition = new StandardRegexSpecialCharactersDefinition();
+		public static readonly IRegularExpressionFactory StandardFactory = new StandardRegularExpressionFactory(RegexSpecialCharactersDefinition);
+
 		public static RegularExpressionBuildingContext CreateStandard()
 		{
-			return new RegularExpressionBuildingContext(new StandardRegularExpressionFactory(), new StandardRegularExpressionFactoryContext());
+			return new RegularExpressionBuildingContext(StandardFactory, new StandardRegularExpressionFactoryContext(RegexSpecialCharactersDefinition));
 		}
 
 		public RegularExpressionBuildingContext(IRegularExpressionFactory factory, IRegularExpressionFactoryContext context)

@@ -38,6 +38,7 @@
 #endregion
 
 using System;
+using QuickAccess.Parser.Product;
 
 namespace QuickAccess.Parser
 {
@@ -71,7 +72,7 @@ namespace QuickAccess.Parser
         /// <param name="expression">The expression.</param>
         /// <exception cref="InvalidOperationException">
         /// Thrown when last item is an expression.</exception>
-        void Add(IParsedExpressionNode expression);
+        void Add(IParsingProduct expression);
 
         /// <summary>
         /// Adds the specified binary operator to the chain.
@@ -91,8 +92,8 @@ namespace QuickAccess.Parser
         /// </summary>
         /// <param name="createOperatorNode">The callback to create operator node for specified operator and two arguments (expressions)</param>
         /// <returns>The created expression tree node.</returns>
-        IParsedExpressionNode EvaluateExpressionTree(
-            Func<ISourceCodeFragment, IBinaryOperatorTermDefinition, IParsedExpressionNode, IParsedExpressionNode,
-                IParsedExpressionNode> createOperatorNode);
+        IParsingProduct EvaluateExpressionTree(
+            Func<ISourceCodeFragment, IBinaryOperatorTermDefinition, IParsingProduct, IParsingProduct,
+                IParsingProduct> createOperatorNode);
     }
 }

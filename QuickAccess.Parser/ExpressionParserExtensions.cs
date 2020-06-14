@@ -39,66 +39,62 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using QuickAccess.DataStructures.Common.Collections;
+using QuickAccess.Parser.Product;
+using QuickAccess.Parser.SmartExpressions;
 
 namespace QuickAccess.Parser
 {
 	public static class ExpressionParserExtensions
 	{
-		public static CompositeNode TryAggregateParse(this IEnumerable<IExpressionParser> source,
-		                                              ISourceCode src, string expressionTypeId, string valueTypeId = null)
+		public static IParsingProduct TryAggregateParse(this IEnumerable<IExpressionParser> source, ISourceCode src)
 		{
 			if (source is IReadOnlyCollection<IExpressionParser> collection)
 			{
-				return TryAggregateParse(collection, src, expressionTypeId, valueTypeId);
+				return TryAggregateParse(collection, src);
 			}
 
-			List<IParsedExpressionNode> nodes = null;
-			using (var ctx = src.GetFurtherContext())
-			{
-				foreach (var parser in source)
-				{
-					var res = parser.TryParse(src);
+			List<IParsingProduct> nodes = null;
+            using var ctx = src.GetFurtherContext();
+            foreach (var parser in source)
+            {
+                var res = parser.TryParse(src);
 
-					if (res == null)
-					{
-						return null;
-					}
+                if (res == null)
+                {
+                    return null;
+                }
 
-					nodes = nodes ?? new List<IParsedExpressionNode>();
-					nodes.Add(res);
-				}
+                nodes ??= new List<IParsingProduct>();
+                nodes.Add(res);
+            }
 
-				ctx.Accept();
-				return new CompositeNode(ctx.GetAcceptedFragment(), nodes, expressionTypeId, valueTypeId);
-			}
-		}
+            ctx.Accept();
+            return ctx.CreateExpressionForAcceptedFragment(SmartExpression.ExpressionTypes.Concatenation, nodes);
+        }
 
-		public static CompositeNode TryAggregateParse(this IReadOnlyCollection<IExpressionParser> parsers,
-		                                              ISourceCode src, string expressionTypeId, string valueTypeId = null)
-		{
-			using (var ctx = src.GetFurtherContext())
-			{
-				var nodes = new IParsedExpressionNode[parsers.Count];
-				var idx = 0;
-				foreach (var parser in parsers)
-				{
-					var res = parser.TryParse(ctx);
+		public static IParsingProduct TryAggregateParse(this IReadOnlyCollection<IExpressionParser> parsers, ISourceCode src)
+        {
+            using var ctx = src.GetFurtherContext();
+            var nodes = new IParsingProduct[parsers.Count];
+            var idx = 0;
+            foreach (var parser in parsers)
+            {
+                var res = parser.TryParse(ctx);
 
-					if (res == null)
-					{
-						return null;
-					}
+                if (res == null)
+                {
+                    return null;
+                }
 
-					nodes[idx] = res;
-					idx++;
-				}
+                nodes[idx] = res;
+                idx++;
+            }
 
-				ctx.Accept();
-				return new CompositeNode(ctx.GetAcceptedFragment(), nodes, expressionTypeId, valueTypeId);
-			}
-		}
+            ctx.Accept();
+            return ctx.CreateExpressionForAcceptedFragment(SmartExpression.ExpressionTypes.Concatenation, nodes);
+        }
 
-		public static IParsedExpressionNode TryAlternativeParse(
+		public static IParsingProduct TryAlternativeParse(
 			this IEnumerable<IExpressionParser> parsers,
 			ISourceCode src,
 			ParsingAlternationType parsingAlternationType = ParsingAlternationType.TakeFirst)
@@ -118,7 +114,7 @@ namespace QuickAccess.Parser
 			var replaceCmp = shortest ? -1 : 1;
 
 			IParsingContextStream selectedCtx = null;
-			IParsedExpressionNode result = null;
+			IParsingProduct result = null;
 		    
 			foreach (var parser in parsers)
 			{

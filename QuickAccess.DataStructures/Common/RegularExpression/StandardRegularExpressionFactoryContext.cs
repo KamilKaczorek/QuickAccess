@@ -41,31 +41,20 @@ using System.Text;
 
 namespace QuickAccess.DataStructures.Common.RegularExpression
 {
-	public class StandardRegularExpressionFactoryContext : IRegularExpressionFactoryContext
-	{
-		private static readonly HashSet<char> SpecialRegexCharacters = new HashSet<char>{'\\','^','$','.','|','?','*','+','(',')','{','}'};
-
+    public class StandardRegularExpressionFactoryContext : IRegularExpressionFactoryContext
+    {
+        private readonly IDefineSpecialCharacters _specialCharactersDefinition;
 		private readonly Dictionary<string, int> _usedGroupNamesCounters = new Dictionary<string, int>();
 		private readonly Dictionary<string, string> _regexGroupNameToOriginalGroupName = new Dictionary<string, string>();
 
-		public string GetOriginalGroupName(string regexGroupName)
+        public StandardRegularExpressionFactoryContext(IDefineSpecialCharacters specialCharactersDefinition)
+        {
+            _specialCharactersDefinition = specialCharactersDefinition;
+        }
+
+        public string GetOriginalGroupName(string regexGroupName)
 		{
 			return _regexGroupNameToOriginalGroupName.TryGetValue(regexGroupName, out var original) ? original : regexGroupName;
-		}
-		
-		public bool IsSpecialCharacter(char ch)
-		{
-			return SpecialRegexCharacters.Contains(ch);
-		}
-
-		public bool IsTab(char ch)
-		{
-			return ch == '\t';
-		}
-
-		public bool IsWhiteSpaceCharacter(char ch)
-		{
-			return char.IsWhiteSpace(ch);
 		}
 
 		/// <inheritdoc />
@@ -103,7 +92,7 @@ namespace QuickAccess.DataStructures.Common.RegularExpression
 
 		internal string RemoveSpecialCharactersAndReplacesSpacesByUnderscore(string text)
 		{
-			var specialCount = text.Count(IsSpecialCharacter);
+			var specialCount = text.Count(_specialCharactersDefinition.IsSpecialCharacter);
 
 			if (specialCount == 0)
 			{
@@ -118,7 +107,7 @@ namespace QuickAccess.DataStructures.Common.RegularExpression
 			var sb = new StringBuilder(text.Length-specialCount);
 
 			var isPrevWhiteSpace = true;
-			foreach (var ch in text.Where(ch => !IsSpecialCharacter(ch)))
+			foreach (var ch in text.Where(ch => !_specialCharactersDefinition.IsSpecialCharacter(ch)))
 			{
 				var isWhiteSpace = char.IsWhiteSpace(ch);
 

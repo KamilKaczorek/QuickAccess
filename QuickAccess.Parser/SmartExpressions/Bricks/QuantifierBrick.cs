@@ -37,9 +37,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.Security.Cryptography;
-using QuickAccess.DataStructures.CodeOperatorAlgebra;
+using QuickAccess.DataStructures.Common.Guards;
 using QuickAccess.DataStructures.Common.RegularExpression;
+using QuickAccess.Parser.Product;
 
 namespace QuickAccess.Parser.SmartExpressions.Bricks
 {
@@ -82,7 +82,7 @@ namespace QuickAccess.Parser.SmartExpressions.Bricks
 		}
 
 		/// <inheritdoc />
-		public override string ExpressionId => $"${Content.ExpressionId}${{{Min}${Max}}}$";
+		//public override string ExpressionId => $"${Content.ExpressionId}${{{Min}${Max}}}$";
 
 		public override string ToRegularExpressionString(RegularExpressionBuildingContext ctx)
 		{
@@ -92,7 +92,7 @@ namespace QuickAccess.Parser.SmartExpressions.Bricks
 		/// <inheritdoc />
 		public override bool Equals(SmartExpressionBrick other)
 		{
-			if (ReferenceEquals(null, other))
+			if (other is null)
 			{
 				return false;
 			}
@@ -106,7 +106,7 @@ namespace QuickAccess.Parser.SmartExpressions.Bricks
 		}
 
 		/// <inheritdoc />
-		protected override IParsedExpressionNode TryParseInternal(IParsingContextStream ctx)
+		protected override IParsingProduct TryParseInternal(IParsingContextStream ctx)
 		{
 			if (Min == 1 && Max == 1)
 			{
@@ -118,7 +118,7 @@ namespace QuickAccess.Parser.SmartExpressions.Bricks
 				return Content.TryParse(ctx) ?? new EmptyNode(ctx);
 			}
 
-			List<IParsedExpressionNode> nodes = null;
+			List<IParsingProduct> nodes = null;
 
 			
 			for (var idx = 0; idx <= Max; idx++)
@@ -128,17 +128,17 @@ namespace QuickAccess.Parser.SmartExpressions.Bricks
 				if (res == null)
 				{
 					if (idx >= Min)
-					{
-						var fragment = ctx.AcceptAndGetFragment();
+                    {
+                        ctx.Accept();
 						return nodes != null
-							? (IParsedExpressionNode)new CompositeNode(fragment, nodes, SmartExpression.ExpressionType.Composition, null)
+							? ctx.CreateExpressionForAcceptedFragment(SmartExpression.ExpressionTypes.Concatenation, nodes)
 							: new EmptyNode(ctx);
 					}
 					
 					return null;
 				}
 
-				nodes = nodes ?? new List<IParsedExpressionNode>((int)Math.Min(Math.Max(Min, 16), Max));
+				nodes ??= new List<IParsingProduct>((int)Math.Min(Math.Max(Min, 16), Max));
 
 				if (!EmptyNode.IsEmptyNode(res))
 				{
@@ -146,8 +146,9 @@ namespace QuickAccess.Parser.SmartExpressions.Bricks
 				}
 			}
 
-			throw new InvalidOperationException();
-		}
+			Guard.CodeNeverReached();
+            return null;
+        }
 
 		/// <inheritdoc />
 		public override string ToString()

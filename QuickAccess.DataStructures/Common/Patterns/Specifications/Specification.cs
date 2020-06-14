@@ -63,7 +63,7 @@ namespace QuickAccess.DataStructures.Common.Patterns.Specifications
 		}
 	}
 
-	public abstract class Specification<T> : ISpecification<T>, IEquatable<Specification<T>>, ICodeOperatorAlgebraicDomain<Specification<T>, ISpecificationAlgebra<T>>
+	public abstract class Specification<T> : ISpecification<T>, IEquatable<Specification<T>>, IDefineAlgebraicDomain<Specification<T>, ISpecificationAlgebra<T>>
 	{
 		/// <inheritdoc />
 		public abstract bool IsSatisfiedBy(T candidate);

@@ -1,27 +1,27 @@
 ﻿using System.Collections.Generic;
+using QuickAccess.Parser.Product;
 
 namespace QuickAccess.Parser
 {
-    public abstract class TerminalExpressionNode : IParsedExpressionNode
+    public abstract class TerminalExpressionNode : IParsingProduct
     {
-        public string ExpressionTypeId { get; }
-        public string ValueTypeId { get; }
         public ISourceCodeFragment Fragment { get; }
-        public IReadOnlyList<IParsedExpressionNode> SubNodes => EmptySubNodes.Instance;
+        public IReadOnlyList<IParsingProduct> SubNodes => EmptySubNodes.Instance;
 
         protected TerminalExpressionNode(
-            string expressionTypeId,
-            ISourceCodeFragment fragment,
-            string valueTypeId = null)
+            ExpressionTypeDescriptor expressionType,
+            ISourceCodeFragment fragment)
         {
-            ExpressionTypeId = expressionTypeId;
             Fragment = fragment;
-            ValueTypeId = valueTypeId;
+            ExpressionType = expressionType;
         }
 
         public override string ToString()
         {
             return Fragment.ToString();
         }
+
+        public ParsingProductType ProductType => ParsingProductType.Term;
+        public ExpressionTypeDescriptor ExpressionType { get; }
     }
 }

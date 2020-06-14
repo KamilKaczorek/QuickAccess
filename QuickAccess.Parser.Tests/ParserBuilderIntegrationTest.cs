@@ -35,9 +35,6 @@
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
 
-using System;
-using System.CodeDom;
-using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -102,7 +99,7 @@ namespace QuickAccess.Parser.Tests
 
 			Assert.AreEqual(expressionParsed, res);
 
-			var source = new StringSourceCode(new ParsingContextStreamFactory(), new SourceCodeFragmentFactory(), expression);
+			var source = new StringSourceCode(new ParsingContextStreamFactory(), new SourceCodeFragmentFactory(), new ProductFactory(), expression);
 
 			var rootNode = functionInvocation.TryParse(source.GetFurtherContext());
 
@@ -117,11 +114,11 @@ namespace QuickAccess.Parser.Tests
 
 
 
-			// * anything
-			// + nothing
-			// - positive lookahead			
-			// ^ white space
-			// 
+			// * anything in between 
+			// + nothing in between
+			// & optional white space in between	
+			// ^ white space in between
+            // - positive lookahead	
 			// Parsing
 			// Syntactic validation
 			// Tree build

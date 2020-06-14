@@ -41,13 +41,14 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using QuickAccess.Parser.Product;
 
 namespace QuickAccess.Parser
 {
     /// <summary>
     /// The expression node that represents the parameterless math function.
     /// </summary>
-    /// <seealso cref="ParsedExpressionNode" />
+    /// <seealso cref="ParsingProduct" />
     /// <seealso cref="IExecutableExpressionNode" />
     public sealed class MathExpressionParameterlessFunctionNode : TerminalExpressionNode, IExecutableExpressionNode
     {
@@ -65,7 +66,7 @@ namespace QuickAccess.Parser
             ISourceCodeFragment functionNameFragment,
             Func<object> function,
             string valueTypeId = null)
-            : base(expressionTypeId, functionNameFragment, valueTypeId)
+            : base(ExpressionTypeDescriptor.CreateExpressionClass(expressionTypeId, valueTypeId), functionNameFragment)
         {
             _function = function;            
         }

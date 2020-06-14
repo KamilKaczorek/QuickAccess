@@ -60,6 +60,18 @@ namespace QuickAccess.DataStructures.CodeOperatorAlgebra
 
 		public const OverloadableCodeOperators AllOperators = Unary | Binary;
 
+        [Pure]
+        public static string GetSymbol(this OverloadableCodeBinarySymmetricOperator source)
+        {
+            return source.ToCodeOperator().GetSymbol();
+        }
+
+        [Pure]
+        public static string GetSymbol(this OverloadableCodeUnarySymmetricOperator source)
+        {
+            return source.ToCodeOperator().GetSymbol();
+        }
+
 		[Pure]
 		public static string ToCodeRepresentation(this OverloadableCodeBinarySymmetricOperator source, string arg = null, string right = null)
 		{
@@ -75,61 +87,80 @@ namespace QuickAccess.DataStructures.CodeOperatorAlgebra
 		[Pure]
 		public static string ToCodeRepresentation(this OverloadableCodeOperator source, string arg = null, string right = null, string spaceBetweenBinOperatorAndArgument = null)
 		{
-			var s = spaceBetweenBinOperatorAndArgument;
-			switch (source)
-			{
-				case OverloadableCodeOperator.Increment:
-					return $"{arg}++";
-				case OverloadableCodeOperator.Decrement:
-					return $"{arg}--";
-				case OverloadableCodeOperator.Plus:
-					return $"+{arg}";
-				case OverloadableCodeOperator.Minus:
-					return $"-{arg}";
-				case OverloadableCodeOperator.LogicalNegation:
-					return $"!{arg}";
-				case OverloadableCodeOperator.BitwiseComplement:
-					return $"~{arg}";
-				case OverloadableCodeOperator.TrueOperator:
-					return "true";
-				case OverloadableCodeOperator.FalseOperator:
-					return "false";
-				case OverloadableCodeOperator.Mul:
-					return $"{arg}{s}*{s}{right}";
-				case OverloadableCodeOperator.Div:
-					return $"{arg}{s}/{s}{right}";
-				case OverloadableCodeOperator.Mod:
-					return $"{arg}{s}%{s}{right}";
-				case OverloadableCodeOperator.Sum:
-					return $"{arg}{s}+{s}{right}";
-				case OverloadableCodeOperator.Sub:
-					return $"{arg}{s}-{s}{right}";
-				case OverloadableCodeOperator.LeftShift:
-					return $"{arg}{s}<<{s}{right}";
-				case OverloadableCodeOperator.RightShift:
-					return $"{arg}{s}>>{s}{right}";
-				case OverloadableCodeOperator.LessThan:
-					return $"{arg}{s}<{s}{right}";
-				case OverloadableCodeOperator.LessThanOrEqual:
-					return $"{arg}{s}<={s}{right}";
-				case OverloadableCodeOperator.GreaterThan:
-					return $"{arg}{s}>{s}{right}";
-				case OverloadableCodeOperator.GreaterThanOrEqual:
-					return $"{arg}{s}>={s}{right}";
-				case OverloadableCodeOperator.Equal:
-					return $"{arg}{s}=={s}{right}";
-				case OverloadableCodeOperator.Unequal:
-					return $"{arg}{s}!={s}{right}";
-				case OverloadableCodeOperator.And:
-					return $"{arg}{s}&{s}{right}";
-				case OverloadableCodeOperator.XOr:
-					return $"{arg}{s}^{s}{right}";
-				case OverloadableCodeOperator.Or:
-					return $"{arg}{s}|{s}{right}";
-				default:
-					throw new ArgumentOutOfRangeException(nameof(source), source, null);
-			}
-		}
+            var symbol = source.GetSymbol();
+            var argsCount = source.GetNumberOfArguments();
+
+            if (argsCount == 0)
+            {
+                return symbol;
+            }
+
+            if (argsCount == 1)
+            {
+                var isPost = (source == OverloadableCodeOperator.Increment ||
+                              source == OverloadableCodeOperator.Decrement);
+                return isPost ? $"{arg}{symbol}" : $"{symbol}{arg}";
+            }
+
+            return
+                $"{arg}{spaceBetweenBinOperatorAndArgument}{source.GetSymbol()}{spaceBetweenBinOperatorAndArgument}{right}";
+        }
+
+		[Pure]
+		public static int GetNumberOfArguments(this OverloadableCodeOperator source)
+		{
+            if (source == OverloadableCodeOperator.TrueOperator || source == OverloadableCodeOperator.FalseOperator)
+            {
+                return 0;
+            }
+
+            if (source.IsOneOf(Unary))
+            {
+                return 1;
+            }
+
+            if (source.IsOneOf(Binary))
+            {
+                return 2;
+            }
+
+            throw new ArgumentOutOfRangeException(nameof(source), source, null);
+        }
+
+		[Pure]
+		public static string GetSymbol(this OverloadableCodeOperator source)
+		{
+            var res = source switch
+            {
+                OverloadableCodeOperator.Increment => "++",
+                OverloadableCodeOperator.Decrement => "--",
+                OverloadableCodeOperator.Plus => "+",
+                OverloadableCodeOperator.Minus => "-",
+                OverloadableCodeOperator.LogicalNegation => "!",
+                OverloadableCodeOperator.BitwiseComplement => "~",
+                OverloadableCodeOperator.TrueOperator => "true",
+                OverloadableCodeOperator.FalseOperator => "false",
+                OverloadableCodeOperator.Mul => "*",
+                OverloadableCodeOperator.Div => "/",
+                OverloadableCodeOperator.Mod => "%",
+                OverloadableCodeOperator.Sum => "+",
+                OverloadableCodeOperator.Sub => "-",
+                OverloadableCodeOperator.LeftShift => "<<",
+                OverloadableCodeOperator.RightShift => ">>",
+                OverloadableCodeOperator.LessThan => "<",
+                OverloadableCodeOperator.LessThanOrEqual => "<=",
+                OverloadableCodeOperator.GreaterThan => ">",
+                OverloadableCodeOperator.GreaterThanOrEqual => ">=",
+                OverloadableCodeOperator.Equal => "==",
+                OverloadableCodeOperator.Unequal => "!=",
+                OverloadableCodeOperator.And => "&",
+                OverloadableCodeOperator.XOr => "^",
+                OverloadableCodeOperator.Or => "|",
+                _ => throw new ArgumentOutOfRangeException(nameof(source), source, null),
+            };
+
+            return res;
+        }
 
 		[Pure]
 		public static bool IsOneOf(this OverloadableCodeOperator source, OverloadableCodeOperators flags)

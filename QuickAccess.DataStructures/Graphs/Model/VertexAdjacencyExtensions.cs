@@ -55,7 +55,7 @@ namespace QuickAccess.DataStructures.Graphs.Model
 		/// <typeparam name="TEdgeData">The type of the edge data.</typeparam>
 		/// <param name="source">The source.</param>
 		/// <returns><c>true</c> if the edge data is of <see cref="EmptyValue"/>; otherwise, <c>false</c>.</returns>
-		public static bool HasEmptyEdgeData<TEdgeData>(this VertexAdjacency<TEdgeData> source)
+		public static bool HasEmptyEdgeData<TEdgeData>(this VertexAdjacency<TEdgeData> _)
 		{
 			return EmptyValue.IsEmptyValueType<TEdgeData>();
 		}
@@ -96,7 +96,8 @@ namespace QuickAccess.DataStructures.Graphs.Model
 				return source.AdjacentIndexes.All(other.ContainsEdgeToIndex);
 			}
 
-			edgeDataComparer = edgeDataComparer ?? EqualityComparer<TEdgeData>.Default;
+			edgeDataComparer ??= EqualityComparer<TEdgeData>.Default;
+
 			foreach (var edgeTo in source)
 			{
 				if (!other.TryGetEdgeToIndex(edgeTo.Destination, out var edgeData) || !edgeDataComparer.Equals(edgeData, edgeTo.Data))

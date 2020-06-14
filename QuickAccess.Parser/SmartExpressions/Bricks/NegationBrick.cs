@@ -36,6 +36,7 @@
 #endregion
 
 using QuickAccess.DataStructures.Common.RegularExpression;
+using QuickAccess.Parser.Product;
 
 namespace QuickAccess.Parser.SmartExpressions.Bricks
 {
@@ -56,10 +57,7 @@ namespace QuickAccess.Parser.SmartExpressions.Bricks
 			ApplyRuleDefinition(Content, name, content, recursion, freeze);
 		}
 
-		/// <inheritdoc />
-		public override string ExpressionId => $"$!{Content.ExpressionId}";
-
-		/// <inheritdoc />
+        /// <inheritdoc />
 		public override bool Equals(SmartExpressionBrick other)
 		{
 			return other is NegationBrick nb && nb.Content.Equals(Content);
@@ -75,11 +73,16 @@ namespace QuickAccess.Parser.SmartExpressions.Bricks
 			return ctx.Factory.CreateNot(ctx.Context, Content.ToRegularExpressionString(ctx));
 		}
 
-		protected override IParsedExpressionNode TryParseInternal(IParsingContextStream ctx)
+		protected override IParsingProduct TryParseInternal(IParsingContextStream ctx)
 		{
 			var res = Content.TryParse(ctx);
 
 			return res != null ? null : new EmptyNode(ctx);
 		}
-	}
+
+        public override string ToString()
+        {
+            return $"!({Content})";
+        }
+    }
 }

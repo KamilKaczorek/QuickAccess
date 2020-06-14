@@ -61,7 +61,7 @@ namespace QuickAccess.DataStructures.Common.Patterns.Specifications
 		                              CompositeSpecificationOperation operation,
 		                              params ISpecification<T>[] arguments
 		)
-			: base(algebra.GetHighestPrioritizedAlgebra<Specification<T>, ISpecificationAlgebra<T>>(arguments.OfType<ICodeOperatorAlgebraicDomain<Specification<T>, ISpecificationAlgebra<T>>>().Select(a => a.Algebra)), null)
+			: base(algebra.GetHighestPrioritizedAlgebra<Specification<T>, ISpecificationAlgebra<T>>(arguments.OfType<IDefineAlgebraicDomain<Specification<T>, ISpecificationAlgebra<T>>>().Select(a => a.Algebra)), null)
 		{
 			Operation = operation;
 			_arguments = GetFlatArgumentsArray(operation, arguments);
@@ -191,7 +191,7 @@ namespace QuickAccess.DataStructures.Common.Patterns.Specifications
 		{
 			var isCodeOperator = Operation.CanBeRepresentedByCodeOperator();
 			var args = _arguments.Select(arg => arg.ToString());
-			var separator = isCodeOperator ? Operation.ToCodeSymmetricBinaryOperator().ToCodeRepresentation() : ", ";
+			var separator = isCodeOperator ? Operation.ToCodeSymmetricBinaryOperator().GetSymbol() : ", ";
 			var operation = isCodeOperator ? string.Empty : Operation.ToString();
 			
 			return $"{operation}({string.Join(separator, args)})";

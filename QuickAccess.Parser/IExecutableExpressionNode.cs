@@ -39,6 +39,7 @@
 
 using System.Threading;
 using System.Threading.Tasks;
+using QuickAccess.Parser.Product;
 
 namespace QuickAccess.Parser
 {
@@ -46,8 +47,8 @@ namespace QuickAccess.Parser
     /// The interface of the executable expression node (executable grammar production).
     /// The instance is provided by the <see cref="ICompiler"/>.
     /// </summary>
-    /// <seealso cref="IParsedExpressionNode" />
-    public interface IExecutableExpressionNode : IParsedExpressionNode
+    /// <seealso cref="IParsingProduct" />
+    public interface IExecutableExpressionNode : IParsingProduct
     {
         /// <summary>
         /// Executes synchronously the compiled code.

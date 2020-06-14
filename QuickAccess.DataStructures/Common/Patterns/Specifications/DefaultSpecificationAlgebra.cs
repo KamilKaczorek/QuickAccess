@@ -75,27 +75,30 @@ namespace QuickAccess.DataStructures.Common.Patterns.Specifications
 
 		/// <inheritdoc />
 		public string GetBinaryOperatorDescription(OverloadableCodeBinarySymmetricOperator binaryOperator)
-		{
-			switch (binaryOperator)
-			{
-				case OverloadableCodeBinarySymmetricOperator.And : return $"Creates composite specification where the overall result is a disjunction of results of aggregated specifications.";
-				case OverloadableCodeBinarySymmetricOperator.Or : return  $"Creates composite specification where the overall result is a conjunction of results of aggregated specifications.";
-				case OverloadableCodeBinarySymmetricOperator.XOr : return  $"Creates composite specification where the overall result is a exclusive OR of results of aggregated specifications.";
-				default:throw new NotSupportedException($"Operator {binaryOperator} is not supported.");
-			}
-		}
+        {
+            var res = binaryOperator switch
+            {
+                OverloadableCodeBinarySymmetricOperator.And =>
+                $"Creates composite specification where the overall result is a disjunction of results of aggregated specifications.",
+                OverloadableCodeBinarySymmetricOperator.Or =>
+                $"Creates composite specification where the overall result is a conjunction of results of aggregated specifications.",
+                OverloadableCodeBinarySymmetricOperator.XOr =>
+                $"Creates composite specification where the overall result is a exclusive OR of results of aggregated specifications.",
+                _ => throw new NotSupportedException($"Operator {binaryOperator} is not supported.")
+            };
+
+            return res;
+        }
 
 		/// <inheritdoc />
 		public string GetUnaryOperatorDescription(OverloadableCodeUnarySymmetricOperator unaryOperator)
 		{
-			switch (unaryOperator)
-			{
-				case OverloadableCodeUnarySymmetricOperator.LogicalNegation :
-					return
-						"Creates specification where the specification result will be negation of a result of aggregated specification.";
-				default:throw new NotSupportedException($"Operator {unaryOperator} is not supported.");
-			}
-		}
+            return unaryOperator switch
+            {
+                OverloadableCodeUnarySymmetricOperator.LogicalNegation => "Creates specification where the specification result will be negation of a result of aggregated specification.",
+                _ => throw new NotSupportedException($"Operator {unaryOperator} is not supported."),
+            };
+        }
 
 		/// <inheritdoc />
 		public bool TryEvaluateOperatorResult(object left,
@@ -137,13 +140,12 @@ namespace QuickAccess.DataStructures.Common.Patterns.Specifications
 		/// <inheritdoc />
 		public Specification<T> EvaluateOperatorResult(OverloadableCodeUnarySymmetricOperator unaryOperator, Specification<T> arg)
 		{
-			switch (unaryOperator)
-			{
-				case OverloadableCodeUnarySymmetricOperator.LogicalNegation :
-					return GetNegation(arg);
-				default:throw new NotSupportedException($"Operator {unaryOperator} is not supported.");
-			}
-		}
+            return unaryOperator switch
+            {
+                OverloadableCodeUnarySymmetricOperator.LogicalNegation => GetNegation(arg),
+                _ => throw new NotSupportedException($"Operator {unaryOperator} is not supported."),
+            };
+        }
 
 		/// <inheritdoc />
 		public Specification<T> GetNegation(ISpecification<T> arg)

@@ -37,6 +37,7 @@
 
 using System.Collections.Generic;
 using QuickAccess.DataStructures.Common.RegularExpression;
+using QuickAccess.Parser.Product;
 
 namespace QuickAccess.Parser.SmartExpressions.Bricks
 {
@@ -54,10 +55,7 @@ namespace QuickAccess.Parser.SmartExpressions.Bricks
 		{
 		}
 
-		/// <inheritdoc />
-		public override string ExpressionId => "$";
-
-		/// <inheritdoc />
+        /// <inheritdoc />
 		public override string ToRegularExpressionString(RegularExpressionBuildingContext ctx)
 		{
 			return string.Empty;
@@ -66,21 +64,21 @@ namespace QuickAccess.Parser.SmartExpressions.Bricks
 		/// <inheritdoc />
 		public override bool Equals(SmartExpressionBrick other)
 		{
+            if (other is null)
+            {
+                return false;
+            }
+
 			if (ReferenceEquals(other, this))
 			{
 				return true;
-			}
-
-			if (ReferenceEquals(other, null))
-			{
-				return false;
 			}
 
 			return other.Equals(this);
 		}
 
 		/// <inheritdoc />
-		protected override IParsedExpressionNode TryParseInternal(IParsingContextStream ctx)
+		protected override IParsingProduct TryParseInternal(IParsingContextStream ctx)
 		{
 			return new EmptyNode(ctx);
 		}
