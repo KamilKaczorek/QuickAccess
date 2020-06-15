@@ -41,41 +41,41 @@ using QuickAccess.DataStructures.CodeOperatorAlgebra;
 using QuickAccess.DataStructures.Common.RegularExpression;
 using QuickAccess.Parser.Product;
 
-namespace QuickAccess.Parser.SmartExpressions
+namespace QuickAccess.Parser.Flexpressions.Bricks
 {
-    public abstract class SmartExpressionBrick
+    public abstract class FlexpressionBrick
 		:  IExpressionParser, 
             IRegularExpressionRepresentable, 
-            IDefineAlgebraicDomain<SmartExpressionBrick, ISmartExpressionAlgebra>, 
-            IEquatable<SmartExpressionBrick>
+            IDefineAlgebraicDomain<FlexpressionBrick, IFlexpressionAlgebra>, 
+            IEquatable<FlexpressionBrick>
     {
         private static int _idCounter = 0;
         public const string AnonymousNamePrefix = "Anonym";
 
-		protected SmartExpressionBrick(ISmartExpressionAlgebra algebra)
+		protected FlexpressionBrick(IFlexpressionAlgebra algebra)
         {
             Id = Interlocked.Increment(ref _idCounter);
 
-			Algebra = algebra ?? SX.DefaultAlgebra;
+			Algebra = algebra ?? FX.DefaultAlgebra;
 		}
 
 		public int Id { get; }
 		public virtual string Name => $"{AnonymousNamePrefix}{Id}";
 
 		/// <inheritdoc />
-		public ISmartExpressionAlgebra Algebra { get; }
+		public IFlexpressionAlgebra Algebra { get; }
 
-		public SmartExpressionBrick this[long minCount, long maxCount] =>
+		public FlexpressionBrick this[long minCount, long maxCount] =>
 			Algebra.CreateQuantifierBrick(this, minCount, maxCount);
 
-		public SmartExpressionBrick this[long count] => Algebra.CreateQuantifierBrick(this, count, count);
+		public FlexpressionBrick this[long count] => Algebra.CreateQuantifierBrick(this, count, count);
 
         /// <inheritdoc />
         public virtual MatchingLevel RegularExpressionMatchingLevel => MatchingLevel.None;
 
 		public virtual bool IsEmpty => false;
 
-        protected abstract void ApplyRuleDefinition(string name, SmartExpressionBrick content, bool recursion, bool freeze);
+        protected abstract void ApplyRuleDefinition(string name, FlexpressionBrick content, bool recursion, bool freeze);
 
         /// <summary>Tries the parse internal.</summary>
         /// <param name="parsingContext">The source.</param>
@@ -83,86 +83,86 @@ namespace QuickAccess.Parser.SmartExpressions
         protected abstract IParsingProduct TryParseInternal(IParsingContextStream parsingContext);
 
         /// <inheritdoc />
-        public abstract bool Equals(SmartExpressionBrick other);
+        public abstract bool Equals(FlexpressionBrick other);
 
-        public static SmartExpressionBrick operator *(SmartExpressionBrick left, SmartExpressionBrick right)
+        public static FlexpressionBrick operator *(FlexpressionBrick left, FlexpressionBrick right)
 		{
-			return SX.DefaultAlgebra.GetOperatorResultOfHighestPrioritizedAlgebra(left, OverloadableCodeBinarySymmetricOperator.Mul, right);
+			return FX.DefaultAlgebra.GetOperatorResultOfHighestPrioritizedAlgebra(left, OverloadableCodeBinarySymmetricOperator.Mul, right);
 		}
 
-		public static SmartExpressionBrick operator /(SmartExpressionBrick left, SmartExpressionBrick right)
+		public static FlexpressionBrick operator /(FlexpressionBrick left, FlexpressionBrick right)
 		{
-			return SX.DefaultAlgebra.GetOperatorResultOfHighestPrioritizedAlgebra(left, OverloadableCodeBinarySymmetricOperator.Div, right);
+			return FX.DefaultAlgebra.GetOperatorResultOfHighestPrioritizedAlgebra(left, OverloadableCodeBinarySymmetricOperator.Div, right);
 		}
 
-		public static SmartExpressionBrick operator %(SmartExpressionBrick left, SmartExpressionBrick right)
+		public static FlexpressionBrick operator %(FlexpressionBrick left, FlexpressionBrick right)
 		{
-			return SX.DefaultAlgebra.GetOperatorResultOfHighestPrioritizedAlgebra(left, OverloadableCodeBinarySymmetricOperator.Mod, right);
+			return FX.DefaultAlgebra.GetOperatorResultOfHighestPrioritizedAlgebra(left, OverloadableCodeBinarySymmetricOperator.Mod, right);
 		}
 
-		public static SmartExpressionBrick operator +(SmartExpressionBrick left, SmartExpressionBrick right)
+		public static FlexpressionBrick operator +(FlexpressionBrick left, FlexpressionBrick right)
 		{
-			return SX.DefaultAlgebra.GetOperatorResultOfHighestPrioritizedAlgebra(left, OverloadableCodeBinarySymmetricOperator.Sum, right);
+			return FX.DefaultAlgebra.GetOperatorResultOfHighestPrioritizedAlgebra(left, OverloadableCodeBinarySymmetricOperator.Sum, right);
 		}
 
-		public static SmartExpressionBrick operator &(SmartExpressionBrick left, SmartExpressionBrick right)
+		public static FlexpressionBrick operator &(FlexpressionBrick left, FlexpressionBrick right)
 		{
-			return SX.DefaultAlgebra.GetOperatorResultOfHighestPrioritizedAlgebra(left, OverloadableCodeBinarySymmetricOperator.And, right);
+			return FX.DefaultAlgebra.GetOperatorResultOfHighestPrioritizedAlgebra(left, OverloadableCodeBinarySymmetricOperator.And, right);
 		}
 
-		public static SmartExpressionBrick operator ^(SmartExpressionBrick left, SmartExpressionBrick right)
+		public static FlexpressionBrick operator ^(FlexpressionBrick left, FlexpressionBrick right)
 		{
-			return SX.DefaultAlgebra.GetOperatorResultOfHighestPrioritizedAlgebra(left, OverloadableCodeBinarySymmetricOperator.XOr, right);
+			return FX.DefaultAlgebra.GetOperatorResultOfHighestPrioritizedAlgebra(left, OverloadableCodeBinarySymmetricOperator.XOr, right);
 		}
 
-		public static SmartExpressionBrick operator |(SmartExpressionBrick left, SmartExpressionBrick right)
+		public static FlexpressionBrick operator |(FlexpressionBrick left, FlexpressionBrick right)
 		{
-			return SX.DefaultAlgebra.GetOperatorResultOfHighestPrioritizedAlgebra(left, OverloadableCodeBinarySymmetricOperator.Or, right);
+			return FX.DefaultAlgebra.GetOperatorResultOfHighestPrioritizedAlgebra(left, OverloadableCodeBinarySymmetricOperator.Or, right);
 		}
 
-		public static SmartExpressionBrick operator ++(SmartExpressionBrick arg)
+		public static FlexpressionBrick operator ++(FlexpressionBrick arg)
 		{
-			return SX.DefaultAlgebra.EvaluateOperatorResult(OverloadableCodeUnarySymmetricOperator.Increment, arg);
+			return FX.DefaultAlgebra.EvaluateOperatorResult(OverloadableCodeUnarySymmetricOperator.Increment, arg);
 		}
 
-		public static SmartExpressionBrick operator +(SmartExpressionBrick arg)
+		public static FlexpressionBrick operator +(FlexpressionBrick arg)
 		{
-			return SX.DefaultAlgebra.EvaluateOperatorResult(OverloadableCodeUnarySymmetricOperator.Plus, arg);
+			return FX.DefaultAlgebra.EvaluateOperatorResult(OverloadableCodeUnarySymmetricOperator.Plus, arg);
 		}
 
-		public static SmartExpressionBrick operator -(SmartExpressionBrick arg)
+		public static FlexpressionBrick operator -(FlexpressionBrick arg)
 		{
-			return SX.DefaultAlgebra.EvaluateOperatorResult(OverloadableCodeUnarySymmetricOperator.Minus, arg);
+			return FX.DefaultAlgebra.EvaluateOperatorResult(OverloadableCodeUnarySymmetricOperator.Minus, arg);
 		}
 
-		public static SmartExpressionBrick operator ~(SmartExpressionBrick arg)
+		public static FlexpressionBrick operator ~(FlexpressionBrick arg)
 		{
-			return SX.DefaultAlgebra.EvaluateOperatorResult(OverloadableCodeUnarySymmetricOperator.BitwiseComplement, arg);
+			return FX.DefaultAlgebra.EvaluateOperatorResult(OverloadableCodeUnarySymmetricOperator.BitwiseComplement, arg);
 		}
 
-		public static implicit operator SmartExpressionBrick(string x)
+		public static implicit operator FlexpressionBrick(string x)
 		{
-			return SX.ToTextSequence(x);
+			return FX.ToTextSequence(x);
 		}
 
-		public static implicit operator SmartExpressionBrick(char x)
+		public static implicit operator FlexpressionBrick(char x)
 		{
-			return SX.ToCharacter(x);
+			return FX.ToCharacter(x);
 		}
 
-		public void ApplyCustomRule(string name, SmartExpressionBrick content)
+		public void ApplyCustomRule(string name, FlexpressionBrick content)
 		{
 			ApplyRuleDefinition(name, content, recursion: false, freeze: false);
 		}
 
-		public void ApplyCustomSealedRule(string name, SmartExpressionBrick content)
+		public void ApplyCustomSealedRule(string name, FlexpressionBrick content)
 		{
 			ApplyRuleDefinition(name, content, recursion: false, freeze: true);
 		}
 
-		protected static void ApplyRuleDefinition(SmartExpressionBrick target,
+		protected static void ApplyRuleDefinition(FlexpressionBrick target,
 		                                          string name,
-		                                          SmartExpressionBrick content,
+		                                          FlexpressionBrick content,
 		                                          bool recursion,
 		                                          bool freeze)
 		{

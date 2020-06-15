@@ -35,56 +35,58 @@
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
 
-using System.Diagnostics;
+using System.Linq;
 using QuickAccess.DataStructures.Common.RegularExpression;
 using QuickAccess.Parser.Product;
-using static QuickAccess.Parser.SmartExpressions.SmartExpression;
 
-namespace QuickAccess.Parser.SmartExpressions.Bricks
+namespace QuickAccess.Parser.Flexpressions.Bricks
 {
-	public sealed class CharBrick : SmartExpressionBrick
+	public sealed class ConcatenationBrick : CompositeFlexpressionBrick
 	{
-		
-		public char Character { get; }
-
-		public CharBrick(ISmartExpressionAlgebra algebra, char character)
-		: base(algebra)
-		{
-			Character = character;
-		}
+		/// <inheritdoc />
+		public override MatchingLevel RegularExpressionMatchingLevel => Bricks.GetMinimalMatchingLevel();
 
 		/// <inheritdoc />
-		protected override void ApplyRuleDefinition(string name, SmartExpressionBrick content, bool recursion, bool freeze)
-		{
-		}
-
-		/// <inheritdoc />
-		public override bool Equals(SmartExpressionBrick other)
-		{
-			return other is CharBrick cb && Character.Equals(cb.Character);
-		}
-
-		/// <inheritdoc />
-		[DebuggerStepThrough]
 		protected override IParsingProduct TryParseInternal(IParsingContextStream ctx)
 		{
-			return ctx.ParseChar(Character, true) ? ctx.Accept().CreateTermForAcceptedFragment(ExpressionTypes.CharTerm) : null;
+			return Bricks.TryAggregateParse(ctx);
 		}
 
-        /// <inheritdoc />
-		public override string ToRegularExpressionString(RegularExpressionBuildingContext ctx)
+		//public override string ExpressionId => string.Join(string.Empty, Bricks.Select(b => b.ExpressionId));
+
+		public ConcatenationBrick(IFlexpressionAlgebra algebra, FlexpressionBrick b1, FlexpressionBrick b2)
+			: base(algebra, b1, b2, CanMakeFlat)
 		{
-			return ctx.Factory.CharToRegex(Character);
+			
+		}
+
+		public ConcatenationBrick(IFlexpressionAlgebra algebra, FlexpressionBrick b1, FlexpressionBrick b2, FlexpressionBrick b3)
+			: base(algebra, b1, b2, b3, CanMakeFlat)
+		{
+			
+		}
+
+		public ConcatenationBrick(IFlexpressionAlgebra algebra, FlexpressionBrick[] bricks)
+			: base(algebra, bricks, CanMakeFlat)
+		{
+			
+		}
+
+		private static bool CanMakeFlat(CompositeFlexpressionBrick cb)
+		{
+			return cb is ConcatenationBrick;
 		}
 
 		/// <inheritdoc />
-		public override MatchingLevel RegularExpressionMatchingLevel => MatchingLevel.Exact;
+		public override string ToRegularExpressionString(RegularExpressionBuildingContext ctx)
+		{
+			return string.Join("", Bricks.Select(b => b.ToRegularExpressionString(ctx)));
+		}
 
-        public override string ToString()
-        {
-            var ch = RegularExpressionBuildingContext.StandardFactory.CharToRegex(Character);
-
-			return $"'{ch}'";
-        }
-    }
+		/// <inheritdoc />
+		public override string ToString()
+		{
+			return string.Join("", Bricks.Select(b => b.ToString()));
+		}
+	}
 }

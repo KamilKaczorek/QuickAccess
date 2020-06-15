@@ -39,8 +39,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using QuickAccess.DataStructures.Common.Collections;
+using QuickAccess.Parser.Flexpressions;
 using QuickAccess.Parser.Product;
-using QuickAccess.Parser.SmartExpressions;
 
 namespace QuickAccess.Parser
 {
@@ -69,7 +69,7 @@ namespace QuickAccess.Parser
             }
 
             ctx.Accept();
-            return ctx.CreateExpressionForAcceptedFragment(SmartExpression.ExpressionTypes.Concatenation, nodes);
+            return ctx.CreateExpressionForAcceptedFragment(FX.ExpressionTypes.Concatenation, nodes);
         }
 
 		public static IParsingProduct TryAggregateParse(this IReadOnlyCollection<IExpressionParser> parsers, ISourceCode src)
@@ -91,7 +91,7 @@ namespace QuickAccess.Parser
             }
 
             ctx.Accept();
-            return ctx.CreateExpressionForAcceptedFragment(SmartExpression.ExpressionTypes.Concatenation, nodes);
+            return ctx.CreateExpressionForAcceptedFragment(FX.ExpressionTypes.Concatenation, nodes);
         }
 
 		public static IParsingProduct TryAlternativeParse(

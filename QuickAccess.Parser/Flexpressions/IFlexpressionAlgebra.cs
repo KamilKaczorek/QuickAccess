@@ -35,36 +35,12 @@
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
 
-using QuickAccess.Parser.Product;
+using QuickAccess.DataStructures.CodeOperatorAlgebra;
+using QuickAccess.Parser.Flexpressions.Bricks;
 
-namespace QuickAccess.Parser.SmartExpressions
+namespace QuickAccess.Parser.Flexpressions
 {
-	
-
-	public static class SmartExpression
+    public interface IFlexpressionAlgebra : IDefineBaseFlexpressions, IDefineCodeOperatorSymmetricAlgebra<FlexpressionBrick>
 	{
-		public static class StandardRuleName
-		{
-			public const string Anything = "Anything";
-			public const string Empty = "Empty";
-			public const string WhiteSpace = "WhiteSpace";
-			public const string WhiteSpaceOrNewLine = "WhiteSpaceOrNewLine";
-			public const string OptionalWhiteSpace = "OptionalWhiteSpace";
-			public const string OptionalWhiteSpaceOrNewLine = "OptionalWhiteSpaceOrNewLine";
-			public const string CustomSequence = "CustomSequence";
-			public const string NewLine = "NewLine";
-            public const string Letter = "Letter";
-			public const string UpperLetter = "UpperLetter";
-			public const string LowerLetter = "LowerLetter";
-			public const string Symbol = "Symbol";
-			public const string Digit = "Digit";
-		}
-
-		public static class ExpressionTypes
-		{
-			public static readonly ExpressionTypeDescriptor Concatenation = ExpressionTypeDescriptor.Create("_CONCAT_");
-            public static readonly ExpressionTypeDescriptor CharTerm = ExpressionTypeDescriptor.Create("_CHAR_", "_CHAR_");
-            public static readonly ExpressionTypeDescriptor TextTerm = ExpressionTypeDescriptor.Create("_TXT_", "_TXT_");
-		}
 	}
 }

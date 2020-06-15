@@ -35,61 +35,55 @@
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
 
-using System.Collections.Generic;
+using System.Diagnostics;
 using QuickAccess.DataStructures.Common.RegularExpression;
 using QuickAccess.Parser.Product;
 
-namespace QuickAccess.Parser.SmartExpressions.Bricks
+namespace QuickAccess.Parser.Flexpressions.Bricks
 {
-	public sealed class EmptyParsingBrick : SmartExpressionBrick
+	public sealed class CharBrick : FlexpressionBrick
 	{
-		public static readonly EmptyParsingBrick Instance = new EmptyParsingBrick(SX.DefaultAlgebra);
+		
+		public char Character { get; }
 
-		private EmptyParsingBrick(ISmartExpressionAlgebra algebra)
+		public CharBrick(IFlexpressionAlgebra algebra, char character)
 		: base(algebra)
+		{
+			Character = character;
+		}
+
+		/// <inheritdoc />
+		protected override void ApplyRuleDefinition(string name, FlexpressionBrick content, bool recursion, bool freeze)
 		{
 		}
 
 		/// <inheritdoc />
-		protected override void ApplyRuleDefinition(string name, SmartExpressionBrick content, bool recursion, bool freeze)
+		public override bool Equals(FlexpressionBrick other)
 		{
+			return other is CharBrick cb && Character.Equals(cb.Character);
+		}
+
+		/// <inheritdoc />
+		[DebuggerStepThrough]
+		protected override IParsingProduct TryParseInternal(IParsingContextStream ctx)
+		{
+			return ctx.ParseChar(Character, true) ? ctx.Accept().CreateTermForAcceptedFragment(FX.ExpressionTypes.CharTerm) : null;
 		}
 
         /// <inheritdoc />
 		public override string ToRegularExpressionString(RegularExpressionBuildingContext ctx)
 		{
-			return string.Empty;
+			return ctx.Factory.CharToRegex(Character);
 		}
 
 		/// <inheritdoc />
-		public override bool Equals(SmartExpressionBrick other)
-		{
-            if (other is null)
-            {
-                return false;
-            }
+		public override MatchingLevel RegularExpressionMatchingLevel => MatchingLevel.Exact;
 
-			if (ReferenceEquals(other, this))
-			{
-				return true;
-			}
+        public override string ToString()
+        {
+            var ch = RegularExpressionBuildingContext.StandardFactory.CharToRegex(Character);
 
-			return other.Equals(this);
-		}
-
-		/// <inheritdoc />
-		protected override IParsingProduct TryParseInternal(IParsingContextStream ctx)
-		{
-			return new EmptyNode(ctx);
-		}
-
-		/// <inheritdoc />
-		public override string ToString()
-		{
-			return string.Empty;
-		}
-
-		/// <inheritdoc />
-		public override bool IsEmpty => true;
-	}
+			return $"'{ch}'";
+        }
+    }
 }

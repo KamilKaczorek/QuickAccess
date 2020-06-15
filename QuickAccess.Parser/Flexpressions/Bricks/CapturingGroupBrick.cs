@@ -39,9 +39,9 @@ using QuickAccess.DataStructures.Common.Guards;
 using QuickAccess.DataStructures.Common.RegularExpression;
 using QuickAccess.Parser.Product;
 
-namespace QuickAccess.Parser.SmartExpressions.Bricks
+namespace QuickAccess.Parser.Flexpressions.Bricks
 {
-	public sealed class CapturingGroupBrick : SmartExpressionBrick
+	public sealed class CapturingGroupBrick : FlexpressionBrick
 	{
 		/// <inheritdoc />
 		public override string Name => GroupName;
@@ -49,14 +49,14 @@ namespace QuickAccess.Parser.SmartExpressions.Bricks
         public string GroupName => _expressionType.Name;
 
 		
-		public SmartExpressionBrick Content { get; }
+		public FlexpressionBrick Content { get; }
 
         private readonly ExpressionTypeDescriptor _expressionType;
 
 		/// <inheritdoc />
 		public override bool IsEmpty => Content.IsEmpty;
 
-		public CapturingGroupBrick(ExpressionTypeDescriptor expressionType, ISmartExpressionAlgebra algebra, SmartExpressionBrick content, bool freeze) 
+		public CapturingGroupBrick(ExpressionTypeDescriptor expressionType, IFlexpressionAlgebra algebra, FlexpressionBrick content, bool freeze) 
 			: base(algebra)
         {
 			Guard.ArgNotNull(expressionType, nameof(expressionType));
@@ -67,7 +67,7 @@ namespace QuickAccess.Parser.SmartExpressions.Bricks
 		}
 
 		/// <inheritdoc />
-		protected override void ApplyRuleDefinition(string name, SmartExpressionBrick content, bool recursion, bool freeze)
+		protected override void ApplyRuleDefinition(string name, FlexpressionBrick content, bool recursion, bool freeze)
 		{
 			if (name == GroupName)
 			{
@@ -77,7 +77,7 @@ namespace QuickAccess.Parser.SmartExpressions.Bricks
 			ApplyRuleDefinition(Content, name, content, recursion, freeze);
 		}
 
-        public CapturingGroupBrick Clone(ISmartExpressionAlgebra algebra, string groupName, bool freeze = false)
+        public CapturingGroupBrick Clone(IFlexpressionAlgebra algebra, string groupName, bool freeze = false)
         {
             var expressionType = string.Equals(groupName, _expressionType.Name)
                 ? _expressionType
@@ -86,7 +86,7 @@ namespace QuickAccess.Parser.SmartExpressions.Bricks
 			return new CapturingGroupBrick(expressionType, algebra.GetHighestPrioritizedAlgebra(this), Content, freeze);
 		}
 
-		public CapturingGroupBrick Clone(ISmartExpressionAlgebra algebra, bool freeze = false)
+		public CapturingGroupBrick Clone(IFlexpressionAlgebra algebra, bool freeze = false)
 		{
 			return new CapturingGroupBrick(_expressionType, algebra.GetHighestPrioritizedAlgebra(this), Content, freeze);
 		}
@@ -99,7 +99,7 @@ namespace QuickAccess.Parser.SmartExpressions.Bricks
 		}
 
 		/// <inheritdoc />
-		public override bool Equals(SmartExpressionBrick other)
+		public override bool Equals(FlexpressionBrick other)
 		{
 			if (IsEmpty && (other?.IsEmpty ?? false))
 			{

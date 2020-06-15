@@ -35,50 +35,54 @@
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
 
-using System.Linq;
 using QuickAccess.DataStructures.Common.RegularExpression;
 using QuickAccess.Parser.Product;
 
-namespace QuickAccess.Parser.SmartExpressions.Bricks
+namespace QuickAccess.Parser.Flexpressions.Bricks
 {
-	public sealed class AlternationBrick : CompositeSmartExpressionBrick
+	public sealed class NegationBrick : FlexpressionBrick
 	{
 		/// <inheritdoc />
-		public override MatchingLevel RegularExpressionMatchingLevel => Bricks.GetMinimalMatchingLevel();
-
+		public override string Name => "Not";
+		public FlexpressionBrick Content { get; }
 		/// <inheritdoc />
-		protected override IParsingProduct TryParseInternal(IParsingContextStream ctx)
+		public NegationBrick(IFlexpressionAlgebra algebra, FlexpressionBrick content) : base(algebra)
 		{
-			return Bricks.TryAlternativeParse(ctx);
-		}
-
-		public AlternationBrick(ISmartExpressionAlgebra algebra, SmartExpressionBrick b1, SmartExpressionBrick b2)
-			: base(algebra, b1, b2, CanMakeFlat)
-		{
-			
-		}
-
-		public AlternationBrick(ISmartExpressionAlgebra algebra, SmartExpressionBrick[] bricks)
-			: base(algebra, bricks, CanMakeFlat)
-		{
-			
-		}
-
-		private static bool CanMakeFlat(CompositeSmartExpressionBrick cb)
-		{
-			return cb is AlternationBrick;
+			Content = content;
 		}
 
 		/// <inheritdoc />
-		public override string ToString()
+		protected override void ApplyRuleDefinition(string name, FlexpressionBrick content, bool recursion, bool freeze)
 		{
-			return $"({string.Join("|", Bricks.Select(b => b.ToString()))})";
+			ApplyRuleDefinition(Content, name, content, recursion, freeze);
 		}
+
+        /// <inheritdoc />
+		public override bool Equals(FlexpressionBrick other)
+		{
+			return other is NegationBrick nb && nb.Content.Equals(Content);
+		}
+
+		/// <inheritdoc />
+		public override MatchingLevel RegularExpressionMatchingLevel =>
+			Content?.RegularExpressionMatchingLevel ?? MatchingLevel.None;
 
 		/// <inheritdoc />
 		public override string ToRegularExpressionString(RegularExpressionBuildingContext ctx)
 		{
-			return ctx.Factory.CreateAlternation(ctx.Context, Bricks.Select(b => b.ToRegularExpressionString(ctx)));
+			return ctx.Factory.CreateNot(ctx.Context, Content.ToRegularExpressionString(ctx));
 		}
-	}
+
+		protected override IParsingProduct TryParseInternal(IParsingContextStream ctx)
+		{
+			var res = Content.TryParse(ctx);
+
+			return res != null ? null : new EmptyNode(ctx);
+		}
+
+        public override string ToString()
+        {
+            return $"!({Content})";
+        }
+    }
 }

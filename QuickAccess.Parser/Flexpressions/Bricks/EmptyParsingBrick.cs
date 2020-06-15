@@ -35,91 +35,60 @@
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
 
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using QuickAccess.DataStructures.Common.RegularExpression;
 using QuickAccess.Parser.Product;
 
-namespace QuickAccess.Parser.SmartExpressions.Bricks
+namespace QuickAccess.Parser.Flexpressions.Bricks
 {
-	public sealed class TextMatchingBrick : SmartExpressionBrick
+	public sealed class EmptyParsingBrick : FlexpressionBrick
 	{
-		public string Text { get; }
+		public static readonly EmptyParsingBrick Instance = new EmptyParsingBrick(FX.DefaultAlgebra);
 
-		private static readonly HashSet<char> SpecialRegexCharacters = new HashSet<char>{'\\','^','$','.','|','?','*','+','(',')','{','}'};
-
-		public static bool IsRegexSpecial(char ch)
+		private EmptyParsingBrick(IFlexpressionAlgebra algebra)
+		: base(algebra)
 		{
-			return SpecialRegexCharacters.Contains(ch);
-		}
-
-		public static bool IsRegexSpecialOrTab(char ch)
-		{
-			return SpecialRegexCharacters.Contains(ch) || ch == '\t';
-		}
-
-		public static string CharToRegex(char ch)
-		{
-			return IsRegexSpecial(ch) ? $@"\{ch}" : ch == '\t' ? @"\t" : ch.ToString();
-		}
-
-		public static string StringToRegex(string text)
-		{
-			var specialCount = text.Count(IsRegexSpecialOrTab);
-			var sb = new StringBuilder(specialCount+text.Length);
-
-			foreach (var ch in text)
-			{
-				sb.Append(CharToRegex(ch));
-			}
-
-			return sb.ToString();
 		}
 
 		/// <inheritdoc />
-		public override bool IsEmpty => string.IsNullOrEmpty(Text);
-
-		public TextMatchingBrick(ISmartExpressionAlgebra algebra, string text)
-			: base(algebra)
-		{
-			Text = text;
-		}
-
-		/// <inheritdoc />
-		public override bool Equals(SmartExpressionBrick other)
-		{
-			if (IsEmpty && (other?.IsEmpty ?? false))
-			{
-				return true;
-			}
-
-			return other is TextMatchingBrick cb && Text.Equals(cb.Text);
-		}
-
-		/// <inheritdoc />
-		protected override IParsingProduct TryParseInternal(IParsingContextStream ctx)
-		{
-			return ctx.ParseText(Text) ? ctx.Accept().CreateTermForAcceptedFragment(SmartExpression.ExpressionTypes.TextTerm) : null;
-		}
-
-		/// <inheritdoc />
-		protected override void ApplyRuleDefinition(string name, SmartExpressionBrick content, bool recursion, bool freeze)
+		protected override void ApplyRuleDefinition(string name, FlexpressionBrick content, bool recursion, bool freeze)
 		{
 		}
 
         /// <inheritdoc />
 		public override string ToRegularExpressionString(RegularExpressionBuildingContext ctx)
 		{
-			return ctx.Factory.StringToRegex(Text);
+			return string.Empty;
 		}
 
 		/// <inheritdoc />
-		public override MatchingLevel RegularExpressionMatchingLevel => MatchingLevel.Exact;
+		public override bool Equals(FlexpressionBrick other)
+		{
+            if (other is null)
+            {
+                return false;
+            }
 
-        public override string ToString()
-        {
-            return $"'{Text}'";
-        }
-    }
+			if (ReferenceEquals(other, this))
+			{
+				return true;
+			}
+
+			return other.Equals(this);
+		}
+
+		/// <inheritdoc />
+		protected override IParsingProduct TryParseInternal(IParsingContextStream ctx)
+		{
+			return new EmptyNode(ctx);
+		}
+
+		/// <inheritdoc />
+		public override string ToString()
+		{
+			return string.Empty;
+		}
+
+		/// <inheritdoc />
+		public override bool IsEmpty => true;
+	}
 }

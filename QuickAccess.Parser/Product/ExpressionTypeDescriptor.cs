@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using JetBrains.Annotations;
 using QuickAccess.DataStructures.Common.Guards;
+using QuickAccess.Parser.Flexpressions.Bricks;
 using @Pure = System.Diagnostics.Contracts.PureAttribute;
 
 namespace QuickAccess.Parser.Product
@@ -67,7 +68,7 @@ namespace QuickAccess.Parser.Product
 
         /// <summary>
         /// Gets value indicating whether specific product defines expression class.
-        /// Expression class is defined by <see cref="SmartExpressions.Bricks.CapturingGroupBrick"/>.
+        /// Expression class is defined by <see cref="CapturingGroupBrick"/>.
         /// </summary>
         public bool DefinesExpressionClass { get; }
 
@@ -131,7 +132,7 @@ namespace QuickAccess.Parser.Product
         [@Pure]
         public bool Equals(ExpressionTypeDescriptor other)
         {
-            if (ReferenceEquals(null, other)) return false;
+            if (other is null) return false;
             if (ReferenceEquals(this, other)) return true;
             return Name == other.Name && ValueTypeId == other.ValueTypeId && DefinesExpressionClass == other.DefinesExpressionClass;
         }

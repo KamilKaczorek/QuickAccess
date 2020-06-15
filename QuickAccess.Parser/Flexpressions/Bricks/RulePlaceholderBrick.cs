@@ -35,25 +35,55 @@
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
 
-using System.Collections.Generic;
+using System;
 using QuickAccess.DataStructures.Common.Freezable;
 using QuickAccess.DataStructures.Common.RegularExpression;
 using QuickAccess.Parser.Product;
 
-namespace QuickAccess.Parser.SmartExpressions.Bricks
+namespace QuickAccess.Parser.Flexpressions.Bricks
 {
-	public sealed class CurrentRulePlaceholderBrick : SmartExpressionBrick
+	public sealed class RulePlaceholderBrick : FlexpressionBrick
 	{
+		private readonly FreezableValue<Tuple<FlexpressionBrick, bool>> _rule;
+
+		public string RuleName { get; }
 		/// <inheritdoc />
 		public override string Name => RuleName;
-		private readonly LimitedNumberOfTimesSetValue<KeyValuePair<string, SmartExpressionBrick>> _rule = LimitedNumberOfTimesSetValue.CreateNotSet<KeyValuePair<string, SmartExpressionBrick>>(1);
-		public string RuleName => _rule.IsSet ? _rule.Value.Key : "CURRENT";
-		public SmartExpressionBrick Content => _rule.GetKeyValueOrDefault();
+		public FlexpressionBrick Content => _rule.IsSet ? _rule.Value.Item1 : null;
+		public bool IsRecursion => _rule.IsSet && _rule.Value.Item2;
+		public bool IsFrozen => _rule.IsFrozen;
 
-
-		public override bool Equals(SmartExpressionBrick other)
+		public RulePlaceholderBrick(IFlexpressionAlgebra algebra, string ruleName)
+		: this(algebra, ruleName, null)
 		{
-			return other is CurrentRulePlaceholderBrick;
+			
+		}
+
+		public RulePlaceholderBrick(IFlexpressionAlgebra algebra, string ruleName, FlexpressionBrick defaultRule)
+		: base(algebra.GetHighestPrioritizedAlgebra(defaultRule))
+		{
+			RuleName = ruleName;
+			_rule = defaultRule != null ? new FreezableValue<Tuple<FlexpressionBrick, bool>>(Tuple.Create(defaultRule, false)) : new FreezableValue<Tuple<FlexpressionBrick, bool>>();
+		}
+
+		/// <inheritdoc />
+		protected override void ApplyRuleDefinition(string name, FlexpressionBrick content, bool recursion, bool freeze)
+		{
+			if (name == RuleName && !IsFrozen)
+			{
+				_rule.TrySet(Tuple.Create(content, recursion), freeze);
+			}
+		}
+
+		/// <inheritdoc />
+		public override bool Equals(FlexpressionBrick other)
+		{
+			if (IsEmpty && (other?.IsEmpty ?? false))
+			{
+				return true;
+			}
+
+			return other is RulePlaceholderBrick cb && RuleName.Equals(cb.RuleName);
 		}
 
 		/// <inheritdoc />
@@ -62,35 +92,25 @@ namespace QuickAccess.Parser.SmartExpressions.Bricks
 			return Content.TryParse(ctx);
 		}
 
-		/// <inheritdoc />
-		protected override void ApplyRuleDefinition(string name, SmartExpressionBrick content, bool recursion, bool freeze)
-		{
-			if (!recursion || _rule.IsSet)
-			{
-				return;
-			}
-			
-			_rule.Set(name, content);
-		}
-
         /// <inheritdoc />
-		public override string ToRegularExpressionString(RegularExpressionBuildingContext ctx)
+		public override string ToRegularExpressionString(RegularExpressionBuildingContext  ctx)
 		{
-			return ctx.Factory.CreateRecursiveGroupCall(ctx.Context, RuleName);
+			if (!_rule.IsSet)
+			{
+				throw new InvalidOperationException($"Rule is not defined for this placeholder. Rule name={RuleName}");
+			}
+
+			return IsRecursion ? ctx.Factory.CreateRecursiveGroupCall(ctx.Context, RuleName) : Content.ToRegularExpressionString(ctx);
 		}
 
 		/// <inheritdoc />
-		public override MatchingLevel RegularExpressionMatchingLevel => MatchingLevel.Exact;
+		public override MatchingLevel RegularExpressionMatchingLevel =>
+			IsRecursion ? MatchingLevel.Exact : Content?.RegularExpressionMatchingLevel ?? MatchingLevel.None;
 
 		/// <inheritdoc />
 		public override string ToString()
 		{
-			return RuleName;
-		}
-
-		/// <inheritdoc />
-		public CurrentRulePlaceholderBrick(ISmartExpressionAlgebra algebra) : base(algebra)
-		{
+			return IsRecursion ? RuleName : Content?.ToString() ?? RuleName;
 		}
 	}
 }

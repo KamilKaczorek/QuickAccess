@@ -1,8 +1,8 @@
 ﻿using QuickAccess.DataStructures.Common.RegularExpression;
-using QuickAccess.Parser.SmartExpressions;
 using System;
 using System.Text.RegularExpressions;
 using QuickAccess.Parser;
+using QuickAccess.Parser.Flexpressions;
 
 namespace QuickAccess.ExpressionParser.Demo
 {
@@ -16,14 +16,16 @@ namespace QuickAccess.ExpressionParser.Demo
 
         public static void Test2(string expression)
         {
-            var intNumber = SX.Digit.OneOrMore().DefinesSealedRule("Integer", "Integer");
+			var fx = new StandardFlexpressionAlgebra(-1);
+
+            var intNumber = fx.Digit.OneOrMore().DefinesSealedRule("Integer", "Integer");
             var floatNumber = (intNumber + "." + intNumber).DefinesSealedRule("Float", "Float");
             var number = (intNumber | floatNumber).DefinesRule("Number");
 
-            var sumOper = SX.ToCharacter('+');
-            var minOper = SX.ToCharacter('-');
-            var mulOper = SX.ToCharacter('*');
-            var divOper = SX.ToCharacter('/');
+            var sumOper = FX.ToCharacter('+');
+            var minOper = FX.ToCharacter('-');
+            var mulOper = FX.ToCharacter('*');
+            var divOper = FX.ToCharacter('/');
 
             var oper = (sumOper | minOper | mulOper | divOper).DefinesSealedRule("Operator");
 
@@ -33,7 +35,7 @@ namespace QuickAccess.ExpressionParser.Demo
 
             var expr = (operation | exprNoOperation).DefinesRule("Expression");
 
-            (SX.ToCharacter('(') & expr & SX.ToCharacter(')')).DefinesSealedRule("BracketExpression");
+            (FX.ToCharacter('(') & expr & FX.ToCharacter(')')).DefinesSealedRule("BracketExpression");
 
 
             var ctx = RegularExpressionBuildingContext.CreateStandard();
@@ -54,8 +56,8 @@ namespace QuickAccess.ExpressionParser.Demo
 
 		public static void Test(string expression)
 		{
-			var name = (SX.Letter + (SX.Digit | SX.Letter).ZeroOrMore()).DefinesSealedRule("Name", "String");
-			var intNumber = SX.Digit.OneOrMore().DefinesSealedRule("Integer", "Integer");
+			var name = (FX.Letter + (FX.Digit | FX.Letter).ZeroOrMore()).DefinesSealedRule("Name", "String");
+			var intNumber = FX.Digit.OneOrMore().DefinesSealedRule("Integer", "Integer");
 			var floatNumber = (intNumber + "." + intNumber).DefinesSealedRule("Float", "Float");
 			var functionArg = (floatNumber | intNumber | name).DefinesSealedRule("FunctionArg");
 			var functionArgList = (functionArg & ("," & functionArg).ZeroOrMore()).DefinesRule("FunctionArgList");

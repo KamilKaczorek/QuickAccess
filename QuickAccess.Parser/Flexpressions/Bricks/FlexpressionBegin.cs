@@ -37,52 +37,52 @@
 
 using QuickAccess.DataStructures.CodeOperatorAlgebra;
 
-namespace QuickAccess.Parser.SmartExpressions
+namespace QuickAccess.Parser.Flexpressions.Bricks
 {
-	public sealed class SmartExpressionBegin
+	public sealed class FlexpressionBegin
 	{
-		private readonly ISmartExpressionAlgebra _algebra;
+		private readonly IFlexpressionAlgebra _algebra;
 
-		public SmartExpressionBegin(ISmartExpressionAlgebra algebra)
+		public FlexpressionBegin(IFlexpressionAlgebra algebra)
 		{
 			_algebra = algebra;
 		}
 
-		public static SmartExpressionBrick operator &(SmartExpressionBegin left, SmartExpressionBrick right)
+		public static FlexpressionBrick operator &(FlexpressionBegin left, FlexpressionBrick right)
 		{
 			var algebra = left._algebra.GetHighestPrioritizedAlgebra(right);
 			return algebra.EvaluateOperatorResult(algebra.OptionalWhiteSpace, OverloadableCodeBinarySymmetricOperator.Sum, right);
 		}
 
-		public static SmartExpressionBrick operator +(SmartExpressionBegin _, SmartExpressionBrick right)
+		public static FlexpressionBrick operator +(FlexpressionBegin _, FlexpressionBrick right)
 		{
 			return right;
 		}
 
-		public static SmartExpressionBrick operator -(SmartExpressionBegin left, SmartExpressionBrick right)
+		public static FlexpressionBrick operator -(FlexpressionBegin left, FlexpressionBrick right)
 		{
 			var algebra = left._algebra.GetHighestPrioritizedAlgebra(right);
 			return algebra.EvaluateOperatorResult(OverloadableCodeUnarySymmetricOperator.Minus, right);
 		}
 
-		public static SmartExpressionBrick operator *(SmartExpressionBegin left, SmartExpressionBrick right)
+		public static FlexpressionBrick operator *(FlexpressionBegin left, FlexpressionBrick right)
 		{
 			var algebra = left._algebra.GetHighestPrioritizedAlgebra(right);
 			return algebra.EvaluateOperatorResult(algebra.Anything, OverloadableCodeBinarySymmetricOperator.Sum, right);
 		}
 
-		public static SmartExpressionBrick operator |(SmartExpressionBegin _, SmartExpressionBrick right)
+		public static FlexpressionBrick operator |(FlexpressionBegin _, FlexpressionBrick right)
 		{
 			return right;
 		}
 
-		public static SmartExpressionBrick operator ^(SmartExpressionBegin left, SmartExpressionBrick right)
+		public static FlexpressionBrick operator ^(FlexpressionBegin left, FlexpressionBrick right)
 		{
 			var algebra = left._algebra.GetHighestPrioritizedAlgebra(right);
 			return algebra.EvaluateOperatorResult(algebra.WhiteSpace, OverloadableCodeBinarySymmetricOperator.Sum, right);
 		}
 
-		public static SmartExpressionBrick operator %(SmartExpressionBegin left, SmartExpressionBrick right)
+		public static FlexpressionBrick operator %(FlexpressionBegin left, FlexpressionBrick right)
 		{
 			var algebra = left._algebra.GetHighestPrioritizedAlgebra(right);
 			return algebra.EvaluateOperatorResult(algebra.CustomSequence, OverloadableCodeBinarySymmetricOperator.Sum, right);

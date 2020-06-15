@@ -40,43 +40,43 @@ using System.Collections.Generic;
 using System.Linq;
 using QuickAccess.DataStructures.CodeOperatorAlgebra;
 
-namespace QuickAccess.Parser.SmartExpressions
+namespace QuickAccess.Parser.Flexpressions.Bricks
 {
-	public abstract class CompositeSmartExpressionBrick : SmartExpressionBrick
+	public abstract class CompositeFlexpressionBrick : FlexpressionBrick
 	{
-		public IReadOnlyList<SmartExpressionBrick> Items => Bricks; 
+		public IReadOnlyList<FlexpressionBrick> Items => Bricks; 
 
-		protected readonly SmartExpressionBrick[] Bricks;
+		protected readonly FlexpressionBrick[] Bricks;
 
 		/// <inheritdoc />
 		public override bool IsEmpty => Bricks.All(b => b.IsEmpty);
 
-		protected CompositeSmartExpressionBrick(ISmartExpressionAlgebra algebra, SmartExpressionBrick b1, SmartExpressionBrick b2, Func<CompositeSmartExpressionBrick, bool> canFlattenPredicate)
+		protected CompositeFlexpressionBrick(IFlexpressionAlgebra algebra, FlexpressionBrick b1, FlexpressionBrick b2, Func<CompositeFlexpressionBrick, bool> canFlattenPredicate)
 		 :base(algebra.GetHighestPrioritizedAlgebra(b1, b2))
 		{
 			var flatLength = GetSourceLength(b1,canFlattenPredicate) + GetSourceLength(b2,canFlattenPredicate);
-			Bricks = new SmartExpressionBrick[flatLength];
+			Bricks = new FlexpressionBrick[flatLength];
 			var pos = 0;
 			AddBrick(Bricks, b1,canFlattenPredicate, ref pos);
 			AddBrick(Bricks, b2,canFlattenPredicate, ref pos);
 		}
 
-		protected CompositeSmartExpressionBrick(ISmartExpressionAlgebra algebra, SmartExpressionBrick b1, SmartExpressionBrick b2, SmartExpressionBrick b3, Func<CompositeSmartExpressionBrick, bool> canFlattenPredicate)
+		protected CompositeFlexpressionBrick(IFlexpressionAlgebra algebra, FlexpressionBrick b1, FlexpressionBrick b2, FlexpressionBrick b3, Func<CompositeFlexpressionBrick, bool> canFlattenPredicate)
 			:base(algebra.GetHighestPrioritizedAlgebra(b1, b2, b3))
 		{
 			var flatLength = GetSourceLength(b1,canFlattenPredicate) + GetSourceLength(b2,canFlattenPredicate) + GetSourceLength(b3,canFlattenPredicate);
-			Bricks = new SmartExpressionBrick[flatLength];
+			Bricks = new FlexpressionBrick[flatLength];
 			var pos = 0;
 			AddBrick(Bricks, b1,canFlattenPredicate, ref pos);
 			AddBrick(Bricks, b2,canFlattenPredicate, ref pos);
 			AddBrick(Bricks, b3,canFlattenPredicate, ref pos);
 		}
 
-		protected CompositeSmartExpressionBrick(ISmartExpressionAlgebra algebra, SmartExpressionBrick[] bricks, Func<CompositeSmartExpressionBrick, bool> canFlattenPredicate)
+		protected CompositeFlexpressionBrick(IFlexpressionAlgebra algebra, FlexpressionBrick[] bricks, Func<CompositeFlexpressionBrick, bool> canFlattenPredicate)
 			:base(algebra.GetHighestPrioritizedAlgebra(bricks))
 		{
 			var flatLength = bricks.Sum(b => GetSourceLength(b, canFlattenPredicate));
-			Bricks = new SmartExpressionBrick[flatLength];
+			Bricks = new FlexpressionBrick[flatLength];
 
 			var pos = 0;
 			var len = bricks.Length;
@@ -86,14 +86,14 @@ namespace QuickAccess.Parser.SmartExpressions
 			}
 		}
 
-		private static int GetSourceLength(SmartExpressionBrick brick, Func<CompositeSmartExpressionBrick, bool> canFlattenPredicate)
+		private static int GetSourceLength(FlexpressionBrick brick, Func<CompositeFlexpressionBrick, bool> canFlattenPredicate)
 		{
-			return canFlattenPredicate != null && brick is CompositeSmartExpressionBrick cb && canFlattenPredicate.Invoke(cb) ? cb.Bricks.Length : 1;
+			return canFlattenPredicate != null && brick is CompositeFlexpressionBrick cb && canFlattenPredicate.Invoke(cb) ? cb.Bricks.Length : 1;
 		}
 
-		private void AddBrick(SmartExpressionBrick[] source, SmartExpressionBrick added, Func<CompositeSmartExpressionBrick, bool> canFlattenPredicate, ref int pos)
+		private void AddBrick(FlexpressionBrick[] source, FlexpressionBrick added, Func<CompositeFlexpressionBrick, bool> canFlattenPredicate, ref int pos)
 		{
-			if (canFlattenPredicate != null && added is CompositeSmartExpressionBrick cb && canFlattenPredicate.Invoke(cb))
+			if (canFlattenPredicate != null && added is CompositeFlexpressionBrick cb && canFlattenPredicate.Invoke(cb))
 			{
 				var len = cb.Bricks.Length;
 				Array.Copy(cb.Bricks, 0, source, pos, len);
@@ -107,7 +107,7 @@ namespace QuickAccess.Parser.SmartExpressions
 		}
 
 		/// <inheritdoc />
-		protected override void ApplyRuleDefinition(string name, SmartExpressionBrick content, bool recursion, bool freeze)
+		protected override void ApplyRuleDefinition(string name, FlexpressionBrick content, bool recursion, bool freeze)
 		{
 			foreach (var parsingBrick in Bricks)
 			{
@@ -116,9 +116,9 @@ namespace QuickAccess.Parser.SmartExpressions
 		}
 
 		/// <inheritdoc />
-		public override bool Equals(SmartExpressionBrick other)
+		public override bool Equals(FlexpressionBrick other)
 		{
-			return other is CompositeSmartExpressionBrick cb && cb.GetType() == GetType() && cb.Bricks.Length == Bricks.Length &&
+			return other is CompositeFlexpressionBrick cb && cb.GetType() == GetType() && cb.Bricks.Length == Bricks.Length &&
 			       Bricks.Select((b, i) => cb.Bricks[i].Equals(b)).All(res => res);
 		}
 	}

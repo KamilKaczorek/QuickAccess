@@ -35,44 +35,83 @@
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
 
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using QuickAccess.DataStructures.Common.RegularExpression;
 using QuickAccess.Parser.Product;
 
-namespace QuickAccess.Parser.SmartExpressions.Bricks
+namespace QuickAccess.Parser.Flexpressions.Bricks
 {
-	public sealed class StandardCharacterRangeBrick : SmartExpressionBrick
+	public sealed class TextMatchingBrick : FlexpressionBrick
 	{
-		private readonly StandardCharactersRange _range;
+		public string Text { get; }
 
-		/// <inheritdoc />
-		public StandardCharacterRangeBrick(ISmartExpressionAlgebra algebra, StandardCharactersRange letterTypes) : base(algebra)
+		private static readonly HashSet<char> SpecialRegexCharacters = new HashSet<char>{'\\','^','$','.','|','?','*','+','(',')','{','}'};
+
+		public static bool IsRegexSpecial(char ch)
 		{
-			_range = letterTypes;
+			return SpecialRegexCharacters.Contains(ch);
+		}
+
+		public static bool IsRegexSpecialOrTab(char ch)
+		{
+			return SpecialRegexCharacters.Contains(ch) || ch == '\t';
+		}
+
+		public static string CharToRegex(char ch)
+		{
+			return IsRegexSpecial(ch) ? $@"\{ch}" : ch == '\t' ? @"\t" : ch.ToString();
+		}
+
+		public static string StringToRegex(string text)
+		{
+			var specialCount = text.Count(IsRegexSpecialOrTab);
+			var sb = new StringBuilder(specialCount+text.Length);
+
+			foreach (var ch in text)
+			{
+				sb.Append(CharToRegex(ch));
+			}
+
+			return sb.ToString();
 		}
 
 		/// <inheritdoc />
-		protected override void ApplyRuleDefinition(string name, SmartExpressionBrick content, bool recursion, bool freeze)
+		public override bool IsEmpty => string.IsNullOrEmpty(Text);
+
+		public TextMatchingBrick(IFlexpressionAlgebra algebra, string text)
+			: base(algebra)
 		{
+			Text = text;
 		}
 
-        /// <inheritdoc />
-		public override bool Equals(SmartExpressionBrick other)
+		/// <inheritdoc />
+		public override bool Equals(FlexpressionBrick other)
 		{
-			return other is StandardCharacterRangeBrick lb && lb._range == _range;
+			if (IsEmpty && (other?.IsEmpty ?? false))
+			{
+				return true;
+			}
+
+			return other is TextMatchingBrick cb && Text.Equals(cb.Text);
 		}
 
 		/// <inheritdoc />
 		protected override IParsingProduct TryParseInternal(IParsingContextStream ctx)
 		{
-			return ctx.MoveNext() && ctx.Current.IsFromRange(_range)
-				? ctx.Accept().CreateTermForAcceptedFragment(SmartExpression.ExpressionTypes.CharTerm)
-				: null;
+			return ctx.ParseText(Text) ? ctx.Accept().CreateTermForAcceptedFragment(FX.ExpressionTypes.TextTerm) : null;
 		}
 
 		/// <inheritdoc />
+		protected override void ApplyRuleDefinition(string name, FlexpressionBrick content, bool recursion, bool freeze)
+		{
+		}
+
+        /// <inheritdoc />
 		public override string ToRegularExpressionString(RegularExpressionBuildingContext ctx)
 		{
-			return ctx.Factory.CreateCharRange(ctx.Context, _range);
+			return ctx.Factory.StringToRegex(Text);
 		}
 
 		/// <inheritdoc />
@@ -80,7 +119,7 @@ namespace QuickAccess.Parser.SmartExpressions.Bricks
 
         public override string ToString()
         {
-            return $"{_range}";
+            return $"'{Text}'";
         }
     }
 }

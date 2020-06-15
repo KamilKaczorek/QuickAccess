@@ -41,23 +41,23 @@ using QuickAccess.DataStructures.Common.Guards;
 using QuickAccess.DataStructures.Common.RegularExpression;
 using QuickAccess.Parser.Product;
 
-namespace QuickAccess.Parser.SmartExpressions.Bricks
+namespace QuickAccess.Parser.Flexpressions.Bricks
 {
-	public sealed class QuantifierBrick : SmartExpressionBrick
+	public sealed class QuantifierBrick : FlexpressionBrick
 	{
 		public long Min { get; }
 		public long Max { get; }
-		public SmartExpressionBrick Content { get; }
+		public FlexpressionBrick Content { get; }
 
 		public override bool IsEmpty => (Min == 0 && Max == 0) || Content.IsEmpty;
 
 		/// <inheritdoc />
-		protected override void ApplyRuleDefinition(string name, SmartExpressionBrick content, bool recursion, bool freeze)
+		protected override void ApplyRuleDefinition(string name, FlexpressionBrick content, bool recursion, bool freeze)
 		{
 			ApplyRuleDefinition(Content, name, content, recursion, freeze);
 		}
 
-		public QuantifierBrick(ISmartExpressionAlgebra algebra, SmartExpressionBrick content, long min, long max)
+		public QuantifierBrick(IFlexpressionAlgebra algebra, FlexpressionBrick content, long min, long max)
 		: base(algebra.GetHighestPrioritizedAlgebra(content))
 		{
 			Content = content ?? throw new ArgumentNullException(nameof(content));
@@ -90,7 +90,7 @@ namespace QuickAccess.Parser.SmartExpressions.Bricks
 		}		
 
 		/// <inheritdoc />
-		public override bool Equals(SmartExpressionBrick other)
+		public override bool Equals(FlexpressionBrick other)
 		{
 			if (other is null)
 			{
@@ -131,7 +131,7 @@ namespace QuickAccess.Parser.SmartExpressions.Bricks
                     {
                         ctx.Accept();
 						return nodes != null
-							? ctx.CreateExpressionForAcceptedFragment(SmartExpression.ExpressionTypes.Concatenation, nodes)
+							? ctx.CreateExpressionForAcceptedFragment(FX.ExpressionTypes.Concatenation, nodes)
 							: new EmptyNode(ctx);
 					}
 					
@@ -157,7 +157,7 @@ namespace QuickAccess.Parser.SmartExpressions.Bricks
 
 			if (IsEmpty)
 			{
-				return SX.Empty.ToString();
+				return FX.Empty.ToString();
 			}
 
 			if (Min == 1 && Max == 1)

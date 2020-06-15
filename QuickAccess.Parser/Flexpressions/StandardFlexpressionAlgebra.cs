@@ -2,15 +2,20 @@
 using System.Linq;
 using QuickAccess.DataStructures.CodeOperatorAlgebra;
 using QuickAccess.DataStructures.Common.RegularExpression;
+using QuickAccess.Parser.Flexpressions.Bricks;
 using QuickAccess.Parser.Product;
-using QuickAccess.Parser.SmartExpressions.Bricks;
 
-namespace QuickAccess.Parser.SmartExpressions
+namespace QuickAccess.Parser.Flexpressions
 {
-	public class StandardSmartExpressionAlgebra : ISmartExpressionAlgebra
+    public sealed class OperatorDefinitions
+    {
+
+    }
+
+	public class StandardFlexpressionAlgebra : IFlexpressionAlgebra
 	{
 		/// <inheritdoc />
-		public Type BaseDomainType => typeof(SmartExpressionBrick);
+		public Type BaseDomainType => typeof(FlexpressionBrick);
 
 		/// <inheritdoc />
 		public int Priority { get; }
@@ -18,7 +23,7 @@ namespace QuickAccess.Parser.SmartExpressions
 		/// <inheritdoc />
 		public bool IsDomainSupported(Type domainType)
 		{
-			return typeof(SmartExpressionBrick).IsAssignableFrom(domainType);
+			return typeof(FlexpressionBrick).IsAssignableFrom(domainType);
 		}
 
 		/// <inheritdoc />
@@ -26,6 +31,7 @@ namespace QuickAccess.Parser.SmartExpressions
 		                                                         | OverloadableCodeOperators.BitwiseComplement 
 		                                                         | OverloadableCodeOperators.LogicalNegation 
 		                                                         | OverloadableCodeOperators.Minus;
+
 
 		/// <inheritdoc />
 		public bool IsUnaryOperatorSupported(OverloadableCodeUnarySymmetricOperator unaryOperator)
@@ -74,7 +80,7 @@ namespace QuickAccess.Parser.SmartExpressions
 		                                      object right,
 		                                      out object result)
 		{
-			if (left is SmartExpressionBrick lb && right is SmartExpressionBrick rb)
+			if (left is FlexpressionBrick lb && right is FlexpressionBrick rb)
 			{
 				result = EvaluateOperatorResult(lb, binaryOperator, rb);
 				return true;
@@ -87,7 +93,7 @@ namespace QuickAccess.Parser.SmartExpressions
 		/// <inheritdoc />
 		public bool TryEvaluateOperatorResult(OverloadableCodeUnarySymmetricOperator unaryOperator, object arg, out object result)
 		{
-			if (arg is SmartExpressionBrick sb)
+			if (arg is FlexpressionBrick sb)
 			{
 				result = EvaluateOperatorResult(unaryOperator, sb);
 				return true;
@@ -97,64 +103,64 @@ namespace QuickAccess.Parser.SmartExpressions
 			return false;
 		}
 
-		public SmartExpressionBrick Anything => CreateRulePlaceholder(SmartExpression.StandardRuleName.Anything, null);
+		public FlexpressionBrick Anything => CreateRulePlaceholder(FX.StandardRuleName.Anything, null);
 
 		/// <inheritdoc />
-		public SmartExpressionBrick Empty => EmptyParsingBrick.Instance;
+		public FlexpressionBrick Empty => EmptyParsingBrick.Instance;
 
 		/// <inheritdoc />
-		public SmartExpressionBegin Start => new SmartExpressionBegin(this);
+		public FlexpressionBegin Start => new FlexpressionBegin(this);
 		/// <inheritdoc />
-		public SmartExpressionBrick WhiteSpace => CreateRulePlaceholder(SmartExpression.StandardRuleName.WhiteSpace, (Start | ' ' | '\t').OneOrMore());
+		public FlexpressionBrick WhiteSpace => CreateRulePlaceholder(FX.StandardRuleName.WhiteSpace, (Start | ' ' | '\t').OneOrMore());
         /// <inheritdoc />
-		public SmartExpressionBrick WhiteSpaceOrNewLine => CreateRulePlaceholder(SmartExpression.StandardRuleName.WhiteSpaceOrNewLine, (Start | ' ' | '\t' | '\n' | '\r').OneOrMore());
+		public FlexpressionBrick WhiteSpaceOrNewLine => CreateRulePlaceholder(FX.StandardRuleName.WhiteSpaceOrNewLine, (Start | ' ' | '\t' | '\n' | '\r').OneOrMore());
 
 		/// <inheritdoc />
-		public SmartExpressionBrick OptionalWhiteSpace => CreateRulePlaceholder(SmartExpression.StandardRuleName.OptionalWhiteSpace, ~WhiteSpace);
+		public FlexpressionBrick OptionalWhiteSpace => CreateRulePlaceholder(FX.StandardRuleName.OptionalWhiteSpace, ~WhiteSpace);
         /// <inheritdoc />
-		public SmartExpressionBrick OptionalWhiteSpaceOrNewLine => CreateRulePlaceholder(SmartExpression.StandardRuleName.OptionalWhiteSpaceOrNewLine, ~WhiteSpaceOrNewLine);
+		public FlexpressionBrick OptionalWhiteSpaceOrNewLine => CreateRulePlaceholder(FX.StandardRuleName.OptionalWhiteSpaceOrNewLine, ~WhiteSpaceOrNewLine);
 
 		/// <inheritdoc />
-		public SmartExpressionBrick CustomSequence => CreateRulePlaceholder(SmartExpression.StandardRuleName.CustomSequence, Empty);
+		public FlexpressionBrick CustomSequence => CreateRulePlaceholder(FX.StandardRuleName.CustomSequence, Empty);
 		/// <inheritdoc />
-		public SmartExpressionBrick NewLine => CreateRulePlaceholder(SmartExpression.StandardRuleName.NewLine, OptionalWhiteSpace + (Start | '\n' | '\r').OneOrMore());
+		public FlexpressionBrick NewLine => CreateRulePlaceholder(FX.StandardRuleName.NewLine, OptionalWhiteSpace + (Start | '\n' | '\r').OneOrMore());
 		/// <inheritdoc />
-		public SmartExpressionBrick Letter => CreateRulePlaceholder(SmartExpression.StandardRuleName.Letter, new StandardCharacterRangeBrick(this, StandardCharactersRange.Letter));
+		public FlexpressionBrick Letter => CreateRulePlaceholder(FX.StandardRuleName.Letter, new StandardCharacterRangeBrick(this, StandardCharactersRange.Letter));
 		/// <inheritdoc />
-		public SmartExpressionBrick UpperLetter => CreateRulePlaceholder(SmartExpression.StandardRuleName.UpperLetter, new StandardCharacterRangeBrick(this, StandardCharactersRange.UpperLetter));
+		public FlexpressionBrick UpperLetter => CreateRulePlaceholder(FX.StandardRuleName.UpperLetter, new StandardCharacterRangeBrick(this, StandardCharactersRange.UpperLetter));
 		/// <inheritdoc />
-		public SmartExpressionBrick LowerLetter => CreateRulePlaceholder(SmartExpression.StandardRuleName.LowerLetter, new StandardCharacterRangeBrick(this, StandardCharactersRange.LowerLetter));
+		public FlexpressionBrick LowerLetter => CreateRulePlaceholder(FX.StandardRuleName.LowerLetter, new StandardCharacterRangeBrick(this, StandardCharactersRange.LowerLetter));
 		/// <inheritdoc />
-		public SmartExpressionBrick Symbol => CreateRulePlaceholder(SmartExpression.StandardRuleName.Symbol, null);
+		public FlexpressionBrick Symbol => CreateRulePlaceholder(FX.StandardRuleName.Symbol, null);
 		/// <inheritdoc />
-		public SmartExpressionBrick Digit => CreateRulePlaceholder(SmartExpression.StandardRuleName.Digit, new StandardCharacterRangeBrick(this, StandardCharactersRange.Digit));
+		public FlexpressionBrick Digit => CreateRulePlaceholder(FX.StandardRuleName.Digit, new StandardCharacterRangeBrick(this, StandardCharactersRange.Digit));
 		/// <inheritdoc />
-		public SmartExpressionBrick Current => new CurrentRulePlaceholderBrick(this);
+		public FlexpressionBrick Current => new CurrentRulePlaceholderBrick(this);
 		
-		public StandardSmartExpressionAlgebra(int priority)
+		public StandardFlexpressionAlgebra(int priority)
 		{
 			Priority = priority;
 		}
 
-		public SmartExpressionBrick DefineRule(SmartExpressionBrick parsingBrick, ExpressionTypeDescriptor expressionType, bool blockFromRuleOverwriting)
+		public FlexpressionBrick DefineRule(FlexpressionBrick parsingBrick, ExpressionTypeDescriptor expressionType, bool blockFromRuleOverwriting)
         {
             return new CapturingGroupBrick(expressionType, this, parsingBrick, blockFromRuleOverwriting);
 		}
 
 		/// <inheritdoc />
-		public SmartExpressionBrick DefineSealedRule(SmartExpressionBrick content, ExpressionTypeDescriptor expressionType)
+		public FlexpressionBrick DefineSealedRule(FlexpressionBrick content, ExpressionTypeDescriptor expressionType)
 		{
 			return DefineRule(content, expressionType, blockFromRuleOverwriting: true);
 		}
 
         /// <inheritdoc />
-		public SmartExpressionBrick CreateRulePlaceholder(string ruleName, SmartExpressionBrick defaultExpression)
+		public FlexpressionBrick CreateRulePlaceholder(string ruleName, FlexpressionBrick defaultExpression)
 		{
-			return new RulePlaceholderBrick(this.GetHighestPrioritizedAlgebra<SmartExpressionBrick, SmartExpressionBrick, ISmartExpressionAlgebra>(defaultExpression), ruleName, defaultExpression);
+			return new RulePlaceholderBrick(this.GetHighestPrioritizedAlgebra<FlexpressionBrick, FlexpressionBrick, IFlexpressionAlgebra>(defaultExpression), ruleName, defaultExpression);
 		}
 
         /// <inheritdoc />
-        public SmartExpressionBrick CreateQuantifierBrick(SmartExpressionBrick content, long min, long max)
+        public FlexpressionBrick CreateQuantifierBrick(FlexpressionBrick content, long min, long max)
 		{
 			EvaluateArguments(ref content);
 
@@ -177,31 +183,31 @@ namespace QuickAccess.Parser.SmartExpressions
 		}
 
 		/// <inheritdoc />
-		public SmartExpressionBrick DefineRule(SmartExpressionBrick content, ExpressionTypeDescriptor expressionType)
+		public FlexpressionBrick DefineRule(FlexpressionBrick content, ExpressionTypeDescriptor expressionType)
 		{
 			return DefineRule(content, expressionType, blockFromRuleOverwriting: false);
 		}
 
-		public SmartExpressionBrick EvaluateOperatorResult(SmartExpressionBrick left, OverloadableCodeBinarySymmetricOperator binaryOperator, SmartExpressionBrick right)
+		public FlexpressionBrick EvaluateOperatorResult(FlexpressionBrick left, OverloadableCodeBinarySymmetricOperator binaryOperator, FlexpressionBrick right)
 		{
 			EvaluateArguments(ref left, ref right);
 
             return binaryOperator switch
             {
-                OverloadableCodeBinarySymmetricOperator.Mul => Concatenate(left, SX.Anything, right),
-                OverloadableCodeBinarySymmetricOperator.Div => Concatenate(left, SX.NewLine, right),
-                OverloadableCodeBinarySymmetricOperator.Mod => Concatenate(left, SX.CustomSequence, right),
+                OverloadableCodeBinarySymmetricOperator.Mul => Concatenate(left, FX.Anything, right),
+                OverloadableCodeBinarySymmetricOperator.Div => Concatenate(left, FX.NewLine, right),
+                OverloadableCodeBinarySymmetricOperator.Mod => Concatenate(left, FX.CustomSequence, right),
                 OverloadableCodeBinarySymmetricOperator.Sum => Concatenate(left, right),
-                OverloadableCodeBinarySymmetricOperator.And => Concatenate(left, SX.OptionalWhiteSpace, right),
-                OverloadableCodeBinarySymmetricOperator.XOr => Concatenate(left, SX.WhiteSpace, right),
+                OverloadableCodeBinarySymmetricOperator.And => Concatenate(left, FX.OptionalWhiteSpace, right),
+                OverloadableCodeBinarySymmetricOperator.XOr => Concatenate(left, FX.WhiteSpace, right),
                 OverloadableCodeBinarySymmetricOperator.Or => CreateAlternation(left, right),
-                _ => throw new NotSupportedException($"{nameof(SmartExpressionBrick)} doesn't support binary operator '{binaryOperator.GetSymbol()}' ({binaryOperator})."),
+                _ => throw new NotSupportedException($"{nameof(FlexpressionBrick)} doesn't support binary operator '{binaryOperator.GetSymbol()}' ({binaryOperator})."),
             };
         }
 
         private const long MaxQuantification = int.MaxValue;
 		
-		public SmartExpressionBrick EvaluateOperatorResult(OverloadableCodeUnarySymmetricOperator unaryOperator, SmartExpressionBrick arg)
+		public FlexpressionBrick EvaluateOperatorResult(OverloadableCodeUnarySymmetricOperator unaryOperator, FlexpressionBrick arg)
 		{
 			EvaluateArguments(ref arg);
 
@@ -210,11 +216,11 @@ namespace QuickAccess.Parser.SmartExpressions
                 OverloadableCodeUnarySymmetricOperator.BitwiseComplement => CreateQuantifierBrick(arg, 0, 1),
                 OverloadableCodeUnarySymmetricOperator.Increment => CreateQuantifierBrick(arg, 1, MaxQuantification),
 
-                _ => throw new NotSupportedException($"{nameof(SmartExpressionBrick)} doesn't support unary operator '{unaryOperator.GetSymbol()}' ({unaryOperator})."),
+                _ => throw new NotSupportedException($"{nameof(FlexpressionBrick)} doesn't support unary operator '{unaryOperator.GetSymbol()}' ({unaryOperator})."),
             };
         }
 
-		private SmartExpressionBrick Concatenate(SmartExpressionBrick left, SmartExpressionBrick right)
+		private FlexpressionBrick Concatenate(FlexpressionBrick left, FlexpressionBrick right)
 		{
 			if (left.IsEmpty)
 			{
@@ -229,7 +235,7 @@ namespace QuickAccess.Parser.SmartExpressions
 			return new ConcatenationBrick(this, left, right);
 		}
 
-		private SmartExpressionBrick Concatenate(SmartExpressionBrick left, SmartExpressionBrick middle, SmartExpressionBrick right)
+		private FlexpressionBrick Concatenate(FlexpressionBrick left, FlexpressionBrick middle, FlexpressionBrick right)
 		{
 			EvaluateArguments(ref middle);
 
@@ -251,7 +257,7 @@ namespace QuickAccess.Parser.SmartExpressions
 			return new ConcatenationBrick(this, left, middle, right);
 		}
 
-		private SmartExpressionBrick CreateAlternation(SmartExpressionBrick left, SmartExpressionBrick right)
+		private FlexpressionBrick CreateAlternation(FlexpressionBrick left, FlexpressionBrick right)
 		{
 			if (left.Equals(right))
 			{
@@ -276,7 +282,7 @@ namespace QuickAccess.Parser.SmartExpressions
 			return new AlternationBrick(this, left, right);
 		}
 
-		private void EvaluateArguments(ref SmartExpressionBrick arg1)
+		private void EvaluateArguments(ref FlexpressionBrick arg1)
 		{
 			if (arg1 is CapturingGroupBrick cb)
 			{
@@ -284,7 +290,7 @@ namespace QuickAccess.Parser.SmartExpressions
 			}
 		}
 
-		private void EvaluateArguments(ref SmartExpressionBrick arg1, ref SmartExpressionBrick arg2)
+		private void EvaluateArguments(ref FlexpressionBrick arg1, ref FlexpressionBrick arg2)
 		{
 			EvaluateArguments(ref arg1);
 			EvaluateArguments(ref arg2);

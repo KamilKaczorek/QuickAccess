@@ -35,32 +35,52 @@
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
 
-using QuickAccess.DataStructures.CodeOperatorAlgebra;
+using QuickAccess.DataStructures.Common.RegularExpression;
 using QuickAccess.Parser.Product;
 
-namespace QuickAccess.Parser.SmartExpressions
+namespace QuickAccess.Parser.Flexpressions.Bricks
 {
-	public interface ISmartExpressionAlgebra : IDefineCodeOperatorSymmetricAlgebra<SmartExpressionBrick>
+	public sealed class StandardCharacterRangeBrick : FlexpressionBrick
 	{
-		SmartExpressionBrick CreateQuantifierBrick(SmartExpressionBrick content, long min, long max);
-		SmartExpressionBrick DefineRule(SmartExpressionBrick content, ExpressionTypeDescriptor expressionType);
-		SmartExpressionBrick DefineSealedRule(SmartExpressionBrick content, ExpressionTypeDescriptor expressionType);
-		SmartExpressionBrick CreateRulePlaceholder(string ruleName, SmartExpressionBrick defaultExpression);
-		SmartExpressionBrick Current { get; }
+		private readonly StandardCharactersRange _range;
 
-		SmartExpressionBegin Start { get; }
-		SmartExpressionBrick Anything { get; }
-		SmartExpressionBrick Empty { get; }
-		SmartExpressionBrick WhiteSpace { get; }
-		SmartExpressionBrick WhiteSpaceOrNewLine { get; }
-		SmartExpressionBrick OptionalWhiteSpace { get; }
-		SmartExpressionBrick OptionalWhiteSpaceOrNewLine { get; }
-		SmartExpressionBrick CustomSequence { get; }
-		SmartExpressionBrick NewLine { get; }
-		SmartExpressionBrick Letter { get; }
-		SmartExpressionBrick UpperLetter { get; }
-		SmartExpressionBrick LowerLetter { get; }
-		SmartExpressionBrick Symbol { get; }
-		SmartExpressionBrick Digit { get; }
-	}
+		/// <inheritdoc />
+		public StandardCharacterRangeBrick(IFlexpressionAlgebra algebra, StandardCharactersRange letterTypes) : base(algebra)
+		{
+			_range = letterTypes;
+		}
+
+		/// <inheritdoc />
+		protected override void ApplyRuleDefinition(string name, FlexpressionBrick content, bool recursion, bool freeze)
+		{
+		}
+
+        /// <inheritdoc />
+		public override bool Equals(FlexpressionBrick other)
+		{
+			return other is StandardCharacterRangeBrick lb && lb._range == _range;
+		}
+
+		/// <inheritdoc />
+		protected override IParsingProduct TryParseInternal(IParsingContextStream ctx)
+		{
+			return ctx.MoveNext() && ctx.Current.IsFromRange(_range)
+				? ctx.Accept().CreateTermForAcceptedFragment(FX.ExpressionTypes.CharTerm)
+				: null;
+		}
+
+		/// <inheritdoc />
+		public override string ToRegularExpressionString(RegularExpressionBuildingContext ctx)
+		{
+			return ctx.Factory.CreateCharRange(ctx.Context, _range);
+		}
+
+		/// <inheritdoc />
+		public override MatchingLevel RegularExpressionMatchingLevel => MatchingLevel.Exact;
+
+        public override string ToString()
+        {
+            return $"{_range}";
+        }
+    }
 }

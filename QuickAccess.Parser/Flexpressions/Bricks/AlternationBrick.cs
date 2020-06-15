@@ -39,9 +39,9 @@ using System.Linq;
 using QuickAccess.DataStructures.Common.RegularExpression;
 using QuickAccess.Parser.Product;
 
-namespace QuickAccess.Parser.SmartExpressions.Bricks
+namespace QuickAccess.Parser.Flexpressions.Bricks
 {
-	public sealed class ConcatenationBrick : CompositeSmartExpressionBrick
+	public sealed class AlternationBrick : CompositeFlexpressionBrick
 	{
 		/// <inheritdoc />
 		public override MatchingLevel RegularExpressionMatchingLevel => Bricks.GetMinimalMatchingLevel();
@@ -49,44 +49,36 @@ namespace QuickAccess.Parser.SmartExpressions.Bricks
 		/// <inheritdoc />
 		protected override IParsingProduct TryParseInternal(IParsingContextStream ctx)
 		{
-			return Bricks.TryAggregateParse(ctx);
+			return Bricks.TryAlternativeParse(ctx);
 		}
 
-		//public override string ExpressionId => string.Join(string.Empty, Bricks.Select(b => b.ExpressionId));
-
-		public ConcatenationBrick(ISmartExpressionAlgebra algebra, SmartExpressionBrick b1, SmartExpressionBrick b2)
+		public AlternationBrick(IFlexpressionAlgebra algebra, FlexpressionBrick b1, FlexpressionBrick b2)
 			: base(algebra, b1, b2, CanMakeFlat)
 		{
 			
 		}
 
-		public ConcatenationBrick(ISmartExpressionAlgebra algebra, SmartExpressionBrick b1, SmartExpressionBrick b2, SmartExpressionBrick b3)
-			: base(algebra, b1, b2, b3, CanMakeFlat)
-		{
-			
-		}
-
-		public ConcatenationBrick(ISmartExpressionAlgebra algebra, SmartExpressionBrick[] bricks)
+		public AlternationBrick(IFlexpressionAlgebra algebra, FlexpressionBrick[] bricks)
 			: base(algebra, bricks, CanMakeFlat)
 		{
 			
 		}
 
-		private static bool CanMakeFlat(CompositeSmartExpressionBrick cb)
+		private static bool CanMakeFlat(CompositeFlexpressionBrick cb)
 		{
-			return cb is ConcatenationBrick;
-		}
-
-		/// <inheritdoc />
-		public override string ToRegularExpressionString(RegularExpressionBuildingContext ctx)
-		{
-			return string.Join("", Bricks.Select(b => b.ToRegularExpressionString(ctx)));
+			return cb is AlternationBrick;
 		}
 
 		/// <inheritdoc />
 		public override string ToString()
 		{
-			return string.Join("", Bricks.Select(b => b.ToString()));
+			return $"({string.Join("|", Bricks.Select(b => b.ToString()))})";
+		}
+
+		/// <inheritdoc />
+		public override string ToRegularExpressionString(RegularExpressionBuildingContext ctx)
+		{
+			return ctx.Factory.CreateAlternation(ctx.Context, Bricks.Select(b => b.ToRegularExpressionString(ctx)));
 		}
 	}
 }

@@ -35,54 +35,62 @@
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
 
+using System.Collections.Generic;
+using QuickAccess.DataStructures.Common.Freezable;
 using QuickAccess.DataStructures.Common.RegularExpression;
 using QuickAccess.Parser.Product;
 
-namespace QuickAccess.Parser.SmartExpressions.Bricks
+namespace QuickAccess.Parser.Flexpressions.Bricks
 {
-	public sealed class NegationBrick : SmartExpressionBrick
+	public sealed class CurrentRulePlaceholderBrick : FlexpressionBrick
 	{
 		/// <inheritdoc />
-		public override string Name => "Not";
-		public SmartExpressionBrick Content { get; }
-		/// <inheritdoc />
-		public NegationBrick(ISmartExpressionAlgebra algebra, SmartExpressionBrick content) : base(algebra)
+		public override string Name => RuleName;
+		private readonly LimitedNumberOfTimesSetValue<KeyValuePair<string, FlexpressionBrick>> _rule = LimitedNumberOfTimesSetValue.CreateNotSet<KeyValuePair<string, FlexpressionBrick>>(1);
+		public string RuleName => _rule.IsSet ? _rule.Value.Key : "CURRENT";
+		public FlexpressionBrick Content => _rule.GetKeyValueOrDefault();
+
+
+		public override bool Equals(FlexpressionBrick other)
 		{
-			Content = content;
+			return other is CurrentRulePlaceholderBrick;
 		}
 
 		/// <inheritdoc />
-		protected override void ApplyRuleDefinition(string name, SmartExpressionBrick content, bool recursion, bool freeze)
+		protected override IParsingProduct TryParseInternal(IParsingContextStream ctx)
 		{
-			ApplyRuleDefinition(Content, name, content, recursion, freeze);
+			return Content.TryParse(ctx);
+		}
+
+		/// <inheritdoc />
+		protected override void ApplyRuleDefinition(string name, FlexpressionBrick content, bool recursion, bool freeze)
+		{
+			if (!recursion || _rule.IsSet)
+			{
+				return;
+			}
+			
+			_rule.Set(name, content);
 		}
 
         /// <inheritdoc />
-		public override bool Equals(SmartExpressionBrick other)
-		{
-			return other is NegationBrick nb && nb.Content.Equals(Content);
-		}
-
-		/// <inheritdoc />
-		public override MatchingLevel RegularExpressionMatchingLevel =>
-			Content?.RegularExpressionMatchingLevel ?? MatchingLevel.None;
-
-		/// <inheritdoc />
 		public override string ToRegularExpressionString(RegularExpressionBuildingContext ctx)
 		{
-			return ctx.Factory.CreateNot(ctx.Context, Content.ToRegularExpressionString(ctx));
+			return ctx.Factory.CreateRecursiveGroupCall(ctx.Context, RuleName);
 		}
 
-		protected override IParsingProduct TryParseInternal(IParsingContextStream ctx)
+		/// <inheritdoc />
+		public override MatchingLevel RegularExpressionMatchingLevel => MatchingLevel.Exact;
+
+		/// <inheritdoc />
+		public override string ToString()
 		{
-			var res = Content.TryParse(ctx);
-
-			return res != null ? null : new EmptyNode(ctx);
+			return RuleName;
 		}
 
-        public override string ToString()
-        {
-            return $"!({Content})";
-        }
-    }
+		/// <inheritdoc />
+		public CurrentRulePlaceholderBrick(IFlexpressionAlgebra algebra) : base(algebra)
+		{
+		}
+	}
 }
