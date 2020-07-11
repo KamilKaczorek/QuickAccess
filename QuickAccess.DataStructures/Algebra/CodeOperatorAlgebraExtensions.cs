@@ -40,7 +40,7 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
 
-namespace QuickAccess.DataStructures.CodeOperatorAlgebra
+namespace QuickAccess.DataStructures.Algebra
 {
 	public static class CodeOperatorAlgebraExtensions
 	{
@@ -52,20 +52,13 @@ namespace QuickAccess.DataStructures.CodeOperatorAlgebra
 		}
 
 		[Pure]
-		public static T GetOperatorResultOfHighestPrioritizedAlgebra<T>(this IDefineCodeOperatorSymmetricAlgebra<T> defaultAlgebra, T left,  OverloadableCodeBinarySymmetricOperator binaryOperator, T right)
+		public static T GetOperatorResultOfHighestPrioritizedAlgebra<T>(this IDefineCodeOperatorSymmetricAlgebra<T> defaultAlgebra,  OverloadableCodeBinarySymmetricOperator binaryOperator, T left, T right)
 			where T : IDefineAlgebraicDomain<T, IDefineCodeOperatorSymmetricAlgebra<T>>
 		{
 			return defaultAlgebra.GetHighestPrioritizedAlgebra(left, right).EvaluateOperatorResult(left, binaryOperator, right);
 		}
 
-        [Pure]
-        public static TFinal GetOperatorResultOfHighestPrioritizedAlgebra<T, TFinal>(this IDefineCodeOperatorSymmetricAlgebra<T, TFinal> defaultAlgebra, T left,  OverloadableCodeBinarySymmetricOperator binaryOperator, T right)
-            where T : IDefineAlgebraicDomain<T, TFinal, IDefineCodeOperatorSymmetricAlgebra<T, TFinal>>
-		    where TFinal : T
-        {
-            return defaultAlgebra.GetHighestPrioritizedAlgebra<T, TFinal, IDefineCodeOperatorSymmetricAlgebra<T, TFinal>>(left, right).EvaluateOperatorResult(left, binaryOperator, right);
-        }
-
+       
 		[Pure]
 		public static T GetOperatorResultOfHighestPrioritizedAlgebra<T>(this IDefineCodeOperatorSymmetricAlgebra<T> defaultAlgebra, OverloadableCodeUnarySymmetricOperator unaryOperator, T arg)
 			where T : IDefineAlgebraicDomain<T, IDefineCodeOperatorSymmetricAlgebra<T>>
@@ -90,16 +83,7 @@ namespace QuickAccess.DataStructures.CodeOperatorAlgebra
 			return arg1Prior >= arg2Prior ? algebra1 ?? algebra2 : algebra2;
 		}
 
-        [Pure]
-        public static TAlgebra GetHighestPrioritizedAlgebra<T, TFinal, TAlgebra>(this TAlgebra algebra1, TAlgebra algebra2)
-            where TAlgebra : class, IDefineCodeOperatorSymmetricAlgebra<T, TFinal>
-		    where TFinal : T
-        {
-            var arg1Prior = algebra1?.Priority ?? int.MinValue;
-            var arg2Prior = algebra2?.Priority ?? int.MinValue;
-
-            return arg1Prior >= arg2Prior ? algebra1 ?? algebra2 : algebra2;
-        }
+      
 
 		[Pure]
 		public static TAlgebra GetHighestPrioritizedAlgebra<T, TAlgebra>(this TAlgebra defaultAlgebra, IEnumerable<TAlgebra> algebras)
@@ -133,15 +117,6 @@ namespace QuickAccess.DataStructures.CodeOperatorAlgebra
 			return GetHighestPrioritizedAlgebra<T, TAlgebra>(arg1?.Algebra, defaultAlgebra);
 		}
 
-        [Pure]
-        public static TAlgebra GetHighestPrioritizedAlgebra<T, TFinal, TAlgebra>(this TAlgebra defaultAlgebra, T arg1)
-            where T : IDefineAlgebraicDomain<T, TFinal, TAlgebra>
-			where TFinal : T
-            where TAlgebra : class, IDefineCodeOperatorSymmetricAlgebra<T, TFinal>
-        {
-            return GetHighestPrioritizedAlgebra<T, TFinal, TAlgebra>(arg1?.Algebra, defaultAlgebra);
-        }
-
 		[Pure]
 		public static TAlgebra GetHighestPrioritizedAlgebra<T, TAlgebra>(this T arg1, T arg2)
 			where T : IDefineAlgebraicDomain<T, TAlgebra>
@@ -157,15 +132,6 @@ namespace QuickAccess.DataStructures.CodeOperatorAlgebra
 		{
 			return GetHighestPrioritizedAlgebra<T, TAlgebra>(GetHighestPrioritizedAlgebra<T, TAlgebra>(arg1?.Algebra, arg2?.Algebra), defaultAlgebra);
 		}
-
-        [Pure]
-        public static TAlgebra GetHighestPrioritizedAlgebra<T, TFinal, TAlgebra>(this TAlgebra defaultAlgebra, T arg1, T arg2)
-            where T : IDefineAlgebraicDomain<T, TFinal, TAlgebra>
-			where TFinal : T
-            where TAlgebra : class, IDefineCodeOperatorSymmetricAlgebra<T, TFinal>
-        {
-            return GetHighestPrioritizedAlgebra<T, TFinal, TAlgebra>(GetHighestPrioritizedAlgebra<T, TFinal, TAlgebra>(arg1?.Algebra, arg2?.Algebra), defaultAlgebra);
-        }
 
 		[Pure]
 		public static TAlgebra GetHighestPrioritizedAlgebra<T, TAlgebra>(this TAlgebra defaultAlgebra, T arg1, T arg2, T arg3)

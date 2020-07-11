@@ -1,16 +1,13 @@
 ﻿using System;
 using System.Linq;
-using QuickAccess.DataStructures.CodeOperatorAlgebra;
+using QuickAccess.DataStructures.Algebra;
 using QuickAccess.DataStructures.Common.RegularExpression;
 using QuickAccess.Parser.Flexpressions.Bricks;
 using QuickAccess.Parser.Product;
 
 namespace QuickAccess.Parser.Flexpressions
 {
-    public sealed class OperatorDefinitions
-    {
-
-    }
+    
 
 	public class StandardFlexpressionAlgebra : IFlexpressionAlgebra
 	{
@@ -103,7 +100,7 @@ namespace QuickAccess.Parser.Flexpressions
 			return false;
 		}
 
-		public FlexpressionBrick Anything => CreateRulePlaceholder(FX.StandardRuleName.Anything, null);
+		public FlexpressionBrick Anything => CreateRulePlaceholder(FXB.StandardRuleName.Anything, null);
 
 		/// <inheritdoc />
 		public FlexpressionBrick Empty => EmptyParsingBrick.Instance;
@@ -111,29 +108,29 @@ namespace QuickAccess.Parser.Flexpressions
 		/// <inheritdoc />
 		public FlexpressionBegin Start => new FlexpressionBegin(this);
 		/// <inheritdoc />
-		public FlexpressionBrick WhiteSpace => CreateRulePlaceholder(FX.StandardRuleName.WhiteSpace, (Start | ' ' | '\t').OneOrMore());
+		public FlexpressionBrick WhiteSpace => CreateRulePlaceholder(FXB.StandardRuleName.WhiteSpace, (Start | ' ' | '\t').OneOrMore());
         /// <inheritdoc />
-		public FlexpressionBrick WhiteSpaceOrNewLine => CreateRulePlaceholder(FX.StandardRuleName.WhiteSpaceOrNewLine, (Start | ' ' | '\t' | '\n' | '\r').OneOrMore());
+		public FlexpressionBrick WhiteSpaceOrNewLine => CreateRulePlaceholder(FXB.StandardRuleName.WhiteSpaceOrNewLine, (Start | ' ' | '\t' | '\n' | '\r').OneOrMore());
 
 		/// <inheritdoc />
-		public FlexpressionBrick OptionalWhiteSpace => CreateRulePlaceholder(FX.StandardRuleName.OptionalWhiteSpace, ~WhiteSpace);
+		public FlexpressionBrick OptionalWhiteSpace => CreateRulePlaceholder(FXB.StandardRuleName.OptionalWhiteSpace, ~WhiteSpace);
         /// <inheritdoc />
-		public FlexpressionBrick OptionalWhiteSpaceOrNewLine => CreateRulePlaceholder(FX.StandardRuleName.OptionalWhiteSpaceOrNewLine, ~WhiteSpaceOrNewLine);
+		public FlexpressionBrick OptionalWhiteSpaceOrNewLine => CreateRulePlaceholder(FXB.StandardRuleName.OptionalWhiteSpaceOrNewLine, ~WhiteSpaceOrNewLine);
 
 		/// <inheritdoc />
-		public FlexpressionBrick CustomSequence => CreateRulePlaceholder(FX.StandardRuleName.CustomSequence, Empty);
+		public FlexpressionBrick CustomSequence => CreateRulePlaceholder(FXB.StandardRuleName.CustomSequence, Empty);
 		/// <inheritdoc />
-		public FlexpressionBrick NewLine => CreateRulePlaceholder(FX.StandardRuleName.NewLine, OptionalWhiteSpace + (Start | '\n' | '\r').OneOrMore());
+		public FlexpressionBrick NewLine => CreateRulePlaceholder(FXB.StandardRuleName.NewLine, OptionalWhiteSpace + (Start | '\n' | '\r').OneOrMore());
 		/// <inheritdoc />
-		public FlexpressionBrick Letter => CreateRulePlaceholder(FX.StandardRuleName.Letter, new StandardCharacterRangeBrick(this, StandardCharactersRange.Letter));
+		public FlexpressionBrick Letter => CreateRulePlaceholder(FXB.StandardRuleName.Letter, new StandardCharacterRangeBrick(this, StandardCharactersRange.Letter));
 		/// <inheritdoc />
-		public FlexpressionBrick UpperLetter => CreateRulePlaceholder(FX.StandardRuleName.UpperLetter, new StandardCharacterRangeBrick(this, StandardCharactersRange.UpperLetter));
+		public FlexpressionBrick UpperLetter => CreateRulePlaceholder(FXB.StandardRuleName.UpperLetter, new StandardCharacterRangeBrick(this, StandardCharactersRange.UpperLetter));
 		/// <inheritdoc />
-		public FlexpressionBrick LowerLetter => CreateRulePlaceholder(FX.StandardRuleName.LowerLetter, new StandardCharacterRangeBrick(this, StandardCharactersRange.LowerLetter));
+		public FlexpressionBrick LowerLetter => CreateRulePlaceholder(FXB.StandardRuleName.LowerLetter, new StandardCharacterRangeBrick(this, StandardCharactersRange.LowerLetter));
 		/// <inheritdoc />
-		public FlexpressionBrick Symbol => CreateRulePlaceholder(FX.StandardRuleName.Symbol, null);
+		public FlexpressionBrick Symbol => CreateRulePlaceholder(FXB.StandardRuleName.Symbol, null);
 		/// <inheritdoc />
-		public FlexpressionBrick Digit => CreateRulePlaceholder(FX.StandardRuleName.Digit, new StandardCharacterRangeBrick(this, StandardCharactersRange.Digit));
+		public FlexpressionBrick Digit => CreateRulePlaceholder(FXB.StandardRuleName.Digit, new StandardCharacterRangeBrick(this, StandardCharactersRange.Digit));
 		/// <inheritdoc />
 		public FlexpressionBrick Current => new CurrentRulePlaceholderBrick(this);
 		
@@ -156,7 +153,7 @@ namespace QuickAccess.Parser.Flexpressions
         /// <inheritdoc />
 		public FlexpressionBrick CreateRulePlaceholder(string ruleName, FlexpressionBrick defaultExpression)
 		{
-			return new RulePlaceholderBrick(this.GetHighestPrioritizedAlgebra<FlexpressionBrick, FlexpressionBrick, IFlexpressionAlgebra>(defaultExpression), ruleName, defaultExpression);
+			return new RulePlaceholderBrick(this.GetHighestPrioritizedAlgebra(defaultExpression), ruleName, defaultExpression);
 		}
 
         /// <inheritdoc />
@@ -176,10 +173,10 @@ namespace QuickAccess.Parser.Flexpressions
 
 			if (min == 0 && max == 1 && content is QuantifierBrick qb && qb.Min <= 1)
 			{
-				return new QuantifierBrick(this, qb.Content, 0, qb.Max);
+				return new QuantifierBrick(content.Algebra, qb.Content, 0, qb.Max);
 			}
 
-			return new QuantifierBrick(this, content, min, max);
+			return new QuantifierBrick(content.Algebra, content, min, max);
 		}
 
 		/// <inheritdoc />
@@ -194,12 +191,12 @@ namespace QuickAccess.Parser.Flexpressions
 
             return binaryOperator switch
             {
-                OverloadableCodeBinarySymmetricOperator.Mul => Concatenate(left, FX.Anything, right),
-                OverloadableCodeBinarySymmetricOperator.Div => Concatenate(left, FX.NewLine, right),
-                OverloadableCodeBinarySymmetricOperator.Mod => Concatenate(left, FX.CustomSequence, right),
+                OverloadableCodeBinarySymmetricOperator.Mul => Concatenate(left, FXB.Anything, right),
+                OverloadableCodeBinarySymmetricOperator.Div => Concatenate(left, FXB.NewLine, right),
+                OverloadableCodeBinarySymmetricOperator.Mod => Concatenate(left, FXB.CustomSequence, right),
                 OverloadableCodeBinarySymmetricOperator.Sum => Concatenate(left, right),
-                OverloadableCodeBinarySymmetricOperator.And => Concatenate(left, FX.OptionalWhiteSpace, right),
-                OverloadableCodeBinarySymmetricOperator.XOr => Concatenate(left, FX.WhiteSpace, right),
+                OverloadableCodeBinarySymmetricOperator.And => Concatenate(left, FXB.OptionalWhiteSpace, right),
+                OverloadableCodeBinarySymmetricOperator.XOr => Concatenate(left, FXB.WhiteSpace, right),
                 OverloadableCodeBinarySymmetricOperator.Or => CreateAlternation(left, right),
                 _ => throw new NotSupportedException($"{nameof(FlexpressionBrick)} doesn't support binary operator '{binaryOperator.GetSymbol()}' ({binaryOperator})."),
             };

@@ -38,12 +38,12 @@ namespace QuickAccess.DataStructures.Common.RegularExpression
 {
 	public static class RegularExpressionRepresentableExtensions
 	{
-		public static bool IsRegularExpressionProvided(this IRegularExpressionRepresentable source)
+		public static bool IsRegularExpressionProvided(this IRepresentRegularExpression source)
 		{
 			return source.RegularExpressionMatchingLevel != MatchingLevel.None;
 		}
 
-		public static bool IsRegularExpressionProvided(this IRegularExpressionRepresentable source, MatchingLevel minimalMatchingLevel)
+		public static bool IsRegularExpressionProvided(this IRepresentRegularExpression source, MatchingLevel minimalMatchingLevel)
 		{
 			return source.RegularExpressionMatchingLevel >= minimalMatchingLevel;
 		}

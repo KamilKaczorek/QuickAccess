@@ -49,9 +49,11 @@ namespace QuickAccess.Parser
         /// Creates a new instance of the <see cref="ParsingContextStream"/> class.
         /// </summary>
         /// <param name="parent">The parent context.</param>
-        /// <param name="productFactory">The product factory.</param>
         /// <param name="offset">The context absolute offset within the source code.</param>
         /// <param name="maxDeep">The maximum deep of parented contexts.</param>
-        IParsingContextStream Create(IParsingContextStreamParent parent, IParsingProductFactory productFactory, int offset, int maxDeep);
+        IParsingContextStream Create(
+            IParsingContextStreamParent parent,
+            int offset,
+            int maxDeep);
     }
 }

@@ -40,6 +40,7 @@
 
 using System;
 using System.Collections.Generic;
+using QuickAccess.Parser.Flexpressions;
 using QuickAccess.Parser.Product;
 
 namespace QuickAccess.Parser
@@ -55,9 +56,10 @@ namespace QuickAccess.Parser
         IParsingContextStreamParent
     {
         private readonly IParsingProductFactory _productFactory;
-        private IParsingContextStreamParent _parent;
         private readonly int _initialOffset;
         private readonly int _maxDeep;
+
+        private IParsingContextStreamParent _parent;
 
         private int _internalOffset;
         private int _position;
@@ -93,7 +95,9 @@ namespace QuickAccess.Parser
         /// <inheritdoc />
         char IParsingContextStreamParent.this[int idx] => _parent[idx];
 
-        
+        /// <inheritdoc />
+        public IFlexpressionAlgebra MetaExpressionAlgebra { get; }
+
         /// <inheritdoc />
         public IParsingProduct CreateExpressionForAcceptedFragment(ExpressionTypeDescriptor expressionType,
             IReadOnlyCollection<IParsingProduct> subNodes)
@@ -129,14 +133,21 @@ namespace QuickAccess.Parser
         /// <summary>
         /// Initializes a new instance of the <see cref="ParsingContextStream"/> class.
         /// </summary>
-        /// <param name="parent">The parent context.</param>
         /// <param name="productFactory">The product factory.</param>
+        /// <param name="metaExpressionAlgebra">The algebra that defines meta expression operators and base symbols.</param>
+        /// <param name="parent">The parent context.</param>
         /// <param name="offset">The context absolute offset within the source code.</param>
         /// <param name="maxDeep">The maximum deep of parented contexts.</param>
-        public ParsingContextStream(IParsingContextStreamParent parent, IParsingProductFactory productFactory, int offset, int maxDeep)
+        public ParsingContextStream(
+            IParsingProductFactory productFactory, 
+            IFlexpressionAlgebra metaExpressionAlgebra, 
+            IParsingContextStreamParent parent, 
+            int offset, 
+            int maxDeep)
         {
             _initialOffset = offset;
             _maxDeep = maxDeep;
+            MetaExpressionAlgebra = metaExpressionAlgebra;
             _productFactory = productFactory;
             _internalOffset = 0;
             _parent = parent;
@@ -181,7 +192,7 @@ namespace QuickAccess.Parser
                 maxDeep--;
             }
 
-            return new ParsingContextStream(this, _productFactory, CurrentIndex + 1, maxDeep);
+            return new ParsingContextStream(_productFactory, MetaExpressionAlgebra, this, CurrentIndex + 1, maxDeep);
         }
 
         /// <inheritdoc />

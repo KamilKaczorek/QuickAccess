@@ -43,7 +43,7 @@ using QuickAccess.Parser.Product;
 
 namespace QuickAccess.Parser.Flexpressions
 {
-	public static class FX
+	public static class FXB
 	{
         [SuppressMessage("ReSharper", "MemberHidesStaticFromOuterClass")]
         public static class StandardRuleName
@@ -94,9 +94,9 @@ namespace QuickAccess.Parser.Flexpressions
 		public static FlexpressionBrick ToCharacter(char ch) => new CharBrick(DefaultAlgebra, ch);
 		public static FlexpressionBrick ToTextSequence(string text) => new TextMatchingBrick(DefaultAlgebra, text);
 
-		public static FlexpressionBrick ZeroOrMore(this string text) => ToTextSequence(text)[0, FX.Max];
+		public static FlexpressionBrick ZeroOrMore(this string text) => ToTextSequence(text)[0, FXB.Max];
 
-		public static FlexpressionBrick OneOrMore(this string text) => ToTextSequence(text)[1, FX.Max];
+		public static FlexpressionBrick OneOrMore(this string text) => ToTextSequence(text)[1, FXB.Max];
 
 		public static FlexpressionBrick Optional(this string text) => ToTextSequence(text)[0, 1];
 
@@ -122,9 +122,9 @@ namespace QuickAccess.Parser.Flexpressions
 			return DefaultAlgebra.DefineSealedRule(ToTextSequence(text), CreateExpressionType(patternName));
 		}
 
-		public static FlexpressionBrick ZeroOrMore(this FlexpressionBrick source) => source[0, FX.Max];
+		public static FlexpressionBrick ZeroOrMore(this FlexpressionBrick source) => source[0, FXB.Max];
 
-		public static FlexpressionBrick OneOrMore(this FlexpressionBrick source) => source[1, FX.Max];
+		public static FlexpressionBrick OneOrMore(this FlexpressionBrick source) => source[1, FXB.Max];
 
 		public static FlexpressionBrick Optional(this FlexpressionBrick source) => source[0, 1];
 

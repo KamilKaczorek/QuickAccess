@@ -28,41 +28,33 @@
 // 
 // =====================================================================
 // 
-// Project: QuickAccess.Parser
+// Project: QuickAccess.DataStructures
 // 
 // Author: Kamil Piotr Kaczorek
 // http://kamil.scienceontheweb.net
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
-namespace QuickAccess.DataStructures.CodeOperatorAlgebra
+
+using System;
+
+namespace QuickAccess.DataStructures.Algebra
 {
-	public enum OverloadableCodeUnarySymmetricOperator
+	public interface IAlgebra
 	{
-		/// <summary>
-		/// <c>x++</c>
-		/// </summary>
-		Increment = OverloadableCodeOperator.Increment,
-		/// <summary>
-		/// <c>x--</c>
-		/// </summary>
-		Decrement = OverloadableCodeOperator.Decrement,
-		/// <summary>
-		/// <c>+x</c>
-		/// </summary>
-		Plus = OverloadableCodeOperator.Plus,
-		/// <summary>
-		/// <c>-x</c>
-		/// </summary>
-		Minus =  OverloadableCodeOperator.Minus,
-		/// <summary>
-		/// <c>!x</c>
-		/// </summary>
-		LogicalNegation = OverloadableCodeOperator.LogicalNegation,
-		/// <summary>
-		/// <c>~x</c>
-		/// </summary>
-		BitwiseComplement = OverloadableCodeOperator.BitwiseComplement
+		Type BaseDomainType { get; }
+		int Priority { get; }
+		bool IsDomainSupported(Type domainType);
 	}
 
+	public interface IAlgebra<in TUnaryOperator, in TBinaryOperator> : IAlgebra
+	{
+		bool IsUnaryOperatorSupported(TUnaryOperator unaryOperator);
+		bool IsBinaryOperatorSupported(TBinaryOperator binaryOperator);
+	
+		string GetBinaryOperatorDescription(TBinaryOperator binaryOperator);
+		string GetUnaryOperatorDescription(TUnaryOperator unaryOperator);
 
+		bool TryEvaluateOperatorResult(object left, TBinaryOperator binaryOperator, object right, out object result);
+		bool TryEvaluateOperatorResult(TUnaryOperator unaryOperator, object arg, out object result);
+	}
 }

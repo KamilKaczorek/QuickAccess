@@ -100,7 +100,7 @@ namespace QuickAccess.Parser.Flexpressions.Bricks
 		/// <inheritdoc />
 		protected override IParsingProduct TryParseInternal(IParsingContextStream ctx)
 		{
-			return ctx.ParseText(Text) ? ctx.Accept().CreateTermForAcceptedFragment(FX.ExpressionTypes.TextTerm) : null;
+			return ctx.ParseText(Text) ? ctx.Accept().CreateTermForAcceptedFragment(FXB.ExpressionTypes.TextTerm) : null;
 		}
 
 		/// <inheritdoc />

@@ -42,7 +42,7 @@ namespace QuickAccess.Parser.Flexpressions.Bricks
 {
 	public sealed class EmptyParsingBrick : FlexpressionBrick
 	{
-		public static readonly EmptyParsingBrick Instance = new EmptyParsingBrick(FX.DefaultAlgebra);
+		public static readonly EmptyParsingBrick Instance = new EmptyParsingBrick(FXB.DefaultAlgebra);
 
 		private EmptyParsingBrick(IFlexpressionAlgebra algebra)
 		: base(algebra)

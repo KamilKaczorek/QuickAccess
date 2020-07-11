@@ -69,7 +69,7 @@ namespace QuickAccess.Parser
             }
 
             ctx.Accept();
-            return ctx.CreateExpressionForAcceptedFragment(FX.ExpressionTypes.Concatenation, nodes);
+            return ctx.CreateExpressionForAcceptedFragment(FXB.ExpressionTypes.Concatenation, nodes);
         }
 
 		public static IParsingProduct TryAggregateParse(this IReadOnlyCollection<IExpressionParser> parsers, ISourceCode src)
@@ -91,7 +91,7 @@ namespace QuickAccess.Parser
             }
 
             ctx.Accept();
-            return ctx.CreateExpressionForAcceptedFragment(FX.ExpressionTypes.Concatenation, nodes);
+            return ctx.CreateExpressionForAcceptedFragment(FXB.ExpressionTypes.Concatenation, nodes);
         }
 
 		public static IParsingProduct TryAlternativeParse(

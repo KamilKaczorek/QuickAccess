@@ -40,7 +40,7 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
 
-namespace QuickAccess.DataStructures.CodeOperatorAlgebra
+namespace QuickAccess.DataStructures.Algebra
 {
 	public static class OverloadableCodeOperatorsGroups
 	{
@@ -73,19 +73,19 @@ namespace QuickAccess.DataStructures.CodeOperatorAlgebra
         }
 
 		[Pure]
-		public static string ToCodeRepresentation(this OverloadableCodeBinarySymmetricOperator source, string arg = null, string right = null)
+		public static string ToCodeRepresentation(this OverloadableCodeBinarySymmetricOperator source, object left = null, object right = null, string spaceBetweenBinOperatorAndArgument = null)
 		{
-			return source.ToCodeOperator().ToCodeRepresentation(arg, right);
+			return source.ToCodeOperator().ToCodeRepresentation(left, right, spaceBetweenBinOperatorAndArgument);
 		}
 
 		[Pure]
-		public static string ToCodeRepresentation(this OverloadableCodeUnarySymmetricOperator source, string arg = null, string right = null)
+		public static string ToCodeRepresentation(this OverloadableCodeUnarySymmetricOperator source, object singleArg = null, string spaceBetweenBinOperatorAndArgument = null)
 		{
-			return source.ToCodeOperator().ToCodeRepresentation(arg, right);
+			return source.ToCodeOperator().ToCodeRepresentation(singleArg, null, spaceBetweenBinOperatorAndArgument);
 		}
 
 		[Pure]
-		public static string ToCodeRepresentation(this OverloadableCodeOperator source, string arg = null, string right = null, string spaceBetweenBinOperatorAndArgument = null)
+		public static string ToCodeRepresentation(this OverloadableCodeOperator source, object leftOrSingle = null, object right = null, string spaceBetweenBinOperatorAndArgument = null)
 		{
             var symbol = source.GetSymbol();
             var argsCount = source.GetNumberOfArguments();
@@ -99,11 +99,11 @@ namespace QuickAccess.DataStructures.CodeOperatorAlgebra
             {
                 var isPost = (source == OverloadableCodeOperator.Increment ||
                               source == OverloadableCodeOperator.Decrement);
-                return isPost ? $"{arg}{symbol}" : $"{symbol}{arg}";
+                return isPost ? $"{leftOrSingle}{symbol}" : $"{symbol}{leftOrSingle}";
             }
 
             return
-                $"{arg}{spaceBetweenBinOperatorAndArgument}{source.GetSymbol()}{spaceBetweenBinOperatorAndArgument}{right}";
+                $"{leftOrSingle}{spaceBetweenBinOperatorAndArgument}{source.GetSymbol()}{spaceBetweenBinOperatorAndArgument}{right}";
         }
 
 		[Pure]

@@ -56,7 +56,6 @@ namespace QuickAccess.Parser.Flexpressions.Bricks
 		public RulePlaceholderBrick(IFlexpressionAlgebra algebra, string ruleName)
 		: this(algebra, ruleName, null)
 		{
-			
 		}
 
 		public RulePlaceholderBrick(IFlexpressionAlgebra algebra, string ruleName, FlexpressionBrick defaultRule)

@@ -44,7 +44,7 @@ namespace QuickAccess.Parser.Flexpressions.Bricks
 	public sealed class AlternationBrick : CompositeFlexpressionBrick
 	{
 		/// <inheritdoc />
-		public override MatchingLevel RegularExpressionMatchingLevel => Bricks.GetMinimalMatchingLevel();
+		public override MatchingLevel RegularExpressionMatchingLevel => Bricks.Min(p => p.RegularExpressionMatchingLevel);
 
 		/// <inheritdoc />
 		protected override IParsingProduct TryParseInternal(IParsingContextStream ctx)

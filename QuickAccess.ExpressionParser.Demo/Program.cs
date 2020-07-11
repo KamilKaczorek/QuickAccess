@@ -1,8 +1,12 @@
 ﻿using QuickAccess.DataStructures.Common.RegularExpression;
 using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using QuickAccess.DataStructures.Common.Collections;
 using QuickAccess.Parser;
 using QuickAccess.Parser.Flexpressions;
+using QuickAccess.Parser.Flexpressions.Bricks;
+using QuickAccess.Parser.Flexpressions.Model;
 
 namespace QuickAccess.ExpressionParser.Demo
 {
@@ -12,6 +16,7 @@ namespace QuickAccess.ExpressionParser.Demo
 		{
 			Test("Cos(12, 23, 34);");
 			Test2("10+(12.1 - 4)*8");
+            TestFlex();
 		}
 
         public static void Test2(string expression)
@@ -22,10 +27,10 @@ namespace QuickAccess.ExpressionParser.Demo
             var floatNumber = (intNumber + "." + intNumber).DefinesSealedRule("Float", "Float");
             var number = (intNumber | floatNumber).DefinesRule("Number");
 
-            var sumOper = FX.ToCharacter('+');
-            var minOper = FX.ToCharacter('-');
-            var mulOper = FX.ToCharacter('*');
-            var divOper = FX.ToCharacter('/');
+            var sumOper = FXB.ToCharacter('+');
+            var minOper = FXB.ToCharacter('-');
+            var mulOper = FXB.ToCharacter('*');
+            var divOper = FXB.ToCharacter('/');
 
             var oper = (sumOper | minOper | mulOper | divOper).DefinesSealedRule("Operator");
 
@@ -35,7 +40,7 @@ namespace QuickAccess.ExpressionParser.Demo
 
             var expr = (operation | exprNoOperation).DefinesRule("Expression");
 
-            (FX.ToCharacter('(') & expr & FX.ToCharacter(')')).DefinesSealedRule("BracketExpression");
+            (FXB.ToCharacter('(') & expr & FXB.ToCharacter(')')).DefinesSealedRule("BracketExpression");
 
 
             var ctx = RegularExpressionBuildingContext.CreateStandard();
@@ -44,7 +49,7 @@ namespace QuickAccess.ExpressionParser.Demo
             Console.WriteLine($"Regex: {regularExpressionString}");
 
 
-            var source = new StringSourceCode(new ParsingContextStreamFactory(), new SourceCodeFragmentFactory(), new ProductFactory(),  expression);
+            var source = new StringSourceCode(new ParsingContextStreamFactory(new ProductFactory(), fx), new SourceCodeFragmentFactory(),  expression);
 
             var rootNode = expr.TryParse(source.GetFurtherContext());
 
@@ -54,10 +59,75 @@ namespace QuickAccess.ExpressionParser.Demo
 
 		}
 
+        public class B<TConstraint> where TConstraint : IFlexpressionConstraint
+        {
+            private readonly Dictionary<string, FlexpressionGroupBase<TConstraint>> _groupsByName;
+                                
+            public B()
+            {
+                _groupsByName = new Dictionary<string, FlexpressionGroupBase<TConstraint>>();
+            }
+
+            public Flexpression<TConstraint> Text(string str)
+            {
+                return StringFlexpression.Create<TConstraint>(str);
+            }
+
+            public Flexpression<TConstraint> DefineGroup(string groupName, IFlexpression<TConstraint> content)
+            {
+                var group = _groupsByName.GetExistingValueOrNew(
+                    groupName,
+                    pName => new GroupFlexpression<TConstraint>(pName));
+
+                if (content != null)
+                {
+                    group.SetContent(content);
+                }
+
+                return group;
+            }
+
+            public Flexpression<TConstraint> this[string groupName]
+            {
+                get => DefineGroup(groupName, null);
+                set => DefineGroup(groupName, value);
+            }
+
+            public Flexpression<TConstraint> Char(char c)
+            {
+                return CharFlexpression.Create<TConstraint>(c);
+            }
+        }
+
+        public class ParsingConstraint : CustomFlexpressionConstraint
+        {
+
+        }
+
+        public class ParsingExt : ParsingConstraint
+        {
+
+        }
+
+		public static void TestFlex()
+        {
+            var b = new B<ParsingConstraint>();
+
+            var c = new B<ParsingExt>();
+
+            b["abc"] = b.Text("asda") | b.Char('c') + b["zzz"] + c["aaa"];
+            b["zzz"] = b.Text("zzz");
+            var str = b["zzz"].ToString();
+            Console.WriteLine(str);
+            Console.ReadLine();
+        }
+
 		public static void Test(string expression)
 		{
-			var name = (FX.Letter + (FX.Digit | FX.Letter).ZeroOrMore()).DefinesSealedRule("Name", "String");
-			var intNumber = FX.Digit.OneOrMore().DefinesSealedRule("Integer", "Integer");
+			var f = (new CharFlexpression<DefaultFlexpressionConstraint>('c') + "dsdsa" | 'c')[1, 2];
+
+			var name = (FXB.Letter + (FXB.Digit | FXB.Letter).ZeroOrMore()).DefinesSealedRule("Name", "String");
+			var intNumber = FXB.Digit.OneOrMore().DefinesSealedRule("Integer", "Integer");
 			var floatNumber = (intNumber + "." + intNumber).DefinesSealedRule("Float", "Float");
 			var functionArg = (floatNumber | intNumber | name).DefinesSealedRule("FunctionArg");
 			var functionArgList = (functionArg & ("," & functionArg).ZeroOrMore()).DefinesRule("FunctionArgList");
@@ -73,8 +143,7 @@ namespace QuickAccess.ExpressionParser.Demo
 			Console.WriteLine($"Regex: {regularExpressionString}");
 			Console.WriteLine($"Regex result: {res}");
 
-
-			var source = new StringSourceCode(new ParsingContextStreamFactory(), new SourceCodeFragmentFactory(), new ProductFactory(), expression);
+			var source = new StringSourceCode(new ParsingContextStreamFactory(new ProductFactory(), FXB.DefaultAlgebra), new SourceCodeFragmentFactory(), expression);
 
 			var rootNode = functionInvocation.TryParse(source.GetFurtherContext());
 

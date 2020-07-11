@@ -36,7 +36,7 @@
 #endregion
 
 using System;
-using QuickAccess.DataStructures.CodeOperatorAlgebra;
+using QuickAccess.DataStructures.Algebra;
 
 namespace QuickAccess.DataStructures.Common.Patterns.Specifications
 {

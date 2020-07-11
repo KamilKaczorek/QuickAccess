@@ -28,33 +28,25 @@
 // 
 // =====================================================================
 // 
-// Project: QuickAccess.DataStructures
+// Project: QuickAccess.Parser
 // 
 // Author: Kamil Piotr Kaczorek
 // http://kamil.scienceontheweb.net
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
 
-using System;
-
-namespace QuickAccess.DataStructures.CodeOperatorAlgebra
+namespace QuickAccess.DataStructures.Algebra
 {
-	public interface IAlgebra
+	public interface IDefineCodeOperatorSymmetricAlgebra : IAlgebra<OverloadableCodeUnarySymmetricOperator, OverloadableCodeBinarySymmetricOperator>
 	{
-		Type BaseDomainType { get; }
-		int Priority { get; }
-		bool IsDomainSupported(Type domainType);
+		OverloadableCodeOperators SupportedOperators { get; }
 	}
 
-	public interface IAlgebra<in TUnaryOperator, in TBinaryOperator> : IAlgebra
+	public interface IDefineCodeOperatorSymmetricAlgebra<TDomain> : IDefineCodeOperatorSymmetricAlgebra
 	{
-		bool IsUnaryOperatorSupported(TUnaryOperator unaryOperator);
-		bool IsBinaryOperatorSupported(TBinaryOperator binaryOperator);
-	
-		string GetBinaryOperatorDescription(TBinaryOperator binaryOperator);
-		string GetUnaryOperatorDescription(TUnaryOperator unaryOperator);
-
-		bool TryEvaluateOperatorResult(object left, TBinaryOperator binaryOperator, object right, out object result);
-		bool TryEvaluateOperatorResult(TUnaryOperator unaryOperator, object arg, out object result);
+        TDomain EvaluateOperatorResult(TDomain left, OverloadableCodeBinarySymmetricOperator binaryOperator, TDomain right);
+        TDomain EvaluateOperatorResult(OverloadableCodeUnarySymmetricOperator unaryOperator, TDomain arg);
 	}
+
+
 }

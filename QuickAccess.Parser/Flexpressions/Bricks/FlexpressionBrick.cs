@@ -37,15 +37,15 @@
 
 using System;
 using System.Threading;
-using QuickAccess.DataStructures.CodeOperatorAlgebra;
+using QuickAccess.DataStructures.Algebra;
 using QuickAccess.DataStructures.Common.RegularExpression;
 using QuickAccess.Parser.Product;
 
 namespace QuickAccess.Parser.Flexpressions.Bricks
 {
     public abstract class FlexpressionBrick
-		:  IExpressionParser, 
-            IRegularExpressionRepresentable, 
+		:  IExpressionParser,
+            IRepresentRegularExpression, 
             IDefineAlgebraicDomain<FlexpressionBrick, IFlexpressionAlgebra>, 
             IEquatable<FlexpressionBrick>
     {
@@ -56,7 +56,7 @@ namespace QuickAccess.Parser.Flexpressions.Bricks
         {
             Id = Interlocked.Increment(ref _idCounter);
 
-			Algebra = algebra ?? FX.DefaultAlgebra;
+			Algebra = algebra ?? FXB.DefaultAlgebra;
 		}
 
 		public int Id { get; }
@@ -87,67 +87,67 @@ namespace QuickAccess.Parser.Flexpressions.Bricks
 
         public static FlexpressionBrick operator *(FlexpressionBrick left, FlexpressionBrick right)
 		{
-			return FX.DefaultAlgebra.GetOperatorResultOfHighestPrioritizedAlgebra(left, OverloadableCodeBinarySymmetricOperator.Mul, right);
+			return FXB.DefaultAlgebra.GetOperatorResultOfHighestPrioritizedAlgebra(OverloadableCodeBinarySymmetricOperator.Mul, left, right);
 		}
 
 		public static FlexpressionBrick operator /(FlexpressionBrick left, FlexpressionBrick right)
 		{
-			return FX.DefaultAlgebra.GetOperatorResultOfHighestPrioritizedAlgebra(left, OverloadableCodeBinarySymmetricOperator.Div, right);
+			return FXB.DefaultAlgebra.GetOperatorResultOfHighestPrioritizedAlgebra(OverloadableCodeBinarySymmetricOperator.Div, left, right);
 		}
 
 		public static FlexpressionBrick operator %(FlexpressionBrick left, FlexpressionBrick right)
 		{
-			return FX.DefaultAlgebra.GetOperatorResultOfHighestPrioritizedAlgebra(left, OverloadableCodeBinarySymmetricOperator.Mod, right);
+			return FXB.DefaultAlgebra.GetOperatorResultOfHighestPrioritizedAlgebra(OverloadableCodeBinarySymmetricOperator.Mod, left, right);
 		}
 
 		public static FlexpressionBrick operator +(FlexpressionBrick left, FlexpressionBrick right)
 		{
-			return FX.DefaultAlgebra.GetOperatorResultOfHighestPrioritizedAlgebra(left, OverloadableCodeBinarySymmetricOperator.Sum, right);
+			return FXB.DefaultAlgebra.GetOperatorResultOfHighestPrioritizedAlgebra(OverloadableCodeBinarySymmetricOperator.Sum, left, right);
 		}
 
 		public static FlexpressionBrick operator &(FlexpressionBrick left, FlexpressionBrick right)
 		{
-			return FX.DefaultAlgebra.GetOperatorResultOfHighestPrioritizedAlgebra(left, OverloadableCodeBinarySymmetricOperator.And, right);
+			return FXB.DefaultAlgebra.GetOperatorResultOfHighestPrioritizedAlgebra(OverloadableCodeBinarySymmetricOperator.And, left, right);
 		}
 
 		public static FlexpressionBrick operator ^(FlexpressionBrick left, FlexpressionBrick right)
 		{
-			return FX.DefaultAlgebra.GetOperatorResultOfHighestPrioritizedAlgebra(left, OverloadableCodeBinarySymmetricOperator.XOr, right);
+			return FXB.DefaultAlgebra.GetOperatorResultOfHighestPrioritizedAlgebra(OverloadableCodeBinarySymmetricOperator.XOr, left, right);
 		}
 
 		public static FlexpressionBrick operator |(FlexpressionBrick left, FlexpressionBrick right)
 		{
-			return FX.DefaultAlgebra.GetOperatorResultOfHighestPrioritizedAlgebra(left, OverloadableCodeBinarySymmetricOperator.Or, right);
+			return FXB.DefaultAlgebra.GetOperatorResultOfHighestPrioritizedAlgebra(OverloadableCodeBinarySymmetricOperator.Or, left, right);
 		}
 
 		public static FlexpressionBrick operator ++(FlexpressionBrick arg)
 		{
-			return FX.DefaultAlgebra.EvaluateOperatorResult(OverloadableCodeUnarySymmetricOperator.Increment, arg);
+			return FXB.DefaultAlgebra.EvaluateOperatorResult(OverloadableCodeUnarySymmetricOperator.Increment, arg);
 		}
 
 		public static FlexpressionBrick operator +(FlexpressionBrick arg)
 		{
-			return FX.DefaultAlgebra.EvaluateOperatorResult(OverloadableCodeUnarySymmetricOperator.Plus, arg);
+			return FXB.DefaultAlgebra.EvaluateOperatorResult(OverloadableCodeUnarySymmetricOperator.Plus, arg);
 		}
 
 		public static FlexpressionBrick operator -(FlexpressionBrick arg)
 		{
-			return FX.DefaultAlgebra.EvaluateOperatorResult(OverloadableCodeUnarySymmetricOperator.Minus, arg);
+			return FXB.DefaultAlgebra.EvaluateOperatorResult(OverloadableCodeUnarySymmetricOperator.Minus, arg);
 		}
 
 		public static FlexpressionBrick operator ~(FlexpressionBrick arg)
 		{
-			return FX.DefaultAlgebra.EvaluateOperatorResult(OverloadableCodeUnarySymmetricOperator.BitwiseComplement, arg);
+			return FXB.DefaultAlgebra.EvaluateOperatorResult(OverloadableCodeUnarySymmetricOperator.BitwiseComplement, arg);
 		}
 
 		public static implicit operator FlexpressionBrick(string x)
 		{
-			return FX.ToTextSequence(x);
+			return FXB.ToTextSequence(x);
 		}
 
 		public static implicit operator FlexpressionBrick(char x)
 		{
-			return FX.ToCharacter(x);
+			return FXB.ToCharacter(x);
 		}
 
 		public void ApplyCustomRule(string name, FlexpressionBrick content)

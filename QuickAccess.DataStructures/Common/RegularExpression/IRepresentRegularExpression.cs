@@ -35,21 +35,11 @@
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
 
-namespace QuickAccess.DataStructures.CodeOperatorAlgebra
+namespace QuickAccess.DataStructures.Common.RegularExpression
 {
-	public interface IDefineCodeOperatorSymmetricAlgebra : IAlgebra<OverloadableCodeUnarySymmetricOperator, OverloadableCodeBinarySymmetricOperator>
-	{
-		OverloadableCodeOperators SupportedOperators { get; }
-	}
-
-    public interface IDefineCodeOperatorSymmetricAlgebra<in TDomain, out TDomainFinalProduct> : IDefineCodeOperatorSymmetricAlgebra
-	    where TDomainFinalProduct : TDomain
+    public interface IRepresentRegularExpression
     {
-        TDomainFinalProduct EvaluateOperatorResult(TDomain left, OverloadableCodeBinarySymmetricOperator binaryOperator, TDomain right);
-        TDomainFinalProduct EvaluateOperatorResult(OverloadableCodeUnarySymmetricOperator unaryOperator, TDomain arg);
-    }
-
-	public interface IDefineCodeOperatorSymmetricAlgebra<TDomain> : IDefineCodeOperatorSymmetricAlgebra<TDomain, TDomain>
-	{
+		string ToRegularExpressionString(RegularExpressionBuildingContext ctx);
+		MatchingLevel RegularExpressionMatchingLevel { get; }
 	}
 }

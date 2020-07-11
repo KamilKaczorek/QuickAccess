@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using JetBrains.Annotations;
 using QuickAccess.DataStructures.Common.Patterns.Specifications;
@@ -34,7 +35,6 @@ namespace QuickAccess.DataStructures.Common.Guards
         [ContractAnnotation("value:null => halt")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void ArgNotNull<T>(T value, string parameterName)
-            where T : class
         {
             if (ReferenceEquals(value, null))
             {
@@ -47,12 +47,69 @@ namespace QuickAccess.DataStructures.Common.Guards
         [ContractAnnotation("value:notnull => halt")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void ArgNull<T>(T value, string parameterName)
-            where T : class
         {
             if (!ReferenceEquals(value, null))
             {
                 throw new ArgumentException($"{parameterName} is expected to be null but is '{value}'.", parameterName);
             }
+        }
+        [DebuggerHidden]
+        [DebuggerStepThrough]
+        [ContractAnnotation("value:null => halt")]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void ArgTypeImplements(Type value, string parameterName, Type baseType)
+        {
+            if (ReferenceEquals(value, null))
+            {
+                throw new ArgumentNullException(parameterName);
+            }
+
+            var isAssignable = baseType.IsAssignableFrom(value);
+
+            if (!isAssignable)
+            {
+                throw new ArgumentException($"Expected type assignable to '{baseType}', but '{value}' is not assignable.", parameterName);
+            }
+        }
+
+        [DebuggerHidden]
+        [DebuggerStepThrough]
+        [ContractAnnotation("value:null => halt")]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void ArgTypeImplements<TBase>(Type value, string parameterName)
+        {
+            ArgTypeImplements(value, parameterName, typeof(TBase));
+        }
+
+        [DebuggerHidden]
+        [DebuggerStepThrough]
+        [ContractAnnotation("value:null => halt")]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static ConstructorInfo ArgTypeHasParameterlessConstructor(Type value, string parameterName)
+        {
+            if (ReferenceEquals(value, null))
+            {
+                throw new ArgumentNullException(parameterName);
+            }
+
+            if (!value.IsClass)
+            {
+                throw new ArgumentException($"Expected type containing parameterless constructor, but {value} is not a class type.", parameterName);
+            }
+
+            if (value.IsAbstract)
+            {
+                throw new ArgumentException($"Expected type containing parameterless constructor, but {value} is abstract class.", parameterName);
+            }
+
+            var constructor = value.GetConstructor(Array.Empty<Type>());
+
+            if (constructor == null)
+            {
+                throw new ArgumentException($"Expected type containing parameterless constructor, but {value} doesn't have one.", parameterName);
+            }
+
+            return constructor;
         }
 
         [DebuggerHidden]
@@ -132,6 +189,57 @@ namespace QuickAccess.DataStructures.Common.Guards
                 }
 
                 throw new ArgumentException(GetMessage($"Sequence ({parameterName}) is empty, expected not empty sequence."), parameterName);
+            }
+        }
+
+        [DebuggerHidden]
+        [DebuggerStepThrough]
+        [ContractAnnotation("value:null => halt")]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void ArgCountAtLeast<T>(ICollection<T> value, string parameterName, int minCount)
+        {
+            if (ReferenceEquals(value, null))
+            {
+                throw new ArgumentNullException(parameterName);
+            }
+
+            if (value.Count < minCount)
+            {
+                throw new ArgumentException(GetMessage($"Sequence ({parameterName}) contains {value.Count} items, but expected to contain minimum {minCount} items."), parameterName);
+            }
+        }
+
+        [DebuggerHidden]
+        [DebuggerStepThrough]
+        [ContractAnnotation("value:null => halt")]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void ArgCountAtLeast<T>(IReadOnlyList<T> value, string parameterName, int minCount)
+        {
+            if (ReferenceEquals(value, null))
+            {
+                throw new ArgumentNullException(parameterName);
+            }
+
+            if (value.Count < minCount)
+            {
+                throw new ArgumentException(GetMessage($"Sequence ({parameterName}) contains {value.Count} items, but expected to contain minimum {minCount} items."), parameterName);
+            }
+        }
+
+        [DebuggerHidden]
+        [DebuggerStepThrough]
+        [ContractAnnotation("value:null => halt")]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void ArgCountAtLeast<T>(T[] value, string parameterName, int minCount)
+        {
+            if (ReferenceEquals(value, null))
+            {
+                throw new ArgumentNullException(parameterName);
+            }
+
+            if (value.Length < minCount)
+            {
+                throw new ArgumentException(GetMessage($"Sequence ({parameterName}) contains {value.Length} items, but expected to contain minimum {minCount} items."), parameterName);
             }
         }
 

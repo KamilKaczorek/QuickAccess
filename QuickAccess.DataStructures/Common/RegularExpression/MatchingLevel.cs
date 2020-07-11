@@ -61,7 +61,7 @@ namespace QuickAccess.DataStructures.Common.RegularExpression
 	public static class MatchingLevelExtensions
 	{
 		public static MatchingLevel GetMinimalMatchingLevel(
-			this IEnumerable<IRegularExpressionRepresentable> regularExpressionRepresentableItems)
+			this IEnumerable<IRepresentRegularExpression> regularExpressionRepresentableItems)
 		{
 			return  regularExpressionRepresentableItems.Select(r => r.RegularExpressionMatchingLevel).GetMinimal();
 		}

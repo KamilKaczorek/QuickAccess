@@ -38,7 +38,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using QuickAccess.DataStructures.CodeOperatorAlgebra;
+using QuickAccess.DataStructures.Algebra;
 using QuickAccess.DataStructures.Common.Collections;
 
 namespace QuickAccess.DataStructures.Common.Patterns.Specifications

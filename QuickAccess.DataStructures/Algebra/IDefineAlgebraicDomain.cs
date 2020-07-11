@@ -28,31 +28,18 @@
 // 
 // =====================================================================
 // 
-// Project: QuickAccess.Parser
+// Project: QuickAccess.DataStructures
 // 
 // Author: Kamil Piotr Kaczorek
 // http://kamil.scienceontheweb.net
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
-namespace QuickAccess.DataStructures.CodeOperatorAlgebra
+namespace QuickAccess.DataStructures.Algebra
 {
-	public enum OverloadableCodeBinarySymmetricOperator
+	public interface IDefineAlgebraicDomain<TDomain, out TAlgebra> 
+	    where TDomain : IDefineAlgebraicDomain<TDomain, TAlgebra>
+	    where TAlgebra : IDefineCodeOperatorSymmetricAlgebra<TDomain>
 	{
-		/// <summary><c>x*y</c></summary>
-		Mul = OverloadableCodeOperator.Mul,
-        /// <summary><c>x/y</c></summary>
-		Div = OverloadableCodeOperator.Div,
-        /// <summary><c>x%y</c></summary>
-		Mod = OverloadableCodeOperator.Mod,
-        /// <summary><c>x+y</c></summary>
-		Sum = OverloadableCodeOperator.Sum,
-        /// <summary><c>x-y</c></summary>
-		Sub = OverloadableCodeOperator.Sub,
-        /// <summary><c>x&amp;y</c></summary>
-		And = OverloadableCodeOperator.And,
-        /// <summary><c>x^y</c></summary>
-		XOr = OverloadableCodeOperator.XOr,
-        /// <summary><c>x|y</c></summary>
-		Or =  OverloadableCodeOperator.Or
-	}
+        TAlgebra Algebra { get; }
+    }
 }

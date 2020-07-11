@@ -37,6 +37,8 @@
 
 #endregion
 
+using QuickAccess.Parser.Flexpressions;
+
 namespace QuickAccess.Parser
 {
     /// <summary>
@@ -45,10 +47,24 @@ namespace QuickAccess.Parser
     /// <seealso cref="IParsingContextStreamFactory" />
     public sealed class ParsingContextStreamFactory : IParsingContextStreamFactory
     {
-        /// <inheritdoc />
-        public IParsingContextStream Create(IParsingContextStreamParent parent, IParsingProductFactory productFactory, int offset, int maxDeep)
+        private readonly IParsingProductFactory _productFactory;
+        private readonly IFlexpressionAlgebra _metaExpressionAlgebra;
+
+        /// <summary>
+        /// Initializes a new instance of <see cref="ParsingContextStreamFactory"/> class.
+        /// </summary>
+        /// <param name="productFactory">The final parsing product factory (node factory).</param>
+        /// <param name="metaExpressionAlgebra">The algebra that defines meta expression operators and base symbols.</param>
+        public ParsingContextStreamFactory(IParsingProductFactory productFactory, IFlexpressionAlgebra metaExpressionAlgebra)
         {
-            return new ParsingContextStream(parent, productFactory, offset, maxDeep);
+            _productFactory = productFactory;
+            _metaExpressionAlgebra = metaExpressionAlgebra;
+        }
+
+        /// <inheritdoc />
+        public IParsingContextStream Create(IParsingContextStreamParent parent, int offset, int maxDeep)
+        {
+            return new ParsingContextStream(_productFactory, _metaExpressionAlgebra, parent, offset, maxDeep);
         }
     }
 }

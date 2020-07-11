@@ -131,7 +131,7 @@ namespace QuickAccess.Parser.Flexpressions.Bricks
                     {
                         ctx.Accept();
 						return nodes != null
-							? ctx.CreateExpressionForAcceptedFragment(FX.ExpressionTypes.Concatenation, nodes)
+							? ctx.CreateExpressionForAcceptedFragment(FXB.ExpressionTypes.Concatenation, nodes)
 							: new EmptyNode(ctx);
 					}
 					
@@ -157,7 +157,7 @@ namespace QuickAccess.Parser.Flexpressions.Bricks
 
 			if (IsEmpty)
 			{
-				return FX.Empty.ToString();
+				return FXB.Empty.ToString();
 			}
 
 			if (Min == 1 && Max == 1)

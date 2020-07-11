@@ -40,6 +40,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using QuickAccess.Parser.Flexpressions;
 using QuickAccess.Parser.Product;
 
 namespace QuickAccess.Parser
@@ -71,6 +72,11 @@ namespace QuickAccess.Parser
 	/// <seealso cref="IEnumerator{T}" />
 	public interface IParsingContextStream : ISourceCode, IDisposable, IEquatable<IParsingContextStream>, IComparable<IParsingContextStream>
     {
+		/// <summary>
+		/// Gets the algebra of the meta expression (defines how to convert operators and standard symbols into final expressions).
+		/// </summary>
+		IFlexpressionAlgebra MetaExpressionAlgebra { get; }
+
 		/// <summary>
 		/// Creates the expression for the accepted fragment.
 		/// </summary>

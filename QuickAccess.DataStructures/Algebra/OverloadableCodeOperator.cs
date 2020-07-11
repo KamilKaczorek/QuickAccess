@@ -37,7 +37,7 @@
 
 using System;
 
-namespace QuickAccess.DataStructures.CodeOperatorAlgebra
+namespace QuickAccess.DataStructures.Algebra
 {
 	/// <summary>
 	/// Enumeration of all overloadable c# operators in precedence order (lowest value - highest priority).
