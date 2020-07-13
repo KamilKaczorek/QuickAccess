@@ -19,7 +19,7 @@ namespace QuickAccess.Parser.Flexpressions.Model
             [MethodImpl(MethodImplOptions.AggressiveInlining), DebuggerStepThrough]
             get
             {
-                var constraint = FlexpressionConstraintRepositoryProvider.Repository.Get<TConstraint>();
+                var constraint = FlexpressionConstraintRepositoryProvider.Repository.Resolve<TConstraint>();
                 return constraint;
             }
         }
@@ -216,7 +216,10 @@ namespace QuickAccess.Parser.Flexpressions.Model
             return false;
         }
 
-        public override int GetHashCode() { return LocalId.GetHashCode(); }
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(LocalId);
+        }
 
         public override string ToString()
         {

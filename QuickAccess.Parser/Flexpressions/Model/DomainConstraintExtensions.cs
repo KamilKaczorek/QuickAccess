@@ -13,9 +13,9 @@ namespace QuickAccess.Parser.Flexpressions.Model
 
             switch (res)
             {
-                case DomainConstraintResult.Allowed:
+                case FXConstraintResult.Allowed:
                     return;
-                case DomainConstraintResult.OperationNotAllowed:
+                case FXConstraintResult.OperationNotAllowed:
                     throw new DomainConstraintBrokenException($"Char operator is not allowed by domain constraint ({source.GetType().Name}).");
                 default:
                     throw new DomainConstraintBrokenException($"Char operator not allowed for the argument '{ch}'  by domain constraint ({source.GetType().Name}).");
@@ -27,9 +27,9 @@ namespace QuickAccess.Parser.Flexpressions.Model
 
             switch (res)
             {
-                case DomainConstraintResult.Allowed:
+                case FXConstraintResult.Allowed:
                     return;
-                case DomainConstraintResult.OperationNotAllowed:
+                case FXConstraintResult.OperationNotAllowed:
                     throw new DomainConstraintBrokenException($"String operator is not allowed by domain constraint ({source.GetType().Name}).");
                 default:
                     throw new DomainConstraintBrokenException($"String operator not allowed for the argument '{str}'  by domain constraint ({source.GetType().Name}).");
@@ -41,9 +41,9 @@ namespace QuickAccess.Parser.Flexpressions.Model
 
             switch (res)
             {
-                case DomainConstraintResult.Allowed:
+                case FXConstraintResult.Allowed:
                     return;
-                case DomainConstraintResult.OperationNotAllowed:
+                case FXConstraintResult.OperationNotAllowed:
                     throw new DomainConstraintBrokenException($"Quantifier operator ([]) is not allowed by domain constraint ({source.GetType().Name}).");
                 default:
                     throw new DomainConstraintBrokenException($"Quantifier operator not allowed for the range [{min}, {max}]  by domain constraint ({source.GetType().Name}).");
@@ -56,7 +56,7 @@ namespace QuickAccess.Parser.Flexpressions.Model
 
             switch (res)
             {
-                case DomainConstraintResult.Allowed:
+                case FXConstraintResult.Allowed:
                     return;
                 default:
                     throw new DomainConstraintBrokenException($"Unary operator '{unaryOperator.GetSymbol()}' ({unaryOperator}) is not allowed  by domain constraint ({source.GetType().Name}).");
@@ -69,9 +69,9 @@ namespace QuickAccess.Parser.Flexpressions.Model
 
             switch (res)
             {
-                case DomainConstraintResult.Allowed:
+                case FXConstraintResult.Allowed:
                     return;
-                case DomainConstraintResult.OperationNotAllowed:
+                case FXConstraintResult.OperationNotAllowed:
                     throw new DomainConstraintBrokenException($"Binary operator '{binaryOperator.GetSymbol()}' ({binaryOperator}) is not allowed  by domain constraint ({source.GetType().Name}).");
                 default:
                     throw new DomainConstraintBrokenException($"Binary operator '{binaryOperator.GetSymbol()}' ({binaryOperator}) is not allowed for the number of args={argsCount} by domain constraint ({source.GetType().Name}).");
@@ -85,9 +85,9 @@ namespace QuickAccess.Parser.Flexpressions.Model
 
             switch (res)
             {
-                case DomainConstraintResult.Allowed:
+                case FXConstraintResult.Allowed:
                     return;
-                case DomainConstraintResult.OperationNotAllowed:
+                case FXConstraintResult.OperationNotAllowed:
                     throw new DomainConstraintBrokenException($"Operations are not allowed by domain constraint ({source.GetType().Name}).");
                 default:
                     throw new DomainConstraintBrokenException($"Operation '{operationName}' is not allowed (number of args={argsCount})  by domain constraint ({source.GetType().Name}).");
@@ -101,9 +101,9 @@ namespace QuickAccess.Parser.Flexpressions.Model
 
             switch (res)
             {
-                case DomainConstraintResult.Allowed:
+                case FXConstraintResult.Allowed:
                     return;
-                case DomainConstraintResult.OperationNotAllowed:
+                case FXConstraintResult.OperationNotAllowed:
                     throw new DomainConstraintBrokenException($"Groups are not allowed by domain constraint ({source.GetType().Name}).");
                 default:
                     throw new DomainConstraintBrokenException($"Group name '{groupName}' is not allowed by domain constraint ({source.GetType().Name}).");
@@ -116,9 +116,9 @@ namespace QuickAccess.Parser.Flexpressions.Model
 
             switch (res)
             {
-                case DomainConstraintResult.Allowed:
+                case FXConstraintResult.Allowed:
                     return;
-                case DomainConstraintResult.OperationNotAllowed:
+                case FXConstraintResult.OperationNotAllowed:
                     throw new DomainConstraintBrokenException("Placeholders are not allowed.");
                 default:
                     throw new DomainConstraintBrokenException($"Placeholder group name '{groupName}' is not allowed.");

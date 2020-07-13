@@ -36,7 +36,7 @@ namespace QuickAccess.DataStructures.Common.Guards
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void ArgNotNull<T>(T value, string parameterName)
         {
-            if (ReferenceEquals(value, null))
+            if (value == null)
             {
                 throw new ArgumentNullException(parameterName);
             }
@@ -110,6 +110,24 @@ namespace QuickAccess.DataStructures.Common.Guards
             }
 
             return constructor;
+        }
+
+        [DebuggerHidden]
+        [DebuggerStepThrough]
+        [ContractAnnotation("value:null => halt")]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void ArgImplements(object value, string parameterName, Type baseType)
+        {
+            ArgTypeImplements(value?.GetType(), parameterName, baseType);
+        }
+
+        [DebuggerHidden]
+        [DebuggerStepThrough]
+        [ContractAnnotation("value:null => halt")]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void ArgImplements<TBase>(object value, string parameterName)
+        {
+            ArgTypeImplements(value?.GetType(), parameterName, typeof(TBase));
         }
 
         [DebuggerHidden]

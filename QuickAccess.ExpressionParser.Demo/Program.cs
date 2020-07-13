@@ -5,7 +5,6 @@ using System.Text.RegularExpressions;
 using QuickAccess.DataStructures.Common.Collections;
 using QuickAccess.Parser;
 using QuickAccess.Parser.Flexpressions;
-using QuickAccess.Parser.Flexpressions.Bricks;
 using QuickAccess.Parser.Flexpressions.Model;
 
 namespace QuickAccess.ExpressionParser.Demo
@@ -57,7 +56,7 @@ namespace QuickAccess.ExpressionParser.Demo
             Console.WriteLine($"{rootNode != null}");
             Console.ReadLine();
 
-		}
+		} 
 
         public class B<TConstraint> where TConstraint : IFlexpressionConstraint
         {
@@ -99,7 +98,7 @@ namespace QuickAccess.ExpressionParser.Demo
             }
         }
 
-        public class ParsingConstraint : CustomFlexpressionConstraint
+        public class ParsingConstraint : CustomFXConstraint
         {
 
         }

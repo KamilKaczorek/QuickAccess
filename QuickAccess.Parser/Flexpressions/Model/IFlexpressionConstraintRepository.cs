@@ -4,9 +4,18 @@ namespace QuickAccess.Parser.Flexpressions.Model
 {
     public interface IFlexpressionConstraintRepository
     {
-        IFlexpressionConstraint Get<TConstraint>()
+        IFlexpressionConstraint Resolve<TConstraint>()
             where TConstraint : IFlexpressionConstraint;
 
-        IFlexpressionConstraint Get(Type domainConstraintType);
+        IFlexpressionConstraint Resolve(Type constraintType);
+
+        IFlexpressionConstraint GetOrDefine(Type constraintType, Func<Type, IFlexpressionConstraint> factoryCallback);
+
+        bool IsDefined(Type constraintType);
+
+        void Define(Type constraintType, IFlexpressionConstraint implementation);
+
+        IDisposable DefineScoped(Type constraintType, IFlexpressionConstraint implementation);
+
     }
 }
