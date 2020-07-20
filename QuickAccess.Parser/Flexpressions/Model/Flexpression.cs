@@ -6,13 +6,14 @@ using QuickAccess.DataStructures.Algebra;
 namespace QuickAccess.Parser.Flexpressions.Model
 {
     [Serializable]
-    public abstract class Flexpression<TConstraint> : IFlexpression<TConstraint> 
+    public abstract class Flexpression<TConstraint> 
+        : IFlexpression<TConstraint> 
         where TConstraint : IFlexpressionConstraint
     {
         public Type ConstraintType => typeof(TConstraint);
-        public long LocalId { get; } = FlexpressionLocalIdGenerator.GetNext();
+        public FlexpressionId LocalId { get; } = FlexpressionId.Generate();
 
-        public virtual string Name => GetType().Name;
+        public virtual string Name => $"<{GetType().Name}_{LocalId}>";
 
         protected static IFlexpressionConstraint Constraint
         {
@@ -197,33 +198,35 @@ namespace QuickAccess.Parser.Flexpressions.Model
 
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(obj, null))
-            {
-                return false;
-            }
-
-            if (ReferenceEquals(this, obj))
-            {
-                return true;
-            }
-
-            if (obj is Flexpression<TConstraint> flexpression)
-            {
-                var equals = flexpression.LocalId == LocalId;
-                return equals;
-            }
-
-            return false;
+            return Equals(obj as IFlexpression);
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(LocalId);
+            return LocalId.GetHashCode();
         }
 
         public override string ToString()
         {
             return Name;
         }
+
+        public virtual bool Equals(IFlexpression other)
+        {
+            if (ReferenceEquals(other, null))
+            {
+                return false;
+            }
+
+            if (ReferenceEquals(this, other))
+            {
+                return true;
+            }
+
+            return LocalId.Equals(other.LocalId);
+        }
+
+        public static bool operator ==(Flexpression<TConstraint> left, Flexpression<TConstraint> right) { return Equals(left, right); }
+        public static bool operator !=(Flexpression<TConstraint> left, Flexpression<TConstraint> right) { return !Equals(left, right); }
     }
 }

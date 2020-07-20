@@ -2,7 +2,7 @@
 // This code is distributed under the BSD-2-Clause license.
 // =====================================================================
 // 
-// Copyright ©2019 by Kamil Piotr Kaczorek
+// Copyright ©2020 by Kamil Piotr Kaczorek
 // All rights reserved.
 // 
 // Redistribution and use in source and binary forms, with or without modification, 
@@ -36,76 +36,74 @@
 #endregion
 
 using System;
+using System.Runtime.InteropServices;
+using QuickAccess.DataStructures.Common.ValueContract;
 
 namespace QuickAccess.DataStructures.Common.Freezable
 {
-	
+    /// <summary>
+    /// Implements the value container that freezes the value from the modification after first set.
+    /// </summary>
+    /// <typeparam name="T">The type of the value.</typeparam>
+	[Serializable]
+	[StructLayout(LayoutKind.Auto)]
+	public sealed class AutoFreezingValue<T> : IEditableValue<T>
+    {
+        private ValueStates _state;
+        private T _value;
 
-
-	public sealed class AutoFreezingValue<T> : FreezableValueBase<T>
-	{
-		private Func<T, bool> _canChangeCurrentValuePredicate;
-		private bool _isSet;
-
-		internal AutoFreezingValue(Func<T, bool> canChangeCurrentValuePredicate)
-		{
-			_isSet = false;
-			_canChangeCurrentValuePredicate = canChangeCurrentValuePredicate;
-		}
-
-		internal AutoFreezingValue(T value, Func<T, bool> canChangeCurrentValuePredicate)
-		{
-			_isSet = false;
-			Value = value;
-			_canChangeCurrentValuePredicate = (!canChangeCurrentValuePredicate?.Invoke(Value) ?? false) ? null : canChangeCurrentValuePredicate;
-		}
+        /// <inheritdoc />
+		public bool IsReadOnly => _state.HasFlag(ValueStates.ReadOnly);
 
 		/// <inheritdoc />
-		public override bool IsFrozen => _canChangeCurrentValuePredicate == null;
-
-		/// <inheritdoc />
-		public override bool IsSet => _isSet;
-
-		/// <inheritdoc />
-		public override bool TrySet(T value)
-		{
-			if (IsFrozen)
-			{
-				return false;
-			}
-
-			_isSet = true;
-			Value = value;
-
-			if (!(_canChangeCurrentValuePredicate?.Invoke(Value) ?? false))
-			{
-				_canChangeCurrentValuePredicate = null;
-			}
-
-			return true;
-		}
+		public bool IsDefined => _state.HasFlag(ValueStates.Defined);
 
 		public static implicit operator T(AutoFreezingValue<T> obj)
 		{
 			return obj.Value;
 		}
-	}
+
+        internal AutoFreezingValue(T value, ValueStates state)
+        {
+            _value = value;
+            _state = state;
+        }
+
+        /// <inheritdoc />
+        public T Value
+        {
+            get =>
+                _state.HasFlag(ValueStates.Defined)
+                    ? _value
+                    : throw new InvalidOperationException("Can't access value - value is undefined.");
+            set => this.Set(value);
+        }
+
+        /// <inheritdoc />
+        public ValueModificationResult TryModifyValue(T value)
+        {
+            if (_state.HasFlag(ValueStates.ReadOnly))
+            {
+                return ValueModificationResult.SourceFrozen;
+            }
+
+            _state = ValueStates.Defined | ValueStates.ReadOnly;
+            _value = value;
+
+            return ValueModificationResult.SuccessfullyModified;
+        }
+    }
 
 	public static class AutoFreezingValue
 	{
-		public static AutoFreezingValue<T> CreateSet<T>(T currentValue, Func<T, bool> canChangeCurrentValuePredicate)
+		public static AutoFreezingValue<T> Create<T>(T currentValue, ValueStates state)
 		{
-			return new AutoFreezingValue<T>(currentValue, canChangeCurrentValuePredicate);
+			return new AutoFreezingValue<T>(currentValue, state);
 		}
 
-		public static AutoFreezingValue<T> CreateSetFrozen<T>(T currentValue)
+		public static AutoFreezingValue<T> CreateUndefined<T>()
 		{
-			return new AutoFreezingValue<T>(currentValue, null);
-		}
-		
-		public static AutoFreezingValue<T> CreateNotSet<T>(Func<T, bool> canChangeCurrentValuePredicate)
-		{
-			return new AutoFreezingValue<T>(canChangeCurrentValuePredicate);
+			return new AutoFreezingValue<T>(default, ValueStates.Undefined);
 		}		
 	}
 }

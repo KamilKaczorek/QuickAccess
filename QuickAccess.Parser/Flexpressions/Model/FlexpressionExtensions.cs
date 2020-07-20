@@ -54,7 +54,7 @@ namespace QuickAccess.Parser.Flexpressions.Model
 
             public bool VisitGroup(string groupName, bool contentVisitationResult) { return _specification.IsSatisfiedByGroup(groupName, contentVisitationResult); }
 
-            public bool VisitPlaceholder(string targetGroupName) { return _specification.IsSatisfiedByPlaceholder(targetGroupName); }
+            public bool VisitGroupPlaceholder(string targetGroupName) { return _specification.IsSatisfiedByPlaceholder(targetGroupName); }
 
             public bool VisitCustom(IFlexpression customFlexpression) { return _specification.IsSatisfiedByCustom(customFlexpression); }
         }

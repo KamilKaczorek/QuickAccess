@@ -3,7 +3,7 @@
 // This code is distributed under the BSD-2-Clause license.
 // =====================================================================
 // 
-// Copyright ©2018 by Kamil Piotr Kaczorek
+// Copyright ©2020 by Kamil Piotr Kaczorek
 // All rights reserved.
 // 
 // Redistribution and use in source and binary forms, with or without modification, 
@@ -39,6 +39,7 @@
 
 using QuickAccess.DataStructures.Common;
 using QuickAccess.DataStructures.Common.Freezable;
+using QuickAccess.DataStructures.Common.ValueContract;
 
 namespace QuickAccess.DataStructures.Graphs.Model
 {

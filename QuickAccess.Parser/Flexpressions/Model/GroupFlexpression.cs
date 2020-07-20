@@ -1,23 +1,35 @@
 ﻿using QuickAccess.DataStructures.Common.Guards;
+using QuickAccess.DataStructures.Common.ValueContract;
 
 namespace QuickAccess.Parser.Flexpressions.Model
 {
-    public sealed class GroupFlexpression<TConstraint> : FlexpressionGroupBase<TConstraint>
+    public sealed class GroupFlexpression<TConstraint> : Flexpression<TConstraint>, IRepresentGroup
         where TConstraint : IFlexpressionConstraint
     {
-        private IFlexpression<TConstraint> _content;
-        public override bool IsSealed => false;
-        public override IFlexpression<TConstraint> Content => _content;
+        public override string Name => GroupName ?? base.Name;
+        public string GroupName { get; }
+        public bool IsDefined => ContentContainer.IsDefined;
 
-        public override void SetContent(IFlexpression<TConstraint> content)
+        public IEditableValue<IFlexpression<TConstraint>> ContentContainer { get; }
+        public IFlexpression<TConstraint> Content => ContentContainer.Value;
+  
+        public GroupFlexpression(string groupName, IEditableValue<IFlexpression<TConstraint>> contentContainer)
         {
-            Guard.ArgNotNull(content, nameof(content));
-            _content = content;
+            Guard.ArgNotNull(contentContainer, nameof(contentContainer));
+
+            GroupName = groupName;
+            ContentContainer = contentContainer;
         }
 
-        public GroupFlexpression(string targetGroupName) : base(targetGroupName)
+        public override TVisitationResult AcceptVisitor<TVisitationResult>(IVisitFlexpressions<TVisitationResult> visitor)
         {
-            Constraint.ValidatePlaceholderAllowed(targetGroupName);
+            var visitationResult = ContentContainer.TryGetValue(out var contentFlexpression)
+                ? visitor.VisitGroup(GroupName, contentFlexpression.AcceptVisitor(visitor))
+                : visitor.VisitGroupPlaceholder(GroupName);
+
+            return visitationResult;
         }
+
+        public override string ToString() { return IsDefined ? $"<{Name}=({Content})>" : $"<{Name}>"; }
     }
 }

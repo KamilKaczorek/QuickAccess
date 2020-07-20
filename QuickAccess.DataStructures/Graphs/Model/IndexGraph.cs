@@ -3,7 +3,7 @@
 // This code is distributed under the BSD-2-Clause license.
 // =====================================================================
 // 
-// Copyright ©2018 by Kamil Piotr Kaczorek
+// Copyright ©2020 by Kamil Piotr Kaczorek
 // All rights reserved.
 // 
 // Redistribution and use in source and binary forms, with or without modification, 
@@ -104,7 +104,7 @@ namespace QuickAccess.DataStructures.Graphs.Model
 		{
 			add
 			{
-				if (IsFrozen)
+				if (IsReadOnly)
 				{
 					return;
 				}
@@ -116,9 +116,7 @@ namespace QuickAccess.DataStructures.Graphs.Model
 
 		private event EventHandler<GraphConnectivityChangedEventArgs> InternalChanged;
 
-		/// <inheritdoc />
-		[Pure]
-		public bool IsReadOnly => IsFrozen;
+
 
 		/// <inheritdoc />
 		[Pure]
@@ -127,7 +125,7 @@ namespace QuickAccess.DataStructures.Graphs.Model
 		/// <inheritdoc />
 		public bool AddEdge(int srcVertexKey, int destVertexKey, TEdgeData edgeData)
 		{
-			if (IsFrozen)
+			if (IsReadOnly)
 			{
 				throw new ReadOnlyException("Graph source is frozen, can't add an edge to a frozen graph.");
 			}
@@ -159,7 +157,7 @@ namespace QuickAccess.DataStructures.Graphs.Model
 		/// <inheritdoc />
 		public int RemoveAllEdgesFrom(int srcVertexKey)
 		{
-			if (IsFrozen)
+			if (IsReadOnly)
 			{
 				throw new ReadOnlyException("Graph source is frozen, can't remove edge from a frozen graph.");
 			}
@@ -187,7 +185,7 @@ namespace QuickAccess.DataStructures.Graphs.Model
 		/// <inheritdoc />
 		public bool AddVertex(int vertexKey)
 		{
-			if (IsFrozen)
+			if (IsReadOnly)
 			{
 				throw new ReadOnlyException("Graph source is frozen, can't add a vertex to a frozen graph.");
 			}
@@ -213,7 +211,7 @@ namespace QuickAccess.DataStructures.Graphs.Model
 		/// <inheritdoc />
 		public int RemoveAllEdgesTo(int destVertexKey)
 		{
-			if (IsFrozen)
+			if (IsReadOnly)
 			{
 				throw new ReadOnlyException("Graph source is frozen, can't remove edge from a frozen graph.");
 			}
@@ -249,12 +247,12 @@ namespace QuickAccess.DataStructures.Graphs.Model
 
 		/// <inheritdoc />
 		[Pure]
-		public bool IsFrozen => _vertexModifier == null;
+		public bool IsReadOnly => _vertexModifier == null;
 
 		/// <inheritdoc />
 		public void Clear(bool removeAdjacencyOnly = false)
 		{
-			if (IsFrozen)
+			if (IsReadOnly)
 			{
 				throw new ReadOnlyException("Graph source is frozen, can't clear a frozen graph.");
 			}
@@ -284,7 +282,7 @@ namespace QuickAccess.DataStructures.Graphs.Model
 		/// <inheritdoc />
 		public bool RemoveEdge(int srcVertexKey, int destVertexKey)
 		{
-			if (IsFrozen)
+			if (IsReadOnly)
 			{
 				throw new ReadOnlyException("Graph source is frozen, can't remove edge from a frozen graph.");
 			}

@@ -2,7 +2,7 @@
 // This code is distributed under the BSD-2-Clause license.
 // =====================================================================
 // 
-// Copyright ©2019 by Kamil Piotr Kaczorek
+// Copyright ©2020 by Kamil Piotr Kaczorek
 // All rights reserved.
 // 
 // Redistribution and use in source and binary forms, with or without modification, 
@@ -34,57 +34,67 @@
 // http://kamil.scienceontheweb.net
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
+
+using System;
+using QuickAccess.DataStructures.Common.ValueContract;
+
 namespace QuickAccess.DataStructures.Common.Freezable
 {
-	public sealed class FreezableValue<T> : FreezableValueBase<T>, IFreezable
-	{
-		public FreezableValue()
-		{
-			_isFrozen = false;
-			_isSet = false;
-		}
+    public sealed class FreezableValue<T> : IEditableValue<T>, IFreezable
+    {
+        private ValueStates _state;
+        private T _value;
 
-		public FreezableValue(T value)
+        /// <inheritdoc />
+        public bool IsReadOnly => _state.HasFlag(ValueStates.ReadOnly);
+
+        /// <inheritdoc />
+        public bool IsDefined => _state.HasFlag(ValueStates.Defined);
+
+        public FreezableValue()
+        {
+            _state = ValueStates.Undefined;
+        }
+
+		public FreezableValue(T value, ValueStates state = ValueStates.Defined)
 		{
 			Value = value;
-			_isFrozen = false;
-			_isSet = true;
-		}
+            _state = state;
+        }
 
-		private bool _isFrozen;
-		private bool _isSet;
+        /// <inheritdoc />
+        public void Freeze()
+        {
+            _state |= ValueStates.ReadOnly;
+        }
 
-		/// <inheritdoc />
-		public override bool IsFrozen => _isFrozen;
+        public static implicit operator T(FreezableValue<T> obj)
+        {
+            return obj.Value;
+        }
 
-		/// <inheritdoc />
-		public void Freeze()
-		{
-			_isFrozen = true;
-		}
+        /// <inheritdoc />
+        public T Value
+        {
+            get =>
+                _state.HasFlag(ValueStates.Defined)
+                    ? _value
+                    : throw new InvalidOperationException("Can't access value - value is undefined.");
+            set => this.Set(value);
+        }
 
-		/// <inheritdoc />
-		public override bool IsSet => _isSet;
+        /// <inheritdoc />
+        public ValueModificationResult TryModifyValue(T value)
+        {
+            if (_state.HasFlag(ValueStates.ReadOnly))
+            {
+                return ValueModificationResult.SourceFrozen;
+            }
 
-		/// <inheritdoc />
-		public override bool TrySet(T value)
-		{
-			if (_isFrozen)
-			{
-				return false;
-			}
+            _state |= ValueStates.Defined;
+            _value = value;
 
-			Value = value;
-			_isSet = true;
-
-			return true;
-		}
-
-		public bool TrySet(T value, bool freeze)
-		{
-			var res = TrySet(value);
-			_isFrozen |= freeze;
-			return res;
-		}
-	}
+            return ValueModificationResult.SuccessfullyModified;
+        }
+    }
 }

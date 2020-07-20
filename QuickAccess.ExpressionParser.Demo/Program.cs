@@ -3,8 +3,11 @@ using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using QuickAccess.DataStructures.Common.Collections;
+using QuickAccess.DataStructures.Common.Freezable;
+using QuickAccess.DataStructures.Common.ValueContract;
 using QuickAccess.Parser;
 using QuickAccess.Parser.Flexpressions;
+using QuickAccess.Parser.Flexpressions.Bricks;
 using QuickAccess.Parser.Flexpressions.Model;
 
 namespace QuickAccess.ExpressionParser.Demo
@@ -12,11 +15,14 @@ namespace QuickAccess.ExpressionParser.Demo
 	class Program
 	{
 		static void Main()
-		{
-			Test("Cos(12, 23, 34);");
+        {
+
+            Test("Cos(12, 23, 34);");
 			Test2("10+(12.1 - 4)*8");
             TestFlex();
-		}
+        }
+
+        
 
         public static void Test2(string expression)
         {
@@ -58,13 +64,13 @@ namespace QuickAccess.ExpressionParser.Demo
 
 		} 
 
-        public class B<TConstraint> where TConstraint : IFlexpressionConstraint
+        public class FXSpecification<TConstraint> where TConstraint : IFlexpressionConstraint
         {
-            private readonly Dictionary<string, FlexpressionGroupBase<TConstraint>> _groupsByName;
+            private readonly Dictionary<string, GroupFlexpression<TConstraint>> _groupsByName;
                                 
-            public B()
+            public FXSpecification()
             {
-                _groupsByName = new Dictionary<string, FlexpressionGroupBase<TConstraint>>();
+                _groupsByName = new Dictionary<string, GroupFlexpression<TConstraint>>();
             }
 
             public Flexpression<TConstraint> Text(string str)
@@ -76,11 +82,11 @@ namespace QuickAccess.ExpressionParser.Demo
             {
                 var group = _groupsByName.GetExistingValueOrNew(
                     groupName,
-                    pName => new GroupFlexpression<TConstraint>(pName));
+                    pName => new GroupFlexpression<TConstraint>(pName, AutoFreezingValue.CreateUndefined<IFlexpression<TConstraint>>()));
 
                 if (content != null)
                 {
-                    group.SetContent(content);
+                    group.ContentContainer.Set(content);
                 }
 
                 return group;
@@ -110,12 +116,15 @@ namespace QuickAccess.ExpressionParser.Demo
 
 		public static void TestFlex()
         {
-            var b = new B<ParsingConstraint>();
+            var b = new FXSpecification<ParsingConstraint>();
 
-            var c = new B<ParsingExt>();
+            var c = new FXSpecification<ParsingExt>();
 
             b["abc"] = b.Text("asda") | b.Char('c') + b["zzz"] + c["aaa"];
             b["zzz"] = b.Text("zzz");
+
+
+
             var str = b["zzz"].ToString();
             Console.WriteLine(str);
             Console.ReadLine();
@@ -123,7 +132,7 @@ namespace QuickAccess.ExpressionParser.Demo
 
 		public static void Test(string expression)
 		{
-			var f = (new CharFlexpression<DefaultFlexpressionConstraint>('c') + "dsdsa" | 'c')[1, 2];
+			var _ = (new CharFlexpression<DefaultFlexpressionConstraint>('c') + "dsdsa" | 'c')[1, 2];
 
 			var name = (FXB.Letter + (FXB.Digit | FXB.Letter).ZeroOrMore()).DefinesSealedRule("Name", "String");
 			var intNumber = FXB.Digit.OneOrMore().DefinesSealedRule("Integer", "Integer");

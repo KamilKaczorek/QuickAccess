@@ -2,7 +2,7 @@
 // This code is distributed under the BSD-2-Clause license.
 // =====================================================================
 // 
-// Copyright ©2019 by Kamil Piotr Kaczorek
+// Copyright ©2020 by Kamil Piotr Kaczorek
 // All rights reserved.
 // 
 // Redistribution and use in source and binary forms, with or without modification, 
@@ -38,20 +38,21 @@
 using System;
 using QuickAccess.DataStructures.Common.Freezable;
 using QuickAccess.DataStructures.Common.RegularExpression;
+using QuickAccess.DataStructures.Common.ValueContract;
 using QuickAccess.Parser.Product;
 
 namespace QuickAccess.Parser.Flexpressions.Bricks
 {
-	public sealed class RulePlaceholderBrick : FlexpressionBrick
+	public sealed class RulePlaceholderBrick : FlexpressionBrick, ICanBeReadOnly
 	{
 		private readonly FreezableValue<Tuple<FlexpressionBrick, bool>> _rule;
 
 		public string RuleName { get; }
 		/// <inheritdoc />
 		public override string Name => RuleName;
-		public FlexpressionBrick Content => _rule.IsSet ? _rule.Value.Item1 : null;
-		public bool IsRecursion => _rule.IsSet && _rule.Value.Item2;
-		public bool IsFrozen => _rule.IsFrozen;
+		public FlexpressionBrick Content => _rule.IsDefined ? _rule.Value.Item1 : null;
+		public bool IsRecursion => _rule.IsDefined && _rule.Value.Item2;
+		public bool IsReadOnly => _rule.IsReadOnly;
 
 		public RulePlaceholderBrick(IFlexpressionAlgebra algebra, string ruleName)
 		: this(algebra, ruleName, null)
@@ -65,16 +66,23 @@ namespace QuickAccess.Parser.Flexpressions.Bricks
 			_rule = defaultRule != null ? new FreezableValue<Tuple<FlexpressionBrick, bool>>(Tuple.Create(defaultRule, false)) : new FreezableValue<Tuple<FlexpressionBrick, bool>>();
 		}
 
-		/// <inheritdoc />
-		protected override void ApplyRuleDefinition(string name, FlexpressionBrick content, bool recursion, bool freeze)
-		{
-			if (name == RuleName && !IsFrozen)
-			{
-				_rule.TrySet(Tuple.Create(content, recursion), freeze);
-			}
-		}
+        /// <inheritdoc />
+        protected override void ApplyRuleDefinition(
+            string name,
+            FlexpressionBrick content,
+            bool recursion,
+            bool freeze)
+        {
+            if (name == RuleName && _rule.TrySet(content, recursion))
+            {
+                if (freeze)
+                {
+                    _rule.Freeze();
+                }
+            }
+        }
 
-		/// <inheritdoc />
+        /// <inheritdoc />
 		public override bool Equals(FlexpressionBrick other)
 		{
 			if (IsEmpty && (other?.IsEmpty ?? false))
@@ -94,7 +102,7 @@ namespace QuickAccess.Parser.Flexpressions.Bricks
         /// <inheritdoc />
 		public override string ToRegularExpressionString(RegularExpressionBuildingContext  ctx)
 		{
-			if (!_rule.IsSet)
+			if (!_rule.IsDefined)
 			{
 				throw new InvalidOperationException($"Rule is not defined for this placeholder. Rule name={RuleName}");
 			}

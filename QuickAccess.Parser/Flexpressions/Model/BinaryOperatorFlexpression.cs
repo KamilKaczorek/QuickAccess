@@ -5,6 +5,8 @@ namespace QuickAccess.Parser.Flexpressions.Model
 {
     public static class BinaryOperatorFlexpression
     {
+
+
         public static Flexpression<TConstraint> Create<TConstraint>(
             OverloadableCodeBinarySymmetricOperator binaryOperator, IFlexpression<TConstraint> leftArgument, IFlexpression<TConstraint> rightArgument) where TConstraint : IFlexpressionConstraint
         {

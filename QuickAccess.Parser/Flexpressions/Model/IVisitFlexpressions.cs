@@ -30,7 +30,7 @@ namespace QuickAccess.Parser.Flexpressions.Model
             string groupName,
             TVisitationResult contentVisitationResult);
 
-        TVisitationResult VisitPlaceholder(string targetGroupName);
+        TVisitationResult VisitGroupPlaceholder(string targetGroupName);
 
         TVisitationResult VisitCustom(IFlexpression customFlexpression);
 

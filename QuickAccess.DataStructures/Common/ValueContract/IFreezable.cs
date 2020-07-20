@@ -2,7 +2,7 @@
 // This code is distributed under the BSD-2-Clause license.
 // =====================================================================
 // 
-// Copyright ©2019 by Kamil Piotr Kaczorek
+// Copyright ©2020 by Kamil Piotr Kaczorek
 // All rights reserved.
 // 
 // Redistribution and use in source and binary forms, with or without modification, 
@@ -28,28 +28,28 @@
 // 
 // =====================================================================
 // 
-// Project: QuickAccess.Parser
+// Project: QuickAccess.DataStructures
 // 
 // Author: Kamil Piotr Kaczorek
 // http://kamil.scienceontheweb.net
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
-
-namespace QuickAccess.DataStructures.Common.Freezable
+namespace QuickAccess.DataStructures.Common.ValueContract
 {
-	public class ReadOnlyFreezableValue<T> : IReadOnlyFreezableValue<T>
+	/// <summary>
+	///     The interface of the freezable object.
+	///     Freezable object became frozen when <see cref="Freeze" /> operation is called and stays frozen (read-only) till the
+	///     end of its lifetime.
+	/// <seealso cref="ICanBeReadOnly"/>
+	/// </summary>
+	public interface IFreezable : ICanBeReadOnly
 	{
-		private readonly IReadOnlyFreezableValue<T> _wrapped;
-
-		public ReadOnlyFreezableValue(IReadOnlyFreezableValue<T> wrapped)
-		{
-			_wrapped = wrapped;
-		}
-
-		public bool IsSet => _wrapped.IsSet;
-
-		public T Value => _wrapped.Value;
-
-		public bool IsFrozen => _wrapped.IsFrozen;
+		/// <summary>
+		///     Freezes the object from editing, since object is frozen each editing operation will throw
+		///     <see cref="System.Data.ReadOnlyException" /> exception.
+		///     When object is frozen once, it stays frozen till the end of its lifetime.
+		///     <seealso cref="ICanBeReadOnly.IsReadOnly" />
+		/// </summary>
+		void Freeze();
 	}
 }

@@ -3,7 +3,7 @@
 // This code is distributed under the BSD-2-Clause license.
 // =====================================================================
 // 
-// Copyright ©2018 by Kamil Piotr Kaczorek
+// Copyright ©2020 by Kamil Piotr Kaczorek
 // All rights reserved.
 // 
 // Redistribution and use in source and binary forms, with or without modification, 
@@ -39,6 +39,7 @@
 
 using System;
 using System.Diagnostics.Contracts;
+using QuickAccess.DataStructures.Common.ValueContract;
 
 namespace QuickAccess.DataStructures.Graphs.Model
 {
@@ -48,7 +49,7 @@ namespace QuickAccess.DataStructures.Graphs.Model
 	/// </summary>
 	/// <typeparam name="TEdgeData">The type of the edge data.</typeparam>
 	/// <seealso cref="IReadOnlyGraph{TEdgeData, TSymbol}" />
-	public interface IReadOnlyGraph<TEdgeData>
+	public interface IReadOnlyGraph<TEdgeData> : ICanBeReadOnly
 	{
 		/// <summary>
 		///   Occurs when graph connectivity changed.
@@ -60,11 +61,6 @@ namespace QuickAccess.DataStructures.Graphs.Model
 		/// <seealso cref="GraphConnectivityChangeType"/>
 		/// <seealso cref="GraphConnectivityChangedEventArgs"/>
 		event EventHandler<GraphConnectivityChangedEventArgs> ConnectivityChanged;
-
-		/// <summary>Gets a value indicating whether this instance is read only.</summary>
-		/// <value><c>true</c> if this instance is read only; otherwise, <c>false</c>.</value>
-		[Pure]
-		bool IsReadOnly { get; }
 
 		/// <summary>
 		///     Gets the graph connectivity definition.

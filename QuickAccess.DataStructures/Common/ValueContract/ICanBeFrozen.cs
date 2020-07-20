@@ -3,7 +3,7 @@
 // This code is distributed under the BSD-2-Clause license.
 // =====================================================================
 // 
-// Copyright ©2018 by Kamil Piotr Kaczorek
+// Copyright ©2020 by Kamil Piotr Kaczorek
 // All rights reserved.
 // 
 // Redistribution and use in source and binary forms, with or without modification, 
@@ -37,22 +37,20 @@
 
 #endregion
 
-namespace QuickAccess.DataStructures.Common.Freezable
+namespace QuickAccess.DataStructures.Common.ValueContract
 {
-	/// <summary>
-	///     The interface of the freezable object.
-	///     Freezable object became frozen when <see cref="IFreezable.Freeze" /> operation is called and stays frozen (read-only) till the
-	///     end of its lifetime.
+    /// <summary>
+	///     The interface of the object that can be or became readonly.
 	/// </summary>
-	public interface IReadOnlyFreezable
+	public interface ICanBeReadOnly
 	{
 		/// <summary>
-		///     Gets a value indicating whether the current object is frozen (editing is not enabled).
+		///     Gets a value indicating whether the current object is readonly or frozen (editing is not enabled).
 		///     <seealso cref="IFreezable.Freeze" />
 		/// </summary>
 		/// <value>
-		///     <c>true</c> if this object is frozen; otherwise, <c>false</c>.
+		///     <c>true</c> if this object is readonly (or frozen); otherwise, <c>false</c>.
 		/// </value>
-		bool IsFrozen { get; }
+		bool IsReadOnly { get; }
 	}
 }

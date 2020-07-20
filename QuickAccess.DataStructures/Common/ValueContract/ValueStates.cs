@@ -2,7 +2,7 @@
 // This code is distributed under the BSD-2-Clause license.
 // =====================================================================
 // 
-// Copyright ©2019 by Kamil Piotr Kaczorek
+// Copyright ©2020 by Kamil Piotr Kaczorek
 // All rights reserved.
 // 
 // Redistribution and use in source and binary forms, with or without modification, 
@@ -34,11 +34,15 @@
 // http://kamil.scienceontheweb.net
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
-namespace QuickAccess.DataStructures.Common.Freezable
+using System;
+
+namespace QuickAccess.DataStructures.Common.ValueContract
 {
-	public interface IFreezableValue<T> : IReadOnlyFreezableValue<T>, ISynchronizable
-	{
-		void Set(T value);
-		bool TrySet(T value);
-	}
+    [Flags]
+    public enum ValueStates
+    {
+        Undefined = 0,
+        Defined = 0x01,
+        ReadOnly = 0x02,
+    }
 }

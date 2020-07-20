@@ -2,7 +2,7 @@
 // This code is distributed under the BSD-2-Clause license.
 // =====================================================================
 // 
-// Copyright ©2019 by Kamil Piotr Kaczorek
+// Copyright ©2020 by Kamil Piotr Kaczorek
 // All rights reserved.
 // 
 // Redistribution and use in source and binary forms, with or without modification, 
@@ -34,11 +34,19 @@
 // http://kamil.scienceontheweb.net
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
-namespace QuickAccess.DataStructures.Common.Freezable
+namespace QuickAccess.DataStructures.Common.ValueContract
 {
-	public interface IReadOnlyFreezableValue<out T> : IReadOnlyFreezable
-	{
-		bool IsSet { get; }
-		T Value { get; }
-	}
+    /// <summary>
+    /// Contract of the container that modifies the value of type <typeparamref name="T"/>.
+    /// </summary>
+    /// <typeparam name="T">The type of the value.</typeparam>
+    public interface IModifyValue<in T>
+    {
+        /// <summary>
+        /// Tries to set the value.
+        /// </summary>
+        /// <param name="value">The value to set.</param>
+        /// <returns>Modification result.</returns>
+        ValueModificationResult TryModifyValue(T value);
+    }
 }

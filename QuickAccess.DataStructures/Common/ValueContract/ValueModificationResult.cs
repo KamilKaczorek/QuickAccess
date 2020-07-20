@@ -2,7 +2,7 @@
 // This code is distributed under the BSD-2-Clause license.
 // =====================================================================
 // 
-// Copyright ©2019 by Kamil Piotr Kaczorek
+// Copyright ©2020 by Kamil Piotr Kaczorek
 // All rights reserved.
 // 
 // Redistribution and use in source and binary forms, with or without modification, 
@@ -34,22 +34,41 @@
 // http://kamil.scienceontheweb.net
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
-namespace QuickAccess.DataStructures.Common.Freezable
+namespace QuickAccess.DataStructures.Common.ValueContract
 {
-	/// <summary>
-	///     The interface of the freezable object.
-	///     Freezable object became frozen when <see cref="Freeze" /> operation is called and stays frozen (read-only) till the
-	///     end of its lifetime.
-	/// <seealso cref="IReadOnlyFreezable"/>
-	/// </summary>
-	public interface IFreezable : IReadOnlyFreezable
-	{
-		/// <summary>
-		///     Freezes the object from editing, since object is frozen each editing operation will throw
-		///     <see cref="System.Data.ReadOnlyException" /> exception.
-		///     When object is frozen once, it stays frozen till the end of its lifetime.
-		///     <seealso cref="IReadOnlyFreezable.IsFrozen" />
-		/// </summary>
-		void Freeze();
-	}
+    /// <summary>
+    /// The result of <see cref="IModifyValue{T}.TryModifyValue"/> method.
+    /// </summary>
+    public enum ValueModificationResult
+    {
+        /// <summary>
+        /// The value was successfully modified.
+        /// </summary>
+        SuccessfullyModified = 0, 
+
+        /// <summary>
+        /// The value was not modified: modification is not allowed for already set value.
+        /// </summary>
+        AlreadySet,
+
+        /// <summary>
+        /// The value was not modified: the source is read-only.
+        /// </summary>
+        SourceReadOnly,
+
+        /// <summary>
+        /// The value was not modified: the source was frozen and it is read-only.
+        /// </summary>
+        SourceFrozen,
+
+        /// <summary>
+        /// The value was not modified: the current value is out of supported range.
+        /// </summary>
+        ValueOutOfRange,
+
+        /// <summary>
+        /// The value was not modified: the undefined value is not allowed.
+        /// </summary>
+        ValueUndefined,
+    }
 }

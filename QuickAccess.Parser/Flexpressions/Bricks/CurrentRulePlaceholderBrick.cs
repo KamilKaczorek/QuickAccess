@@ -2,7 +2,7 @@
 // This code is distributed under the BSD-2-Clause license.
 // =====================================================================
 // 
-// Copyright ©2019 by Kamil Piotr Kaczorek
+// Copyright ©2020 by Kamil Piotr Kaczorek
 // All rights reserved.
 // 
 // Redistribution and use in source and binary forms, with or without modification, 
@@ -38,6 +38,7 @@
 using System.Collections.Generic;
 using QuickAccess.DataStructures.Common.Freezable;
 using QuickAccess.DataStructures.Common.RegularExpression;
+using QuickAccess.DataStructures.Common.ValueContract;
 using QuickAccess.Parser.Product;
 
 namespace QuickAccess.Parser.Flexpressions.Bricks
@@ -46,8 +47,8 @@ namespace QuickAccess.Parser.Flexpressions.Bricks
 	{
 		/// <inheritdoc />
 		public override string Name => RuleName;
-		private readonly LimitedNumberOfTimesSetValue<KeyValuePair<string, FlexpressionBrick>> _rule = LimitedNumberOfTimesSetValue.CreateNotSet<KeyValuePair<string, FlexpressionBrick>>(1);
-		public string RuleName => _rule.IsSet ? _rule.Value.Key : "CURRENT";
+		private readonly AutoFreezingValue<KeyValuePair<string, FlexpressionBrick>> _rule = AutoFreezingValue.CreateUndefined<KeyValuePair<string, FlexpressionBrick>>();
+		public string RuleName => _rule.IsDefined ? _rule.Value.Key : "CURRENT";
 		public FlexpressionBrick Content => _rule.GetKeyValueOrDefault();
 
 
@@ -65,7 +66,7 @@ namespace QuickAccess.Parser.Flexpressions.Bricks
 		/// <inheritdoc />
 		protected override void ApplyRuleDefinition(string name, FlexpressionBrick content, bool recursion, bool freeze)
 		{
-			if (!recursion || _rule.IsSet)
+			if (!recursion || _rule.IsDefined)
 			{
 				return;
 			}

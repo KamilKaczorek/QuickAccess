@@ -3,7 +3,7 @@
 // This code is distributed under the BSD-2-Clause license.
 // =====================================================================
 // 
-// Copyright ©2018 by Kamil Piotr Kaczorek
+// Copyright ©2020 by Kamil Piotr Kaczorek
 // All rights reserved.
 // 
 // Redistribution and use in source and binary forms, with or without modification, 
@@ -133,7 +133,7 @@ namespace QuickAccess.DataStructures.Graphs.Model
 
 		/// <inheritdoc />
 		[Pure]
-		public bool IsFrozen => _indexGraphSource.IsFrozen;
+		public bool IsReadOnly => _indexGraphSource.IsReadOnly;
 
 		/// <inheritdoc />
 		public bool RemoveEdge(TSymbol srcVertexKey, TSymbol destVertexKey)
@@ -151,9 +151,6 @@ namespace QuickAccess.DataStructures.Graphs.Model
 			remove => _indexGraphSource.ConnectivityChanged -= value;
 		}
 
-		/// <inheritdoc />
-		[Pure]
-		public bool IsReadOnly => IsFrozen;
 
 		/// <inheritdoc />
 		public GraphConnectivityDefinition<TEdgeData> Connectivity =>
@@ -165,17 +162,17 @@ namespace QuickAccess.DataStructures.Graphs.Model
 
 		private int GetIndexIfNotFrozen(TSymbol symbol)
 		{
-			return IsFrozen ? -1 : _symbolToIndexConverter.GetIndexOf(symbol);
+			return IsReadOnly ? -1 : _symbolToIndexConverter.GetIndexOf(symbol);
 		}
 
 		private int GetIndexIfSrcValidAndGraphNotFrozen(int srcIndex, TSymbol symbol)
 		{
-			return srcIndex < 0 || IsFrozen ? -1 : _symbolToIndexConverter.GetIndexOf(symbol);
+			return srcIndex < 0 || IsReadOnly ? -1 : _symbolToIndexConverter.GetIndexOf(symbol);
 		}
 
 		private int GetIndexOfExistingOrNewIfNotFrozen(TSymbol symbol)
 		{
-			return IsFrozen ? -1 : _symbolToIndexConverter.GetIndexOfExistingOrNew(symbol);
+			return IsReadOnly ? -1 : _symbolToIndexConverter.GetIndexOfExistingOrNew(symbol);
 		}
 	}
 }
