@@ -104,6 +104,16 @@ namespace QuickAccess.DataStructures.Common.Freezable
 		public static AutoFreezingValue<T> CreateUndefined<T>()
 		{
 			return new AutoFreezingValue<T>(default, ValueStates.Undefined);
-		}		
+		}	
+        
+        public static AutoFreezingValue<T> CreateDefinedNotFrozen<T>(T definedValue)
+        {
+            return new AutoFreezingValue<T>(definedValue, ValueStates.Defined);
+        }
+
+        public static AutoFreezingValue<T> CreateDefinedFrozen<T>(T definedValue)
+        {
+            return new AutoFreezingValue<T>(definedValue, ValueStates.Defined | ValueStates.ReadOnly);
+        }
 	}
 }

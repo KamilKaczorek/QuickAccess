@@ -5,6 +5,55 @@ using QuickAccess.DataStructures.Algebra;
 
 namespace QuickAccess.Parser.Flexpressions.Model
 {
+    public sealed class OperatorDefinition
+    {
+        public OverloadableCodeBinarySymmetricOperator Operator { get; }
+        private readonly OperatorDefinitionArg _left;
+        private readonly OperatorDefinitionArg _right;
+
+        public OperatorDefinition(OverloadableCodeBinarySymmetricOperator @operator, OperatorDefinitionArg left, OperatorDefinitionArg right)
+        {
+            Operator = @operator;
+            _left = left;
+            _right = right;
+        }
+    }
+
+    public sealed class OperatorDefinitionArg
+    {
+        public static OperatorDefinition operator +(OperatorDefinitionArg x, OperatorDefinitionArg y)
+        {
+            return new OperatorDefinition(OverloadableCodeBinarySymmetricOperator.Sum, x, y);
+        }
+
+        public static OperatorDefinition operator -(OperatorDefinitionArg x, OperatorDefinitionArg y)
+        {
+            return new OperatorDefinition(OverloadableCodeBinarySymmetricOperator.Sub, x, y);
+        }
+
+        public static OperatorDefinition operator ^(OperatorDefinitionArg x, OperatorDefinitionArg y)
+        {
+            return new OperatorDefinition(OverloadableCodeBinarySymmetricOperator.XOr, x, y);
+        }
+
+        public static OperatorDefinition operator %(OperatorDefinitionArg x, OperatorDefinitionArg y)
+        {
+            return new OperatorDefinition(OverloadableCodeBinarySymmetricOperator.Mod, x, y);
+        }
+
+        public static OperatorDefinition operator *(OperatorDefinitionArg x, OperatorDefinitionArg y)
+        {
+            return new OperatorDefinition(OverloadableCodeBinarySymmetricOperator.Mul, x, y);
+        }
+
+        public static OperatorDefinition operator /(OperatorDefinitionArg x, OperatorDefinitionArg y)
+        {
+            return new OperatorDefinition(OverloadableCodeBinarySymmetricOperator.Div, x, y);
+        }
+    }
+
+
+
     [Serializable]
     public abstract class Flexpression<TConstraint> 
         : IFlexpression<TConstraint> 

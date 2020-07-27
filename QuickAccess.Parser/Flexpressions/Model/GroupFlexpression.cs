@@ -3,7 +3,7 @@ using QuickAccess.DataStructures.Common.ValueContract;
 
 namespace QuickAccess.Parser.Flexpressions.Model
 {
-    public sealed class GroupFlexpression<TConstraint> : Flexpression<TConstraint>, IRepresentGroup
+    public sealed class GroupFlexpressionDefinition<TConstraint> : Flexpression<TConstraint>, IDefineGroupFlexpression<TConstraint>
         where TConstraint : IFlexpressionConstraint
     {
         public override string Name => GroupName ?? base.Name;
@@ -12,11 +12,15 @@ namespace QuickAccess.Parser.Flexpressions.Model
 
         public IEditableValue<IFlexpression<TConstraint>> ContentContainer { get; }
         public IFlexpression<TConstraint> Content => ContentContainer.Value;
-  
-        public GroupFlexpression(string groupName, IEditableValue<IFlexpression<TConstraint>> contentContainer)
+
+        public bool IsSealed { get; set; }
+
+        public GroupFlexpressionDefinition(string groupName,
+            IEditableValue<IFlexpression<TConstraint>> contentContainer, bool isSealed = false)
         {
             Guard.ArgNotNull(contentContainer, nameof(contentContainer));
 
+            IsSealed = isSealed;
             GroupName = groupName;
             ContentContainer = contentContainer;
         }

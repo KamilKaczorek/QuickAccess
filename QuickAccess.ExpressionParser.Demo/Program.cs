@@ -1,13 +1,15 @@
 ﻿using QuickAccess.DataStructures.Common.RegularExpression;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text.RegularExpressions;
+using QuickAccess.DataStructures.Algebra;
 using QuickAccess.DataStructures.Common.Collections;
 using QuickAccess.DataStructures.Common.Freezable;
 using QuickAccess.DataStructures.Common.ValueContract;
 using QuickAccess.Parser;
 using QuickAccess.Parser.Flexpressions;
-using QuickAccess.Parser.Flexpressions.Bricks;
 using QuickAccess.Parser.Flexpressions.Model;
 
 namespace QuickAccess.ExpressionParser.Demo
@@ -62,15 +64,77 @@ namespace QuickAccess.ExpressionParser.Demo
             Console.WriteLine($"{rootNode != null}");
             Console.ReadLine();
 
-		} 
+		}
+
+
+        public static class FXSpecification
+        {
+            public static FXSpecification<TConstraint> Create<TConstraint>()
+                where TConstraint : IFlexpressionConstraint
+            {
+                return new FXSpecification<TConstraint>(new Dictionary<string, GroupFlexpressionDefinition<TConstraint>>());
+            }
+
+            public static FXSpecification<TConstraint> Create<TConstraint>(IEqualityComparer<string> groupNameComparer)
+                where TConstraint : IFlexpressionConstraint
+            {
+                return new FXSpecification<TConstraint>(
+                    new Dictionary<string, GroupFlexpressionDefinition<TConstraint>>(groupNameComparer));
+            }
+
+            public static FXSpecification<TConstraint> Create<TConstraint>(
+                IEnumerable<IDefineGroupFlexpression<TConstraint>> predefinedOverwritableGroups,
+                IEnumerable<IDefineGroupFlexpression<TConstraint>> predefinedSealedGroups,
+                IEqualityComparer<string> groupNameComparer = null)
+                where TConstraint : IFlexpressionConstraint
+            {
+                predefinedOverwritableGroups ??= Array.Empty<IDefineGroupFlexpression<TConstraint>>();
+                predefinedSealedGroups ??= Array.Empty<IDefineGroupFlexpression<TConstraint>>();
+
+                groupNameComparer ??= StringComparer.Ordinal;
+
+                var groups = predefinedOverwritableGroups
+                    .Where(p => p.IsDefined)
+                    .Select(p =>
+                        new GroupFlexpressionDefinition<TConstraint>(p.GroupName,
+                            AutoFreezingValue.CreateDefinedNotFrozen(p.Content)))
+                    .Concat(predefinedSealedGroups
+                        .Where(p => p.IsDefined)
+                        .Select(p =>
+                            new GroupFlexpressionDefinition<TConstraint>(p.GroupName,
+                                AutoFreezingValue.CreateDefinedFrozen(p.Content), isSealed:true)))
+                    .ToDictionary(
+                        pK => pK.GroupName,
+                        pV => pV,
+                        groupNameComparer);
+
+                var res = new FXSpecification<TConstraint>(groups);
+                return res;
+            }
+
+            public static FXSpecification<TConstraint> Create<TConstraint>(
+                IEnumerable<IDefineGroupFlexpression<TConstraint>> predefinedGroups,
+                IEqualityComparer<string> groupNameComparer = null)
+                where TConstraint : IFlexpressionConstraint
+            {
+                var groupsBySealed = predefinedGroups.ToLookup(p => p.IsSealed);
+
+                var res = Create(groupsBySealed[false], groupsBySealed[true], groupNameComparer);
+                return res;
+            }
+        }
+
 
         public class FXSpecification<TConstraint> where TConstraint : IFlexpressionConstraint
         {
-            private readonly Dictionary<string, GroupFlexpression<TConstraint>> _groupsByName;
-                                
-            public FXSpecification()
+            private readonly Dictionary<string, GroupFlexpressionDefinition<TConstraint>> _groupsDefinitionsByName;
+            private readonly Dictionary<string, GroupPlaceholder<TConstraint>> _groupsPlaceholdersByName;
+
+            internal FXSpecification(Dictionary<string, GroupFlexpressionDefinition<TConstraint>> groupsByName)
             {
-                _groupsByName = new Dictionary<string, GroupFlexpression<TConstraint>>();
+                _groupsDefinitionsByName = groupsByName ?? new Dictionary<string, GroupFlexpressionDefinition<TConstraint>>();
+                _groupsPlaceholdersByName = _groupsDefinitionsByName.Values.ToDictionary(pK => pK.GroupName,
+                    pV => new GroupPlaceholder<TConstraint>(pV.GroupName));
             }
 
             public Flexpression<TConstraint> Text(string str)
@@ -80,9 +144,9 @@ namespace QuickAccess.ExpressionParser.Demo
 
             public Flexpression<TConstraint> DefineGroup(string groupName, IFlexpression<TConstraint> content)
             {
-                var group = _groupsByName.GetExistingValueOrNew(
+                var group = _groupsDefinitionsByName.GetExistingValueOrNew(
                     groupName,
-                    pName => new GroupFlexpression<TConstraint>(pName, AutoFreezingValue.CreateUndefined<IFlexpression<TConstraint>>()));
+                    pName => new GroupFlexpressionDefinition<TConstraint>(pName, AutoFreezingValue.CreateUndefined<IFlexpression<TConstraint>>()));
 
                 if (content != null)
                 {
@@ -94,13 +158,27 @@ namespace QuickAccess.ExpressionParser.Demo
 
             public Flexpression<TConstraint> this[string groupName]
             {
-                get => DefineGroup(groupName, null);
+                get => _groupsPlaceholdersByName.GetExistingValueOrNew(groupName, pName => new GroupPlaceholder<TConstraint>(pName));
                 set => DefineGroup(groupName, value);
             }
 
             public Flexpression<TConstraint> Char(char c)
             {
                 return CharFlexpression.Create<TConstraint>(c);
+            }
+
+            private readonly Dictionary<OverloadableCodeBinarySymmetricOperator, Func<Flexpression<TConstraint>, Flexpression<TConstraint>, Flexpression<TConstraint>>>
+
+                _binOperatorDefinitions = new Dictionary<OverloadableCodeBinarySymmetricOperator,Func<Flexpression<TConstraint>,Flexpression<TConstraint>,Flexpression<TConstraint>>>();
+
+            public Func<Flexpression<TConstraint>, Flexpression<TConstraint>, Flexpression<TConstraint>> this [
+                Func<OperatorDefinitionArg, OperatorDefinitionArg, OperatorDefinition> operatorSelector]
+            {
+                set
+                {
+                    var selectedOperator = operatorSelector.Invoke(new OperatorDefinitionArg(), new OperatorDefinitionArg()).Operator;
+                    _binOperatorDefinitions[selectedOperator] = value;
+                }
             }
         }
 
@@ -116,13 +194,15 @@ namespace QuickAccess.ExpressionParser.Demo
 
 		public static void TestFlex()
         {
-            var b = new FXSpecification<ParsingConstraint>();
+            var b = FXSpecification.Create<ParsingConstraint>();
 
-            var c = new FXSpecification<ParsingExt>();
+            var c = FXSpecification.Create<ParsingExt>();
 
             b["abc"] = b.Text("asda") | b.Char('c') + b["zzz"] + c["aaa"];
             b["zzz"] = b.Text("zzz");
 
+
+            b[(x, y) => x + y] = (x, y) => x & b.Text("_") & y;
 
 
             var str = b["zzz"].ToString();
