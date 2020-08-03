@@ -41,6 +41,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using QuickAccess.DataStructures.Common.CharMatching;
 using QuickAccess.Parser.Product;
 
 namespace QuickAccess.Parser
@@ -85,7 +86,7 @@ namespace QuickAccess.Parser
         /// <param name="parserFactory">The parser factory.</param>
         public MathExpressionCompiler(IEqualityComparer<char> charComparer, IExpressionParserFactory parserFactory)
         {
-            charComparer ??= CharComparer.CaseSensitive;
+            charComparer ??= CharComparer.Ordinal;
             var comparer = new SourceCodeFragmentContentComparer(charComparer);
 
             _functionsByNameByArgCount = new Dictionary<IReadOnlyList<char>, Dictionary<int, Func<object[], object>>>(comparer);

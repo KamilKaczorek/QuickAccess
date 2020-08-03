@@ -37,6 +37,8 @@
 
 #endregion
 
+using QuickAccess.Parser.Flexpressions.Model.Caching;
+
 namespace QuickAccess.Parser
 {
     /// <summary>
@@ -51,9 +53,12 @@ namespace QuickAccess.Parser
         /// <param name="parent">The parent context.</param>
         /// <param name="offset">The context absolute offset within the source code.</param>
         /// <param name="maxDeep">The maximum deep of parented contexts.</param>
+        /// <param name="cache"></param>
         IParsingContextStream Create(
             IParsingContextStreamParent parent,
             int offset,
-            int maxDeep);
+            int maxDeep, 
+            ICacheParsingResults cache
+            );
     }
 }

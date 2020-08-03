@@ -81,7 +81,7 @@ namespace QuickAccess.DataStructures.MultiDictionaries
 			TOuterKey outerKey,
 			TInnerKey innerKey,
 			TValue value,
-			IEqualityComparer<TInnerKey> innerKeyComparer)
+			IEqualityComparer<TInnerKey> innerKeyComparer = null)
 		{
 			if (!source.TryGetValue(outerKey, out var innerDict))
 			{
@@ -339,6 +339,30 @@ namespace QuickAccess.DataStructures.MultiDictionaries
 
 			return true;
 		}
+
+        public static bool RemoveInner<TOuterKey, TInnerKey, TValue>(
+            this IDictionary<TOuterKey, Dictionary<TInnerKey, TValue>> source,
+            TOuterKey outerKey,
+            TInnerKey innerKey,
+            bool removeInnerIfEmpty = true)
+        {
+            if (!source.TryGetValue(outerKey, out var innerDict))
+            {
+                return false;
+            }
+
+            if (!innerDict.Remove(innerKey))
+            {
+                return false;
+            }
+
+            if (removeInnerIfEmpty && innerDict.Count <= 0)
+            {
+                source.Remove(outerKey);
+            }
+
+            return true;
+        }
 
 		public static IEnumerable<(TOuterKey, TInnerKey)> GetOuterInnerKeyPairs<TOuterKey, TInnerKey, TValue>(
 			this IDictionary<TOuterKey, IDictionary<TInnerKey, TValue>> source)

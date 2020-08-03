@@ -41,8 +41,6 @@ using QuickAccess.Parser.Product;
 
 namespace QuickAccess.Parser
 {
-
-
     /// <summary>
     /// The interface of the expression parser.
     /// </summary>
@@ -54,7 +52,11 @@ namespace QuickAccess.Parser
         /// If compilation is failed sets the error and returns <c>null</c>.
         /// </summary>
         /// <param name="src">The parsing source.</param>
+        /// <param name="options">Parsing options</param>
         /// <returns>The not <c>null</c> expression node if successful; otherwise <c>null</c>.</returns>
-        IParsingProduct TryParse(ISourceCode src);
+        IParsingProduct TryParse(ISourceCode src, ParsingOptions options);
+
+        
     }
+
 }

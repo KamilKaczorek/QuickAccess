@@ -60,7 +60,20 @@ namespace QuickAccess.DataStructures.Algebra
 
 		public const OverloadableCodeOperators AllOperators = Unary | Binary;
 
+
         [Pure]
+        public static bool IsBinary(this OverloadableCodeOperator source)
+        {
+            return Binary.Contains(source);
+        }
+
+        [Pure]
+        public static bool IsUnary(this OverloadableCodeOperator source)
+        {
+            return Unary.Contains(source);
+        }
+
+		[Pure]
         public static string GetSymbol(this OverloadableCodeBinarySymmetricOperator source)
         {
             return source.ToCodeOperator().GetSymbol();

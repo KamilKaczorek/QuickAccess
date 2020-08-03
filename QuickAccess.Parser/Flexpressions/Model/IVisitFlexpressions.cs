@@ -1,13 +1,17 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using QuickAccess.DataStructures.Algebra;
+using QuickAccess.DataStructures.Common.CharMatching;
+using QuickAccess.DataStructures.Common.Patterns.Visitor;
 
 namespace QuickAccess.Parser.Flexpressions.Model
 {
-    public interface IVisitFlexpressions<TVisitationResult>
+    
+    public interface IVisitFlexpressions<TVisitationResult> : IVisit<TVisitationResult>
     {
-        TVisitationResult VisitChar(char ch);
-
         TVisitationResult VisitString(string str);
+
+        TVisitationResult VisitCharactersRange(ICharactersRangeDefinition range);
 
         TVisitationResult VisitQuantifier(TVisitationResult contentVisitationResult, long min, long max);
 
@@ -26,13 +30,12 @@ namespace QuickAccess.Parser.Flexpressions.Model
             IEnumerable<TVisitationResult> argsVisitationResults, 
             int argsCount);
 
-        TVisitationResult VisitGroup(
+        TVisitationResult VisitGroup( 
             string groupName,
             TVisitationResult contentVisitationResult);
 
         TVisitationResult VisitGroupPlaceholder(string targetGroupName);
 
         TVisitationResult VisitCustom(IFlexpression customFlexpression);
-
     }
 }

@@ -2,11 +2,26 @@
 
 namespace QuickAccess.Parser.Flexpressions.Model
 {
-    public sealed class QuantifierFlexpression<TConstraint> : Flexpression<TConstraint> where TConstraint : IFlexpressionConstraint
+    public sealed class QuantifierFlexpression : Flexpression 
     {
+        public static Flexpression Create(
+            IFlexpression content,
+            long min,
+            long max)
+        {
+            return new QuantifierFlexpression(content, min, max);
+        }
+
+        public static Flexpression Create(
+            IFlexpression content,
+            long count)
+        {
+            return new QuantifierFlexpression(content, count, count);
+        }
+
         public long Min { get; }
         public long Max { get; }
-        public IFlexpression<TConstraint> Content { get; }
+        public IFlexpression Content { get; }
 
         public bool IsEmpty => (Min == 0 && Max == 0);
 
@@ -17,13 +32,12 @@ namespace QuickAccess.Parser.Flexpressions.Model
             return visitationResult;
         }
 
-        public QuantifierFlexpression(IFlexpression<TConstraint> content, long min, long max)
+        public QuantifierFlexpression(IFlexpression content, long min, long max)
         {
             Content = content ?? throw new ArgumentNullException(nameof(content));
 
-            Constraint.ValidateQuantifierAllowed(min, max);
 
-            if (Content is QuantifierFlexpression<TConstraint> quantifier)
+            if (Content is QuantifierFlexpression quantifier)
             {
                 Content = quantifier.Content;
                 min = quantifier.Min * Min;
@@ -91,21 +105,5 @@ namespace QuickAccess.Parser.Flexpressions.Model
         }
     }
 
-    public static class QuantifierFlexpression
-    {
-        public static Flexpression<TConstraint> Create<TConstraint>(
-            IFlexpression<TConstraint> content,
-            long min,
-            long max) where TConstraint : IFlexpressionConstraint
-        {
-            return new QuantifierFlexpression<TConstraint>(content, min, max);
-        }
-
-        public static Flexpression<TConstraint> Create<TConstraint>(
-            IFlexpression<TConstraint> content,
-            long count) where TConstraint : IFlexpressionConstraint
-        {
-            return new QuantifierFlexpression<TConstraint>(content, count, count);
-        }
-    }
+    
 }

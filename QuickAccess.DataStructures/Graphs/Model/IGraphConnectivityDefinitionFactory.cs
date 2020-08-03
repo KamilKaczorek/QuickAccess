@@ -40,7 +40,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
-using QuickAccess.DataStructures.Common;
 using QuickAccess.DataStructures.Common.Collections;
 using QuickAccess.DataStructures.Graphs.Factory;
 

@@ -34,6 +34,9 @@
 // http://kamil.scienceontheweb.net
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
+
+using QuickAccess.DataStructures.Common.CharMatching;
+
 namespace QuickAccess.DataStructures.Common.RegularExpression
 {
 	public class RegularExpressionBuildingContext

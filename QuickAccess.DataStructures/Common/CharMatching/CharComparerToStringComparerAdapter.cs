@@ -37,9 +37,11 @@
 
 #endregion
 
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
-namespace QuickAccess.Parser
+namespace QuickAccess.DataStructures.Common.CharMatching
 {
     /// <summary>
     /// Implements the string comparison based on character equality comparer.
@@ -48,6 +50,7 @@ namespace QuickAccess.Parser
     public sealed class CharComparerToStringComparerAdapter : IEqualityComparer<string>
     {
         private readonly IEqualityComparer<char> _charComparer;
+        private readonly StringComparison? _comparison;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CharComparerToStringComparerAdapter"/> class.
@@ -56,11 +59,22 @@ namespace QuickAccess.Parser
         public CharComparerToStringComparerAdapter(IEqualityComparer<char> charComparer)
         {
             _charComparer = charComparer;
+            _comparison = (_charComparer as CharComparer)?.StringComparison;
         }
 
-      
+        public CharComparerToStringComparerAdapter(StringComparison comparison)
+        {
+            _comparison = comparison;
+        }
+
         public bool Equals(string x, string y)
         {
+            if (_comparison != null)
+            {
+                return string.Equals(x, y, _comparison.Value);
+            }
+
+
             if (ReferenceEquals(x, y))
             {
                 return true;
@@ -90,7 +104,22 @@ namespace QuickAccess.Parser
 
         public int GetHashCode(string obj)
         {
-            return obj.GetHashCode();
+            if (_comparison != null)
+            {
+                return obj.GetHashCode(_comparison.Value);
+            }
+
+            if (obj.Length == 0)
+            {
+                return 0;
+            }
+
+            if (obj.Length == 1)
+            {
+                return _charComparer.GetHashCode(obj[0]);
+            }
+
+            return HashCode.Combine(obj.Length, _charComparer.GetHashCode(obj[0]), _charComparer.GetHashCode(obj[^1]));
         }
     }
 }

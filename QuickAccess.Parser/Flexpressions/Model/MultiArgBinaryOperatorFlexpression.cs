@@ -5,18 +5,17 @@ using QuickAccess.DataStructures.Common.Guards;
 
 namespace QuickAccess.Parser.Flexpressions.Model
 {
-    public sealed class MultiArgBinaryOperatorFlexpression<TConstraint> : Flexpression<TConstraint> where TConstraint : IFlexpressionConstraint
+    public sealed class MultiArgBinaryOperatorFlexpression : Flexpression 
     {
         /// <inheritdoc />
         public override string Name => string.Join(BinaryOperator.GetSymbol(), (IEnumerable<string>) Arguments.Select(p => $"({p.Name})"));
 
         public OverloadableCodeBinarySymmetricOperator BinaryOperator { get; }
-        public IReadOnlyList<IFlexpression<TConstraint>> Arguments { get; }
+        public IReadOnlyList<IFlexpression> Arguments { get; }
 
-        public MultiArgBinaryOperatorFlexpression(OverloadableCodeBinarySymmetricOperator binaryOperator, IReadOnlyList<IFlexpression<TConstraint>> args)
+        public MultiArgBinaryOperatorFlexpression(OverloadableCodeBinarySymmetricOperator binaryOperator, IReadOnlyList<IFlexpression> args)
         {
             Guard.ArgCountAtLeast(args, nameof(args), 3);
-            Constraint.ValidateBinaryOperatorAllowed(binaryOperator, args.Count);
 
             BinaryOperator = binaryOperator;
             Arguments = args;

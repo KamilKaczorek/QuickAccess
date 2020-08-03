@@ -106,16 +106,16 @@ namespace QuickAccess.Parser.Flexpressions.Bricks
 		}
 
 		/// <inheritdoc />
-		protected override IParsingProduct TryParseInternal(IParsingContextStream ctx)
+		protected override IParsingProduct TryParseInternal(IParsingContextStream ctx, ParsingOptions options)
 		{
 			if (Min == 1 && Max == 1)
 			{
-				return Content.TryParse(ctx);
+				return Content.TryParse(ctx, options);
 			}
 
 			if (Min == 0 && Max == 1)
 			{
-				return Content.TryParse(ctx) ?? new EmptyNode(ctx);
+				return Content.TryParse(ctx, options) ?? new EmptyNode(ctx);
 			}
 
 			List<IParsingProduct> nodes = null;
@@ -123,7 +123,7 @@ namespace QuickAccess.Parser.Flexpressions.Bricks
 			
 			for (var idx = 0; idx <= Max; idx++)
 			{
-				var res = idx < Max ? Content.TryParse(ctx) : null;
+				var res = idx < Max ? Content.TryParse(ctx, options) : null;
 
 				if (res == null)
 				{

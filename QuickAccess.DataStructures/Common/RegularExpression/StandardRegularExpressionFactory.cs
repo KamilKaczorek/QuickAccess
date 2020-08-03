@@ -39,6 +39,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using QuickAccess.DataStructures.Common.CharMatching;
 
 namespace QuickAccess.DataStructures.Common.RegularExpression
 {
@@ -166,53 +167,9 @@ namespace QuickAccess.DataStructures.Common.RegularExpression
 
 		/// <inheritdoc />
 		public string CreateCharRange(IRegularExpressionFactoryContext ctx, StandardCharactersRange range)
-		{
-			if ((range & ~StandardCharactersRange.NotWordCharacter) != StandardCharactersRange.None)
-			{
-				throw new NotSupportedException($"Can't create character range: Specified range is not supported ({range})");
-			}
-
-			switch (range)
-			{
-				case StandardCharactersRange.None:
-				case StandardCharactersRange.Not:
-					throw new InvalidOperationException($"Can't create character range: range is empty ({range}).");
-				case StandardCharactersRange.Underscore:
-					return "_";
-				case StandardCharactersRange.WordCharacter:
-					return @"\w";
-				case StandardCharactersRange.NotWordCharacter:
-					return @"\W";
-				case StandardCharactersRange.NotUnderscore:
-					return "^_";
-			}
-
-			var regex = ((range & StandardCharactersRange.Not) != StandardCharactersRange.None) ? "[^" : "[";
-
-			if ((range & StandardCharactersRange.UpperLetter) != StandardCharactersRange.None)
-			{
-				regex += "A-Z";
-			}
-
-			if ((range & StandardCharactersRange.LowerLetter) != StandardCharactersRange.None)
-			{
-				regex += "a-z";
-			}
-
-			if ((range & StandardCharactersRange.Digit) != StandardCharactersRange.None)
-			{
-				regex += "0-9";
-			}
-
-			if ((range & StandardCharactersRange.Underscore) != StandardCharactersRange.None)
-			{
-				regex += "_";
-			}
-
-			regex += "]";
-
-			return regex;
-		}
+        {
+            return range.ToRegexStatement();
+        }
 
 		/// <inheritdoc />
 		public string CreateCharSet(IRegularExpressionFactoryContext ctx, IEnumerable<char> characters)

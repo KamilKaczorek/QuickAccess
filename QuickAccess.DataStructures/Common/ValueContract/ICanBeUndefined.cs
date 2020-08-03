@@ -44,6 +44,6 @@ namespace QuickAccess.DataStructures.Common.ValueContract
         /// <summary>
         /// Gets value indicating whether the object is defined or not.
         /// </summary>
-        bool IsDefined { get; }
+        public bool IsDefined { get; }
     }
 }

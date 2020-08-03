@@ -1,7 +1,7 @@
 ﻿namespace QuickAccess.Parser.Flexpressions.Model
 {
-    public sealed class GroupPlaceholder<TConstraint> : Flexpression<TConstraint>, IRepresentGroup
-        where TConstraint : IFlexpressionConstraint
+    public sealed class GroupPlaceholder : Flexpression, IRepresentGroup
+        
     {
         public override string Name => GroupName ?? base.Name;
         public string GroupName { get; }

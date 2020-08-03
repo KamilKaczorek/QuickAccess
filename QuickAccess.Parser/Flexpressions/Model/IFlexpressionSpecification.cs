@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
 using QuickAccess.DataStructures.Algebra;
+using QuickAccess.DataStructures.Common.CharMatching;
 
 namespace QuickAccess.Parser.Flexpressions.Model
 {
     public interface IFlexpressionSpecification
     {
-        bool IsSatisfiedByChar(char ch);
+        bool IsSatisfiedByChar(ICharactersRangeDefinition charactersRangeDefinition);
 
         bool IsSatisfiedByString(string str);
 

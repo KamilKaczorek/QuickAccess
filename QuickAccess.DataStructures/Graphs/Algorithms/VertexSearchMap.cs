@@ -55,9 +55,14 @@ namespace QuickAccess.DataStructures.Graphs.Algorithms
 	/// <seealso cref="IWeightedEdgesGraphSearch"/>
 	/// </summary>
 	/// <typeparam name="TKey">The type of the vertex key (index/symbol).</typeparam>
-	public struct VertexSearchMap<TKey> : IEnumerable<VerticesPair<TKey>>
+	public sealed class VertexSearchMap<TKey> : IEnumerable<VerticesPair<TKey>>
 	{
-		private readonly Dictionary<TKey, TKey> _destToSourceMap;
+		private readonly IReadOnlyDictionary<TKey, TKey> _destToSourceMap;
+
+        /// <summary>Gets the vertex key comparer.</summary>
+        /// <value>The comparer.</value>
+		[Pure]
+		public IEqualityComparer<TKey> Comparer { get; }
 
 		/// <summary>Gets the source vertex (starting position).</summary>
 		/// <value>The source vertex.</value>
@@ -67,11 +72,12 @@ namespace QuickAccess.DataStructures.Graphs.Algorithms
 		/// <summary>Initializes a new instance of the <see cref="VertexSearchMap{TKey}" /> structure.</summary>
 		/// <param name="sourceVertex">The source vertex (starting position).</param>
 		/// <param name="destToSourceMap">The destination to source map dictionary that is wrapped by created map.</param>
-		public VertexSearchMap(TKey sourceVertex, Dictionary<TKey, TKey> destToSourceMap)
+		public VertexSearchMap(in TKey sourceVertex,in Dictionary<TKey, TKey> destToSourceMap)
 		{
 			SourceVertex = sourceVertex;
 			_destToSourceMap = destToSourceMap;
-		}
+            Comparer = destToSourceMap?.Comparer ?? EqualityComparer<TKey>.Default;
+        }
 
 		/// <summary>
 		///     Determines whether the map is empty (<see cref="SourceVertex" /> doesn't contain any adjacent vertices or is
@@ -216,10 +222,7 @@ namespace QuickAccess.DataStructures.Graphs.Algorithms
 			}
 		}
 
-		/// <summary>Gets the vertex key comparer.</summary>
-		/// <value>The comparer.</value>
-		[Pure]
-		public IEqualityComparer<TKey> Comparer => _destToSourceMap?.Comparer ?? EqualityComparer<TKey>.Default;
+        
 
 		/// <summary>Returns an enumerator that iterates through all edges of the map.</summary>
 		/// <returns>An enumerator that can be used to iterate through the collection.</returns>

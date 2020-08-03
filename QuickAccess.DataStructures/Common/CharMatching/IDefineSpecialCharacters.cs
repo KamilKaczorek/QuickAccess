@@ -1,7 +1,5 @@
-﻿namespace QuickAccess.DataStructures.Common.RegularExpression
+﻿namespace QuickAccess.DataStructures.Common.CharMatching
 {
-    
-
     public interface IDefineSpecialCharacters
     {
         /// <summary>Determines whether the specified character is a special regex character (symbol).</summary>

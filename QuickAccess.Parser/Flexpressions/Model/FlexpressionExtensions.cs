@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using QuickAccess.DataStructures.Algebra;
+using QuickAccess.DataStructures.Common.CharMatching;
 
 namespace QuickAccess.Parser.Flexpressions.Model
 {
@@ -19,7 +20,7 @@ namespace QuickAccess.Parser.Flexpressions.Model
             return satisfied;
         }
 
-        public static TVisitationResult Visit<TVisitationResult>(this IVisitFlexpressions<TVisitationResult> visitor, IFlexpression flexpression)
+        public static TVisitationResult Visit<TVisitationResult>(this IVisitFlexpressions<TVisitationResult> visitor, IAcceptFlexpressionsVisitor flexpression)
         {
             var visitationResult = flexpression.AcceptVisitor(visitor);
             return visitationResult;
@@ -34,9 +35,12 @@ namespace QuickAccess.Parser.Flexpressions.Model
                 _specification = specification;
             }
 
-            public bool VisitChar(char ch) { return _specification.IsSatisfiedByChar(ch); }
-
             public bool VisitString(string str) { return _specification.IsSatisfiedByString(str); }
+
+            public bool VisitCharactersRange(ICharactersRangeDefinition range)
+            {
+                return _specification.IsSatisfiedByChar(range);
+            }
 
             public bool VisitQuantifier(bool contentVisitationResult, long min, long max) { return _specification.IsSatisfiedByQuantifier(contentVisitationResult, min, max); }
 

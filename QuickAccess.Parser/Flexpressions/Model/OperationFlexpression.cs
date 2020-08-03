@@ -4,7 +4,7 @@ using QuickAccess.DataStructures.Common.Guards;
 
 namespace QuickAccess.Parser.Flexpressions.Model
 {
-    public sealed class OperationFlexpression<TConstraint> : Flexpression<TConstraint> where TConstraint : IFlexpressionConstraint
+    public sealed class OperationFlexpression : Flexpression 
     {
         /// <inheritdoc />
         public override string Name => OperationName;
@@ -18,9 +18,9 @@ namespace QuickAccess.Parser.Flexpressions.Model
             return product;
         }
 
-        public IReadOnlyList<IFlexpression<TConstraint>> Arguments { get; }
+        public IReadOnlyList<IFlexpression> Arguments { get; }
 
-        public OperationFlexpression(string name, IReadOnlyList<IFlexpression<TConstraint>> args)
+        public OperationFlexpression(string name, IReadOnlyList<IFlexpression> args)
         {
             Guard.ArgCountAtLeast(args, nameof(args), 3);
 

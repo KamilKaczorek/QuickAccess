@@ -43,12 +43,12 @@ namespace QuickAccess.DataStructures.Common.Collections
 	/// The result of re-indexed data operation with result data and re-indexing information.
 	/// </summary>
 	/// <typeparam name="TData">The type of the data.</typeparam>
-	public struct ReindexedDataResult<TData>
+	public readonly struct ReindexedDataResult<TData>
 	{
 		/// <summary>Initializes a new instance of the <see cref="ReindexedDataResult{TData}"/> struct.</summary>
 		/// <param name="indexTranslator">The index map.</param>
 		/// <param name="data">The data.</param>
-		public ReindexedDataResult(IIndexTranslator indexTranslator, TData data)
+		public ReindexedDataResult(in IIndexTranslator indexTranslator,in TData data)
 		{
 			IndexTranslator = indexTranslator;
 			Data = data;
@@ -68,7 +68,7 @@ namespace QuickAccess.DataStructures.Common.Collections
 		/// </summary>
 		/// <param name="source">The source.</param>
 		/// <returns>The result of the conversion.</returns>
-		public static implicit operator TData(ReindexedDataResult<TData> source)
+		public static implicit operator TData(in ReindexedDataResult<TData> source)
 		{
 			return source.Data;
 		}

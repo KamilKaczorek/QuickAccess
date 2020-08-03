@@ -52,6 +52,9 @@ namespace QuickAccess.Parser
             ParsedFragment = parsedFragment;
         }
 
-
+        public override string ToString()
+        {
+            return $"{Error}: '{ParsedFragment}{ParsingContextStream.ToStringDefaultCurrentPositionTag}{NotParsedFragment}'";
+        }
     }
 }

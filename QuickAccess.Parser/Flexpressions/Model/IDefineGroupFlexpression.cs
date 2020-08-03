@@ -1,9 +1,8 @@
 ﻿namespace QuickAccess.Parser.Flexpressions.Model
 {
-    public interface IDefineGroupFlexpression<out TConstraint> : IRepresentGroup
-        where TConstraint : IFlexpressionConstraint
+    public interface IDefineGroupFlexpression : IRepresentGroup
     {
-        IFlexpression<TConstraint> Content { get; }
+        IFlexpression Content { get; }
         public bool IsSealed { get; }
     }
 }

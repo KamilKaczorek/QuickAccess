@@ -40,7 +40,8 @@
 
 using System;
 using System.Collections.Generic;
-using QuickAccess.Parser.Flexpressions;
+using QuickAccess.Parser.Flexpressions.Model;
+using QuickAccess.Parser.Flexpressions.Model.Caching;
 using QuickAccess.Parser.Product;
 
 namespace QuickAccess.Parser
@@ -55,6 +56,7 @@ namespace QuickAccess.Parser
     public sealed class ParsingContextStream : IParsingContextStream,
         IParsingContextStreamParent
     {
+        private readonly ICacheParsingResults _cache;
         private readonly IParsingProductFactory _productFactory;
         private readonly int _initialOffset;
         private readonly int _maxDeep;
@@ -96,9 +98,6 @@ namespace QuickAccess.Parser
         char IParsingContextStreamParent.this[int idx] => _parent[idx];
 
         /// <inheritdoc />
-        public IFlexpressionAlgebra MetaExpressionAlgebra { get; }
-
-        /// <inheritdoc />
         public IParsingProduct CreateExpressionForAcceptedFragment(ExpressionTypeDescriptor expressionType,
             IReadOnlyCollection<IParsingProduct> subNodes)
         {
@@ -134,20 +133,20 @@ namespace QuickAccess.Parser
         /// Initializes a new instance of the <see cref="ParsingContextStream"/> class.
         /// </summary>
         /// <param name="productFactory">The product factory.</param>
-        /// <param name="metaExpressionAlgebra">The algebra that defines meta expression operators and base symbols.</param>
         /// <param name="parent">The parent context.</param>
         /// <param name="offset">The context absolute offset within the source code.</param>
         /// <param name="maxDeep">The maximum deep of parented contexts.</param>
+        /// <param name="cache">Parsing results cache.</param>
         public ParsingContextStream(
             IParsingProductFactory productFactory, 
-            IFlexpressionAlgebra metaExpressionAlgebra, 
             IParsingContextStreamParent parent, 
             int offset, 
-            int maxDeep)
+            int maxDeep,
+            ICacheParsingResults cache)
         {
             _initialOffset = offset;
             _maxDeep = maxDeep;
-            MetaExpressionAlgebra = metaExpressionAlgebra;
+            _cache = cache;
             _productFactory = productFactory;
             _internalOffset = 0;
             _parent = parent;
@@ -192,7 +191,7 @@ namespace QuickAccess.Parser
                 maxDeep--;
             }
 
-            return new ParsingContextStream(_productFactory, MetaExpressionAlgebra, this, CurrentIndex + 1, maxDeep);
+            return new ParsingContextStream(_productFactory, this, CurrentIndex + 1, maxDeep, _cache);
         }
 
         /// <inheritdoc />
@@ -310,6 +309,34 @@ namespace QuickAccess.Parser
             var str2 = _parent.GetString(pos, _parent.Length - pos);
 
             return $"{str1}{currentPositionTag}{str2}";
+        }
+
+        public IParsingResultDetails GetParsingResultOrUpdate<TProduct>(in FlexpressionId flexpressionId, Func<TProduct> getResultCallback) 
+            where TProduct : class
+        {
+            var res = _cache.GetParsingResultOrUpdate((uint)(CurrentIndex + 1), flexpressionId, 
+                () =>
+                {
+                    var pos = _position;
+
+                    var product  = getResultCallback.Invoke();
+
+                    return product != null 
+                        ? ParsingResultDetails.CreateSuccessful(product, _position - pos) 
+                        : ParsingResultDetails.Negative;
+                });
+
+            if (res.IsSuccessful && res.IsFromCache)
+            {
+                _position += res.ParsedCharactersCount;
+            }
+
+            return res;
+        }
+
+        public bool ClearParsingResult(in FlexpressionId flexpressionId)
+        {
+            return _cache.ClearParsingResult((uint)(CurrentIndex + 1), flexpressionId);
         }
     }
 }

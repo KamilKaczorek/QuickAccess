@@ -61,5 +61,10 @@ namespace QuickAccess.Parser
             Code = code;
             Message = message;
         }
+
+        public override string ToString()
+        {
+            return $"E{Code} {Message}";
+        }
     }
 }

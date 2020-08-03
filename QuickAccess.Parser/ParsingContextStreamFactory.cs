@@ -38,6 +38,7 @@
 #endregion
 
 using QuickAccess.Parser.Flexpressions;
+using QuickAccess.Parser.Flexpressions.Model.Caching;
 
 namespace QuickAccess.Parser
 {
@@ -62,9 +63,9 @@ namespace QuickAccess.Parser
         }
 
         /// <inheritdoc />
-        public IParsingContextStream Create(IParsingContextStreamParent parent, int offset, int maxDeep)
+        public IParsingContextStream Create(IParsingContextStreamParent parent, int offset, int maxDeep, ICacheParsingResults cache)
         {
-            return new ParsingContextStream(_productFactory, _metaExpressionAlgebra, parent, offset, maxDeep);
+            return new ParsingContextStream(_productFactory, parent, offset, maxDeep, cache);
         }
     }
 }

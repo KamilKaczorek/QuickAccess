@@ -73,9 +73,9 @@ namespace QuickAccess.Parser.Flexpressions.Bricks
 			return ctx.Factory.CreateNot(ctx.Context, Content.ToRegularExpressionString(ctx));
 		}
 
-		protected override IParsingProduct TryParseInternal(IParsingContextStream ctx)
+		protected override IParsingProduct TryParseInternal(IParsingContextStream ctx, ParsingOptions options)
 		{
-			var res = Content.TryParse(ctx);
+			var res = Content.TryParse(ctx, options);
 
 			return res != null ? null : new EmptyNode(ctx);
 		}

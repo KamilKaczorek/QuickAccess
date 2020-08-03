@@ -46,18 +46,33 @@ namespace QuickAccess.Parser
 {
 	public static class ExpressionParserExtensions
 	{
-		public static IParsingProduct TryAggregateParse(this IEnumerable<IExpressionParser> source, ISourceCode src)
+        internal const ParsingOptions DefaultParsingOptions = ParsingOptions.Cache;
+
+        /// <summary>
+        /// Tries to parse the expression specified by the given parsing source with <see cref="DefaultParsingOptions"/> as <see cref="ParsingOptions"/>.
+        /// If successful, returns not <c>null</c> expression node.
+        /// If compilation is failed sets the error and returns <c>null</c>.
+        /// </summary>
+        /// <param name="source">The source of extension.</param>
+        /// <param name="src">The parsing source.</param>
+        /// <returns>The not <c>null</c> expression node if successful; otherwise <c>null</c>.</returns>
+        public static IParsingProduct TryParse(this IExpressionParser source, ISourceCode src)
+        {
+            return source.TryParse(src, DefaultParsingOptions);
+        }
+
+		public static IParsingProduct TryAggregateParse(this IEnumerable<IExpressionParser> source, ISourceCode src, ParsingOptions options = DefaultParsingOptions)
 		{
 			if (source is IReadOnlyCollection<IExpressionParser> collection)
 			{
-				return TryAggregateParse(collection, src);
+				return TryAggregateParse(collection, src, options);
 			}
 
 			List<IParsingProduct> nodes = null;
             using var ctx = src.GetFurtherContext();
             foreach (var parser in source)
             {
-                var res = parser.TryParse(src);
+                var res = parser.TryParse(src, options);
 
                 if (res == null)
                 {
@@ -72,14 +87,14 @@ namespace QuickAccess.Parser
             return ctx.CreateExpressionForAcceptedFragment(FXB.ExpressionTypes.Concatenation, nodes);
         }
 
-		public static IParsingProduct TryAggregateParse(this IReadOnlyCollection<IExpressionParser> parsers, ISourceCode src)
+		public static IParsingProduct TryAggregateParse(this IReadOnlyCollection<IExpressionParser> parsers, ISourceCode src, ParsingOptions options = DefaultParsingOptions)
         {
             using var ctx = src.GetFurtherContext();
             var nodes = new IParsingProduct[parsers.Count];
             var idx = 0;
             foreach (var parser in parsers)
             {
-                var res = parser.TryParse(ctx);
+                var res = parser.TryParse(ctx, options);
 
                 if (res == null)
                 {
@@ -97,11 +112,12 @@ namespace QuickAccess.Parser
 		public static IParsingProduct TryAlternativeParse(
 			this IEnumerable<IExpressionParser> parsers,
 			ISourceCode src,
-			ParsingAlternationType parsingAlternationType = ParsingAlternationType.TakeFirst)
+			ParsingAlternationType parsingAlternationType = ParsingAlternationType.TakeFirst, 
+            ParsingOptions options = DefaultParsingOptions)
 		{
 			if (parsingAlternationType == ParsingAlternationType.TakeFirst)
 			{
-				return parsers.Select(p => p.TryParse(src)).FirstNotNullOrDefault();
+				return parsers.Select(p => p.TryParse(src, options)).FirstNotNullOrDefault();
 			}
 
 			if (parsingAlternationType != ParsingAlternationType.TakeLongest &&
@@ -119,7 +135,7 @@ namespace QuickAccess.Parser
 			foreach (var parser in parsers)
 			{
 				var ctx = src.GetFurtherContext();
-				var res = parser.TryParse(src);
+				var res = parser.TryParse(src, options);
 
 				if (res != null && (result == null || replaceCmp == ctx.CompareTo(selectedCtx)))
 				{

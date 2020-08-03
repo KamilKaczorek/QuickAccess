@@ -43,7 +43,7 @@ using System.Collections.Generic;
 
 namespace QuickAccess.DataStructures.Common.Collections
 {
-	/// <summary>
+    /// <summary>
 	/// It provides empty enumerable instance that satisfies following target types:
 	/// <see cref="IReadOnlyList{T}"/>
 	/// <see cref="IReadOnlyCollection{T}"/>

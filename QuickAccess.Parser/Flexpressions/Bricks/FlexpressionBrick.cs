@@ -36,9 +36,11 @@
 #endregion
 
 using System;
-using System.Threading;
+using System.Runtime.CompilerServices;
 using QuickAccess.DataStructures.Algebra;
 using QuickAccess.DataStructures.Common.RegularExpression;
+using QuickAccess.Parser.Flexpressions.Model;
+using QuickAccess.Parser.Flexpressions.Model.Caching;
 using QuickAccess.Parser.Product;
 
 namespace QuickAccess.Parser.Flexpressions.Bricks
@@ -49,17 +51,16 @@ namespace QuickAccess.Parser.Flexpressions.Bricks
             IDefineAlgebraicDomain<FlexpressionBrick, IFlexpressionAlgebra>, 
             IEquatable<FlexpressionBrick>
     {
-        private static int _idCounter = 0;
         public const string AnonymousNamePrefix = "Anonym";
 
 		protected FlexpressionBrick(IFlexpressionAlgebra algebra)
         {
-            Id = Interlocked.Increment(ref _idCounter);
+            Id = FlexpressionId.Generate();
 
 			Algebra = algebra ?? FXB.DefaultAlgebra;
 		}
 
-		public int Id { get; }
+		public FlexpressionId Id { get; }
 		public virtual string Name => $"{AnonymousNamePrefix}{Id}";
 
 		/// <inheritdoc />
@@ -79,8 +80,9 @@ namespace QuickAccess.Parser.Flexpressions.Bricks
 
         /// <summary>Tries the parse internal.</summary>
         /// <param name="parsingContext">The source.</param>
+        /// <param name="options"></param>
         /// <returns></returns>
-        protected abstract IParsingProduct TryParseInternal(IParsingContextStream parsingContext);
+        protected abstract IParsingProduct TryParseInternal(IParsingContextStream parsingContext, ParsingOptions options);
 
         /// <inheritdoc />
         public abstract bool Equals(FlexpressionBrick other);
@@ -181,17 +183,63 @@ namespace QuickAccess.Parser.Flexpressions.Bricks
 			throw new NotSupportedException($"Conversion to regular expression is not supported for {GetType()}.");
 		}
 
-		/// <inheritdoc />
-		public IParsingProduct TryParse(ISourceCode sourceCode)
+        
+
+        /// <inheritdoc />
+        public IParsingProduct TryParse(ISourceCode sourceCode, ParsingOptions options)
+        {
+            var res = options.HasFlag(ParsingOptions.Cache) 
+                ? TryParseCache(sourceCode, options) 
+                : TryParseNoCache(sourceCode, options);
+
+            if (res != null && options.HasFlag(ParsingOptions.PrintSteps))
+            {
+				Console.WriteLine($"{GetType().Name}, {Id}, {Name} Passed {sourceCode}");
+            }
+
+            return res;
+        }
+
+        
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private IParsingProduct TryParseCache(ISourceCode sourceCode, ParsingOptions options)
         {
             using var ctx = sourceCode.GetFurtherContext();
-            var res = TryParseInternal(ctx);
+            // ReSharper disable once AccessToDisposedClosure
+            var res = ctx.GetParsingResultOrUpdate(Id, () => TryParseInternal(ctx, options));
+
+            if (!res.IsSuccessful)
+            {
+                if (res.Result == ParsingEvaluationResult.CalculationInProgress)
+                {
+                    throw new InvalidOperationException($"Circular definition found {Name}");
+                }
+
+
+         
+				ctx.SetError(new ParsingError(1, $"{GetType().Name} expected at: '{ctx}'; {Name}"));
+
+                return null;
+            }
+
+            ctx.Accept();
+            var product = (IParsingProduct) res.Product;
+            return product;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private IParsingProduct TryParseNoCache(ISourceCode sourceCode, ParsingOptions options)
+        {
+            using var ctx = sourceCode.GetFurtherContext();
+
+            // ReSharper disable once AccessToDisposedClosure
+            var res = TryParseInternal(ctx, options);
 
             if (res != null)
             {
                 ctx.Accept();
             }
-				
+
             return res;
         }
     }

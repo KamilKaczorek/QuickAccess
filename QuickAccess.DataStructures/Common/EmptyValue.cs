@@ -43,7 +43,7 @@ using QuickAccess.DataStructures.Common.Collections;
 
 namespace QuickAccess.DataStructures.Common
 {
-	/// <summary>
+    /// <summary>
 	/// It defines empty value type to use as a dummy type parameter in generic types, when the specified value is not required.
 	/// It is used as edge data type of graph with empty edges (edges without data).
 	/// </summary>

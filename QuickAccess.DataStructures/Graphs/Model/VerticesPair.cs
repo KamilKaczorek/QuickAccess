@@ -50,14 +50,14 @@ namespace QuickAccess.DataStructures.Graphs.Model
 	/// </summary>
 	/// <typeparam name="TVertexKey">The type of the vertex key.</typeparam>
 	[Serializable]
-	public struct VerticesPair<TVertexKey> : IEnumerable<TVertexKey>
+	public readonly struct VerticesPair<TVertexKey> : IEnumerable<TVertexKey>
 	{
 		/// <summary>
 		/// Initializes a new instance of the <see cref="VerticesPair{TVertexKey}" /> structure with specified source and destination vertices.
 		/// </summary>
 		/// <param name="source">The source vertex.</param>
 		/// <param name="destination">The destination vertex.</param>
-		public VerticesPair(TVertexKey source, TVertexKey destination)
+		public VerticesPair(in TVertexKey source, in TVertexKey destination)
 		{
 			Source = source;
 			Destination = destination;
@@ -67,7 +67,7 @@ namespace QuickAccess.DataStructures.Graphs.Model
 		/// Initializes a new instance of the <see cref="VerticesPair{TVertexKey}" /> structure copying values from <paramref name="other"/>.
 		/// </summary>
 		/// <param name="other">The other.</param>
-		public VerticesPair(VerticesPair<TVertexKey> other)
+		public VerticesPair(in VerticesPair<TVertexKey> other)
 		{
 			Source = other.Source;
 			Destination = other.Destination;
@@ -126,7 +126,7 @@ namespace QuickAccess.DataStructures.Graphs.Model
 		/// <param name="edgeData">The edge data.</param>
 		/// <returns>The edge.</returns>
 		[Pure]
-		public Edge<TVertexKey, TEdgeData> ToEdge<TEdgeData>(TEdgeData edgeData)
+		public Edge<TVertexKey, TEdgeData> ToEdge<TEdgeData>(in TEdgeData edgeData)
 		{
 			return new Edge<TVertexKey, TEdgeData>(this, edgeData);
 		}

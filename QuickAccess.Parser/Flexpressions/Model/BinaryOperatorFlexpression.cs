@@ -3,22 +3,22 @@ using QuickAccess.DataStructures.Algebra;
 
 namespace QuickAccess.Parser.Flexpressions.Model
 {
-    public static class BinaryOperatorFlexpression
+
+
+    public sealed class BinaryOperatorFlexpression : Flexpression 
     {
-
-
-        public static Flexpression<TConstraint> Create<TConstraint>(
-            OverloadableCodeBinarySymmetricOperator binaryOperator, IFlexpression<TConstraint> leftArgument, IFlexpression<TConstraint> rightArgument) where TConstraint : IFlexpressionConstraint
+        public static Flexpression Create(
+            OverloadableCodeBinarySymmetricOperator binaryOperator, IFlexpression leftArgument, IFlexpression rightArgument)
         {
-            if (leftArgument is BinaryOperatorFlexpression<TConstraint> binOperator && binOperator.BinaryOperator == binaryOperator)
+            if (leftArgument is BinaryOperatorFlexpression binOperator && binOperator.BinaryOperator == binaryOperator)
             {
-                return new MultiArgBinaryOperatorFlexpression<TConstraint>(binaryOperator, new []{binOperator.LeftArgument, binOperator.RightArgument, rightArgument});
+                return new MultiArgBinaryOperatorFlexpression(binaryOperator, new[] { binOperator.LeftArgument, binOperator.RightArgument, rightArgument });
             }
 
-            if (leftArgument is MultiArgBinaryOperatorFlexpression<TConstraint> multiBinOperator && multiBinOperator.BinaryOperator == binaryOperator)
+            if (leftArgument is MultiArgBinaryOperatorFlexpression multiBinOperator && multiBinOperator.BinaryOperator == binaryOperator)
             {
                 var leftArgs = multiBinOperator.Arguments;
-                var args = new IFlexpression<TConstraint>[leftArgs.Count + 1];
+                var args = new IFlexpression[leftArgs.Count + 1];
 
                 for (var idx = leftArgs.Count - 1; idx >= 0; --idx)
                 {
@@ -27,25 +27,21 @@ namespace QuickAccess.Parser.Flexpressions.Model
 
                 args[^1] = rightArgument;
 
-                return new MultiArgBinaryOperatorFlexpression<TConstraint>(binaryOperator, args);
+                return new MultiArgBinaryOperatorFlexpression(binaryOperator, args);
             }
 
-            return new BinaryOperatorFlexpression<TConstraint>(binaryOperator, leftArgument, rightArgument);
+            return new BinaryOperatorFlexpression(binaryOperator, leftArgument, rightArgument);
         }
-    }
 
-    public sealed class BinaryOperatorFlexpression<TConstraint> : Flexpression<TConstraint> where TConstraint : IFlexpressionConstraint
-    {
         /// <inheritdoc />
         public override string Name => BinaryOperator.ToCodeRepresentation(LeftArgument.Name, RightArgument.Name);
 
         public OverloadableCodeBinarySymmetricOperator BinaryOperator { get; }
-        public IFlexpression<TConstraint> LeftArgument { get; }
-        public IFlexpression<TConstraint> RightArgument { get; }
+        public IFlexpression LeftArgument { get; }
+        public IFlexpression RightArgument { get; }
 
-        public BinaryOperatorFlexpression(OverloadableCodeBinarySymmetricOperator binaryOperator, IFlexpression<TConstraint> leftArgument, IFlexpression<TConstraint> rightArgument)
+        public BinaryOperatorFlexpression(OverloadableCodeBinarySymmetricOperator binaryOperator, IFlexpression leftArgument, IFlexpression rightArgument)
         {
-            Constraint.ValidateBinaryOperatorAllowed(binaryOperator, 2);
             BinaryOperator = binaryOperator;
             LeftArgument = leftArgument;
             RightArgument = rightArgument;

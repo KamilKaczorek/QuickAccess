@@ -46,6 +46,12 @@ namespace QuickAccess.DataStructures.Common.Collections
 {
 	public static class EnumerableExtensions
 	{
+        [Pure]
+        public static IReadOnlySet<T> AsReadOnly<T>(this HashSet<T> actualSet)
+        {
+            return ReadOnlySet.Wrap(actualSet);
+        }
+
 		[Pure]
 		public static IEnumerable<string> AsStrings<T>(this IEnumerable<T> source)
 		{

@@ -1,5 +1,4 @@
 ﻿#region LICENSE [BSD-2-Clause]
-
 // This code is distributed under the BSD-2-Clause license.
 // =====================================================================
 // 
@@ -34,61 +33,52 @@
 // Author: Kamil Piotr Kaczorek
 // http://kamil.scienceontheweb.net
 // e-mail: kamil.piotr.kaczorek@gmail.com
-
 #endregion
 
 using System;
-using System.Collections.Generic;
+using static QuickAccess.DataStructures.Common.CharMatching.CharactersRangeExtensions;
 
-namespace QuickAccess.Parser
+namespace QuickAccess.DataStructures.Common.CharMatching
 {
-    /// <summary>
-    /// The character comparer.
-    /// Implements case sensitive and insensitive invariant character comparison. 
-    /// <seealso cref="CharComparerToStringComparerAdapter"/>
-    /// </summary>
-    /// <seealso cref="IEqualityComparer{T}" />
-    public sealed class CharComparer : IEqualityComparer<char>
-    {
-        public static readonly IEqualityComparer<char> CaseInsensitive = new CharComparer(true);
-        public static readonly IEqualityComparer<char> CaseSensitive = new CharComparer(false);
+	[Flags]
+	public enum StandardCharactersRange
+	{
+		None = 0,
 
-        private readonly bool _ignoreCase;
+		UpperLetter = 0x01,
+		LowerLetter = 0x02,
+		Digit = 0x04,
+		Underscore = 0x08,
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="CharComparer"/> class.
-        /// </summary>
-        /// <param name="ignoreCase">if set to <c>true</c> ignores case; otherwise <c>false</c> - case sensitive.</param>
-        private CharComparer(bool ignoreCase)
-        {
-            _ignoreCase = ignoreCase;
-        }
+		Space = 0x10,
+		Tab = 0x20,
+        NewLine = 0x40,
+		Return = 0x80,
 
-        public bool IsCharContainedByCollection(char c, ICollection<char> charSet)
-        {
-            var contains = charSet.Contains(c);
+        NonUpperLetter = UpperLetter << NegativePatternsShift,
+        NonLowerLetter = LowerLetter << NegativePatternsShift,
+        NonDigit = Digit << NegativePatternsShift,
+        NonUnderscore = Underscore << NegativePatternsShift,
 
-            if (contains)
-            {
-                return true;
-            }
-            
-            if (!_ignoreCase)
-            {
-                return false;
-            }
+        NonSpace = Space << NegativePatternsShift,
+        NonTab = Tab << NegativePatternsShift,
+        NonNewLine = NewLine << NegativePatternsShift,
+        NonReturn = Return << NegativePatternsShift,
 
-            return charSet.Contains(char.ToLowerInvariant(c)) || charSet.Contains(char.ToUpperInvariant(c));
-        }
+		LineBreak = NewLine | Return,
+		SpaceOrTab = Tab | Space,
+		WhiteSpace = SpaceOrTab | LineBreak,
+		Letter = UpperLetter | LowerLetter,
+		LetterOrDigit = Letter | Digit,
+		WordCharacter = LetterOrDigit | Underscore,
+		WordCharacterOrWhiteSpace = WordCharacter | WhiteSpace,
 
-        public bool Equals(char ch1, char ch2)
-        {
-            return _ignoreCase ? char.ToLowerInvariant(ch1) == char.ToLowerInvariant(ch2) :  ch1 == ch2;       
-        }
-            
-        public int GetHashCode(char obj)
-        {
-            return char.ToLowerInvariant(obj).GetHashCode();
-        }
-    }
+        NonLineBreak = NonNewLine | NonReturn,
+        NonSpaceOrTab = NonTab | NonSpace,
+        NonWhiteSpace = NonSpaceOrTab | NonLineBreak,
+        NonLetter = NonUpperLetter | NonLowerLetter,
+        NonLetterOrDigit = NonLetter | NonDigit,
+        NonWordCharacter = NonLetterOrDigit | NonUnderscore,
+        NonWordCharacterOrWhiteSpace = NonWordCharacter | NonWhiteSpace,
+	}
 }

@@ -35,6 +35,7 @@
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
 
+using QuickAccess.DataStructures.Common.CharMatching;
 using QuickAccess.DataStructures.Common.RegularExpression;
 using QuickAccess.Parser.Product;
 
@@ -62,7 +63,7 @@ namespace QuickAccess.Parser.Flexpressions.Bricks
 		}
 
 		/// <inheritdoc />
-		protected override IParsingProduct TryParseInternal(IParsingContextStream ctx)
+		protected override IParsingProduct TryParseInternal(IParsingContextStream ctx, ParsingOptions options)
 		{
 			return ctx.MoveNext() && ctx.Current.IsFromRange(_range)
 				? ctx.Accept().CreateTermForAcceptedFragment(FXB.ExpressionTypes.CharTerm)

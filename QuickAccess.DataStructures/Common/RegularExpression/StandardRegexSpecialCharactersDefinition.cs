@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using QuickAccess.DataStructures.Common.CharMatching;
 
 namespace QuickAccess.DataStructures.Common.RegularExpression
 {

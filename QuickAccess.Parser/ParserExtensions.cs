@@ -42,6 +42,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using QuickAccess.DataStructures.Common.CharMatching;
 
 namespace QuickAccess.Parser
 {
@@ -424,7 +425,7 @@ namespace QuickAccess.Parser
 
         private static bool Equals(char ch1, char ch2, IEqualityComparer<char> charComparer = null)
         {
-            return (charComparer ?? CharComparer.CaseSensitive).Equals(ch1, ch2);
+            return (charComparer ?? CharComparer.Ordinal).Equals(ch1, ch2);
         }
     }
 }

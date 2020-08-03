@@ -83,9 +83,11 @@ namespace QuickAccess.Parser
         }
 
         /// <inheritdoc />
-        public IParsingProduct TryParse(ISourceCode src)
+        public IParsingProduct TryParse(ISourceCode src, ParsingOptions options)
         {
             using var ctx = src.GetFurtherContext();
+
+
             var res = ParseExpression(ctx);
 
             if (res == null)

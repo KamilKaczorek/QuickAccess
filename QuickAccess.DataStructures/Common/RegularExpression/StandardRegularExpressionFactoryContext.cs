@@ -38,6 +38,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using QuickAccess.DataStructures.Common.CharMatching;
 
 namespace QuickAccess.DataStructures.Common.RegularExpression
 {

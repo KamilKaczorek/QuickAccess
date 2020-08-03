@@ -12,12 +12,12 @@ namespace QuickAccess.DataStructures.Common
 	{
 		public const StringSplitOptions RemoveEmpty = StringSplitOptions.RemoveEmptyEntries;
 
-		public struct ParsingResult
+		public readonly struct ParsingResult
 		{
 			public object Value { get; }
 			public bool IsParsed { get; }
 
-			public ParsingResult(bool isParsed, object value)
+			public ParsingResult(in bool isParsed, in object value)
 			{
 				Value = value;
 				IsParsed = isParsed;

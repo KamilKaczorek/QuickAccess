@@ -34,7 +34,7 @@ namespace QuickAccess.DataStructures.Common.Guards
         [DebuggerStepThrough]
         [ContractAnnotation("value:null => halt")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void ArgNotNull<T>(T value, string parameterName)
+        public static void ArgNotNull(object value, string parameterName)
         {
             if (value == null)
             {
@@ -156,6 +156,17 @@ namespace QuickAccess.DataStructures.Common.Guards
             if (!predicate.Invoke(value))
             {
                 throw new ArgumentException(GetMessage(message ?? $"Unexpected argument value ({value}) <= validation predicate failed."), parameterName);
+            }
+        }
+
+        [DebuggerHidden]
+        [DebuggerStepThrough]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void ArgSatisfies<T>(T value, string parameterName, Func<T, bool> predicate, Func<T, string> message = null)
+        {
+            if (!predicate.Invoke(value))
+            {
+                throw new ArgumentException(GetMessage(message?.Invoke(value) ?? $"Unexpected argument value ({value}) <= validation predicate failed."), parameterName);
             }
         }
 

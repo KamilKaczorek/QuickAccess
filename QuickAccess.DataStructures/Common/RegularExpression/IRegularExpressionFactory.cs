@@ -37,6 +37,7 @@
 
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using QuickAccess.DataStructures.Common.CharMatching;
 
 namespace QuickAccess.DataStructures.Common.RegularExpression
 {

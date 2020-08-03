@@ -3,20 +3,20 @@ using QuickAccess.DataStructures.Common.ValueContract;
 
 namespace QuickAccess.Parser.Flexpressions.Model
 {
-    public sealed class GroupFlexpressionDefinition<TConstraint> : Flexpression<TConstraint>, IDefineGroupFlexpression<TConstraint>
-        where TConstraint : IFlexpressionConstraint
+    public sealed class GroupFlexpressionDefinition : Flexpression, IDefineGroupFlexpression
+        
     {
         public override string Name => GroupName ?? base.Name;
         public string GroupName { get; }
         public bool IsDefined => ContentContainer.IsDefined;
 
-        public IEditableValue<IFlexpression<TConstraint>> ContentContainer { get; }
-        public IFlexpression<TConstraint> Content => ContentContainer.Value;
+        public IEditableValue<IFlexpression> ContentContainer { get; }
+        public IFlexpression Content => ContentContainer.Value;
 
         public bool IsSealed { get; set; }
 
         public GroupFlexpressionDefinition(string groupName,
-            IEditableValue<IFlexpression<TConstraint>> contentContainer, bool isSealed = false)
+            IEditableValue<IFlexpression> contentContainer, bool isSealed = false)
         {
             Guard.ArgNotNull(contentContainer, nameof(contentContainer));
 

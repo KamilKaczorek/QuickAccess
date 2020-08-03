@@ -2,17 +2,15 @@
 
 namespace QuickAccess.Parser.Flexpressions.Model
 {
-    public static class UnaryOperatorFlexpression
+   
+    public sealed class UnaryOperatorFlexpression : Flexpression 
     {
-        public static UnaryOperatorFlexpression<TConstraint> Create<TConstraint>(OverloadableCodeUnarySymmetricOperator unaryOperator,
-                                                                                     IFlexpression<TConstraint> argument) where TConstraint : IFlexpressionConstraint
+        public static UnaryOperatorFlexpression Create(OverloadableCodeUnarySymmetricOperator unaryOperator,
+                                                       IFlexpression argument)
         {
-            return new UnaryOperatorFlexpression<TConstraint>(unaryOperator, argument);
+            return new UnaryOperatorFlexpression(unaryOperator, argument);
         }
-    }
 
-    public sealed class UnaryOperatorFlexpression<TConstraint> : Flexpression<TConstraint> where TConstraint : IFlexpressionConstraint
-    {
         /// <inheritdoc />
         public override string Name => UnaryOperator.ToCodeRepresentation(Argument.Name);
 
@@ -24,11 +22,10 @@ namespace QuickAccess.Parser.Flexpressions.Model
         }
 
         public OverloadableCodeUnarySymmetricOperator UnaryOperator { get; }
-        public IFlexpression<TConstraint> Argument { get; }
+        public IFlexpression Argument { get; }
 
-        public UnaryOperatorFlexpression(OverloadableCodeUnarySymmetricOperator unaryOperator, IFlexpression<TConstraint> argument)
+        public UnaryOperatorFlexpression(OverloadableCodeUnarySymmetricOperator unaryOperator, IFlexpression argument)
         {
-            Constraint.ValidateUnaryOperatorAllowed(unaryOperator);
             UnaryOperator = unaryOperator;
             Argument = argument;
         }

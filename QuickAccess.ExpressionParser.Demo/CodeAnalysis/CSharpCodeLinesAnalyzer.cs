@@ -8,10 +8,13 @@ namespace QuickAccess.ExpressionParser.Demo.CodeAnalysis
     {
         public sealed class CodeLinesInfo
         {
-            internal CodeLinesInfo(int classesCount, int structsCount, int enumsCount,
-                int interfacesCount,
-                int numberOfLines,
-                int filesCount)
+            internal CodeLinesInfo(
+                in int classesCount,
+                in int structsCount,
+                in int enumsCount,
+                in int interfacesCount,
+                in int numberOfLines,
+                in int filesCount)
             {
                 ClassesCount = classesCount;
                 StructsCount = structsCount;
@@ -20,6 +23,8 @@ namespace QuickAccess.ExpressionParser.Demo.CodeAnalysis
                 LinesCount = numberOfLines;
                 FilesCount = filesCount;
             }
+
+
             public int ClassesCount { get; }
             public int StructsCount { get; }
             public int EnumsCount { get; }

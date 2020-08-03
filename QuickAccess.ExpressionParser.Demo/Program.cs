@@ -1,13 +1,8 @@
 ﻿using QuickAccess.DataStructures.Common.RegularExpression;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Text.RegularExpressions;
-using QuickAccess.DataStructures.Algebra;
-using QuickAccess.DataStructures.Common.Collections;
-using QuickAccess.DataStructures.Common.Freezable;
-using QuickAccess.DataStructures.Common.ValueContract;
+using System.Diagnostics;
+using System.Threading;
+using QuickAccess.DataStructures.Common.CharMatching;
 using QuickAccess.Parser;
 using QuickAccess.Parser.Flexpressions;
 using QuickAccess.Parser.Flexpressions.Model;
@@ -16,17 +11,49 @@ namespace QuickAccess.ExpressionParser.Demo
 {
 	class Program
 	{
-		static void Main()
+        static void Main()
         {
+            var part =
+                "10 + (12.1 - 4) * 8 + 20 * 30 + 8 + (3 + 5 * (2 - 1) / 12.4)-12.1213*(1- 5)*(10 + (12.1 - 4) * 8 + 20 * 30 + 8 + (3 + 5 * (2 - 1) / 12.4)-12.1213*(1- 5))";
 
-            Test("Cos(12, 23, 34);");
-			Test2("10+(12.1 - 4)*8");
+
+            var source = $"{part}+{part}/{part}*{part}";
+
+            var fun = $"FooFunction12312FunctionCosSinArg(232, 3223, 232, 111, 23.2323, 323.112, 343, 232); ";
+
+            var count = 1000;
+            var st = new Stopwatch();
             TestFlex();
+
+            
+
+            foreach (var option in new[] {ParsingOptions.None, ParsingOptions.Cache})
+            {
+                Console.WriteLine($"---- {option} ----");
+                Thread.Sleep(0);
+                
+
+                st.Start();
+                var start = DateTime.UtcNow;
+
+                Test2(source, count, option);
+                Test(fun, count, option);
+
+                
+                st.Stop();
+                var stop = DateTime.UtcNow;
+                var total = stop - start;
+                Console.WriteLine($"CPUTime   = {st.Elapsed}");
+                Console.WriteLine($"TotalTime = {total}");
+                Console.WriteLine($"---- {new string('-', option.ToString().Length)} ----");
+                
+                st.Reset();
+            }
         }
 
-        
 
-        public static void Test2(string expression)
+
+        public static void Test2(string expression, int count = 1, ParsingOptions options = ParsingOptions.Cache)
         {
 			var fx = new StandardFlexpressionAlgebra(-1);
 
@@ -53,135 +80,29 @@ namespace QuickAccess.ExpressionParser.Demo
             var ctx = RegularExpressionBuildingContext.CreateStandard();
             var regularExpressionString = expr.ToRegularExpressionString(ctx);
 
-            Console.WriteLine($"Regex: {regularExpressionString}");
+            //Console.WriteLine($"Regex: {regularExpressionString}");
 
 
             var source = new StringSourceCode(new ParsingContextStreamFactory(new ProductFactory(), fx), new SourceCodeFragmentFactory(),  expression);
 
-            var rootNode = expr.TryParse(source.GetFurtherContext());
+            for (var idx = 0; idx < count; ++idx)
+            {
+                var rootNode = expr.TryParse(source.GetFurtherContext(), options);
+            }
 
-            Console.WriteLine(expr);
-            Console.WriteLine($"{rootNode != null}");
-            Console.ReadLine();
+            //Console.WriteLine(expr);
+            //Console.WriteLine($"{rootNode != null}");
+            //Console.ReadLine();
 
 		}
 
-
-        public static class FXSpecification
-        {
-            public static FXSpecification<TConstraint> Create<TConstraint>()
-                where TConstraint : IFlexpressionConstraint
-            {
-                return new FXSpecification<TConstraint>(new Dictionary<string, GroupFlexpressionDefinition<TConstraint>>());
-            }
-
-            public static FXSpecification<TConstraint> Create<TConstraint>(IEqualityComparer<string> groupNameComparer)
-                where TConstraint : IFlexpressionConstraint
-            {
-                return new FXSpecification<TConstraint>(
-                    new Dictionary<string, GroupFlexpressionDefinition<TConstraint>>(groupNameComparer));
-            }
-
-            public static FXSpecification<TConstraint> Create<TConstraint>(
-                IEnumerable<IDefineGroupFlexpression<TConstraint>> predefinedOverwritableGroups,
-                IEnumerable<IDefineGroupFlexpression<TConstraint>> predefinedSealedGroups,
-                IEqualityComparer<string> groupNameComparer = null)
-                where TConstraint : IFlexpressionConstraint
-            {
-                predefinedOverwritableGroups ??= Array.Empty<IDefineGroupFlexpression<TConstraint>>();
-                predefinedSealedGroups ??= Array.Empty<IDefineGroupFlexpression<TConstraint>>();
-
-                groupNameComparer ??= StringComparer.Ordinal;
-
-                var groups = predefinedOverwritableGroups
-                    .Where(p => p.IsDefined)
-                    .Select(p =>
-                        new GroupFlexpressionDefinition<TConstraint>(p.GroupName,
-                            AutoFreezingValue.CreateDefinedNotFrozen(p.Content)))
-                    .Concat(predefinedSealedGroups
-                        .Where(p => p.IsDefined)
-                        .Select(p =>
-                            new GroupFlexpressionDefinition<TConstraint>(p.GroupName,
-                                AutoFreezingValue.CreateDefinedFrozen(p.Content), isSealed:true)))
-                    .ToDictionary(
-                        pK => pK.GroupName,
-                        pV => pV,
-                        groupNameComparer);
-
-                var res = new FXSpecification<TConstraint>(groups);
-                return res;
-            }
-
-            public static FXSpecification<TConstraint> Create<TConstraint>(
-                IEnumerable<IDefineGroupFlexpression<TConstraint>> predefinedGroups,
-                IEqualityComparer<string> groupNameComparer = null)
-                where TConstraint : IFlexpressionConstraint
-            {
-                var groupsBySealed = predefinedGroups.ToLookup(p => p.IsSealed);
-
-                var res = Create(groupsBySealed[false], groupsBySealed[true], groupNameComparer);
-                return res;
-            }
-        }
+        
 
 
-        public class FXSpecification<TConstraint> where TConstraint : IFlexpressionConstraint
-        {
-            private readonly Dictionary<string, GroupFlexpressionDefinition<TConstraint>> _groupsDefinitionsByName;
-            private readonly Dictionary<string, GroupPlaceholder<TConstraint>> _groupsPlaceholdersByName;
+        
+        
 
-            internal FXSpecification(Dictionary<string, GroupFlexpressionDefinition<TConstraint>> groupsByName)
-            {
-                _groupsDefinitionsByName = groupsByName ?? new Dictionary<string, GroupFlexpressionDefinition<TConstraint>>();
-                _groupsPlaceholdersByName = _groupsDefinitionsByName.Values.ToDictionary(pK => pK.GroupName,
-                    pV => new GroupPlaceholder<TConstraint>(pV.GroupName));
-            }
-
-            public Flexpression<TConstraint> Text(string str)
-            {
-                return StringFlexpression.Create<TConstraint>(str);
-            }
-
-            public Flexpression<TConstraint> DefineGroup(string groupName, IFlexpression<TConstraint> content)
-            {
-                var group = _groupsDefinitionsByName.GetExistingValueOrNew(
-                    groupName,
-                    pName => new GroupFlexpressionDefinition<TConstraint>(pName, AutoFreezingValue.CreateUndefined<IFlexpression<TConstraint>>()));
-
-                if (content != null)
-                {
-                    group.ContentContainer.Set(content);
-                }
-
-                return group;
-            }
-
-            public Flexpression<TConstraint> this[string groupName]
-            {
-                get => _groupsPlaceholdersByName.GetExistingValueOrNew(groupName, pName => new GroupPlaceholder<TConstraint>(pName));
-                set => DefineGroup(groupName, value);
-            }
-
-            public Flexpression<TConstraint> Char(char c)
-            {
-                return CharFlexpression.Create<TConstraint>(c);
-            }
-
-            private readonly Dictionary<OverloadableCodeBinarySymmetricOperator, Func<Flexpression<TConstraint>, Flexpression<TConstraint>, Flexpression<TConstraint>>>
-
-                _binOperatorDefinitions = new Dictionary<OverloadableCodeBinarySymmetricOperator,Func<Flexpression<TConstraint>,Flexpression<TConstraint>,Flexpression<TConstraint>>>();
-
-            public Func<Flexpression<TConstraint>, Flexpression<TConstraint>, Flexpression<TConstraint>> this [
-                Func<OperatorDefinitionArg, OperatorDefinitionArg, OperatorDefinition> operatorSelector]
-            {
-                set
-                {
-                    var selectedOperator = operatorSelector.Invoke(new OperatorDefinitionArg(), new OperatorDefinitionArg()).Operator;
-                    _binOperatorDefinitions[selectedOperator] = value;
-                }
-            }
-        }
-
+       
         public class ParsingConstraint : CustomFXConstraint
         {
 
@@ -192,27 +113,37 @@ namespace QuickAccess.ExpressionParser.Demo
 
         }
 
+        
 		public static void TestFlex()
         {
-            var b = FXSpecification.Create<ParsingConstraint>();
+            var b = FXSpecification.Create();
 
-            var c = FXSpecification.Create<ParsingExt>();
+            var c = FXSpecification.Create();
 
-            b["abc"] = b.Text("asda") | b.Char('c') + b["zzz"] + c["aaa"];
-            b["zzz"] = b.Text("zzz");
+            var z = b["abc"] = b.Text("asda") | b.Char('c') + b["zzz"] + c["aaa"];
+            b["zzz"] = b.Text("zzz") + z;
+
+            b["WhiteSpaceChar"] = StandardCharactersRange.WhiteSpace;
+
+            b["WhiteSpace"] = b["WhiteSpaceChar"][1, long.MaxValue];
+
+            b[x => ~x] = x => x[0, 1];
 
 
-            b[(x, y) => x + y] = (x, y) => x & b.Text("_") & y;
+
+            b[(x, y) => x + y] = (x, y) => x & ~b["WhiteSpace"] & y;
+            b[(x, y) => x ^ y] = (x, y) => x & b["WhiteSpace"] & y;
+
+            b[x => +x] = x => x;
 
 
             var str = b["zzz"].ToString();
-            Console.WriteLine(str);
-            Console.ReadLine();
+            //Console.WriteLine(str);
+            //Console.ReadLine();
         }
 
-		public static void Test(string expression)
+		public static void Test(string expression, int count = 1, ParsingOptions options = ParsingOptions.Cache)
 		{
-			var _ = (new CharFlexpression<DefaultFlexpressionConstraint>('c') + "dsdsa" | 'c')[1, 2];
 
 			var name = (FXB.Letter + (FXB.Digit | FXB.Letter).ZeroOrMore()).DefinesSealedRule("Name", "String");
 			var intNumber = FXB.Digit.OneOrMore().DefinesSealedRule("Integer", "Integer");
@@ -222,22 +153,28 @@ namespace QuickAccess.ExpressionParser.Demo
 			var functionInvocation = (name & "(" & ~functionArgList & ")" & ';').DefinesSealedRule("FunctionInvocation");
 
 			var ctx = RegularExpressionBuildingContext.CreateStandard();
-			var regularExpressionString = functionInvocation.ToRegularExpressionString(ctx);
+			//var regularExpressionString = functionInvocation.ToRegularExpressionString(ctx);
 
-			var regex = new Regex(regularExpressionString, RegexOptions.Compiled);
+			//var regex = new Regex(regularExpressionString, RegexOptions.Compiled);
 
-			var res = regex.IsMatch(expression);
+			//var res = regex.IsMatch(expression);
 
-			Console.WriteLine($"Regex: {regularExpressionString}");
-			Console.WriteLine($"Regex result: {res}");
+
 
 			var source = new StringSourceCode(new ParsingContextStreamFactory(new ProductFactory(), FXB.DefaultAlgebra), new SourceCodeFragmentFactory(), expression);
 
-			var rootNode = functionInvocation.TryParse(source.GetFurtherContext());
+            for (var idx = 0; idx < count; ++idx)
+            {
+                var rootNode = functionInvocation.TryParse(source, options);
 
-			Console.WriteLine(functionInvocation);
-			Console.WriteLine($"{rootNode != null}");
-			Console.ReadLine();
+                if (rootNode == null)
+                {
+                    throw new InvalidOperationException($"Parsing error {source.GetError()}");
+                }
+            }
+
+           
+			
         }
 	}
 }

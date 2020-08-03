@@ -34,6 +34,7 @@
 // http://kamil.scienceontheweb.net
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
+
 namespace QuickAccess.DataStructures.Common.ValueContract
 {
 	/// <summary>

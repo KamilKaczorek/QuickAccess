@@ -47,9 +47,9 @@ namespace QuickAccess.Parser.Flexpressions.Bricks
 		public override MatchingLevel RegularExpressionMatchingLevel => Bricks.GetMinimalMatchingLevel();
 
 		/// <inheritdoc />
-		protected override IParsingProduct TryParseInternal(IParsingContextStream ctx)
+		protected override IParsingProduct TryParseInternal(IParsingContextStream ctx, ParsingOptions options)
 		{
-			return Bricks.TryAggregateParse(ctx);
+			return Bricks.TryAggregateParse(ctx, options);
 		}
 
 		//public override string ExpressionId => string.Join(string.Empty, Bricks.Select(b => b.ExpressionId));

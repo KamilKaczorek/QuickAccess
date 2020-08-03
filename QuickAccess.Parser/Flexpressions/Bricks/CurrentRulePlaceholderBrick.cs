@@ -58,9 +58,9 @@ namespace QuickAccess.Parser.Flexpressions.Bricks
 		}
 
 		/// <inheritdoc />
-		protected override IParsingProduct TryParseInternal(IParsingContextStream ctx)
+		protected override IParsingProduct TryParseInternal(IParsingContextStream ctx, ParsingOptions options)
 		{
-			return Content.TryParse(ctx);
+			return Content.TryParse(ctx, options);
 		}
 
 		/// <inheritdoc />

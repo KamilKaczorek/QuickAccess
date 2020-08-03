@@ -43,7 +43,6 @@ using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using QuickAccess.DataStructures.Common;
 using QuickAccess.DataStructures.Graphs.Factory;
-using QuickAccess.DataStructures.Graphs.Factory.Internal;
 using QuickAccess.DataStructures.Graphs.Model;
 #if DEBUG
 #endif

@@ -39,6 +39,7 @@
 
 
 using System;
+using QuickAccess.Parser.Flexpressions.Model.Caching;
 
 namespace QuickAccess.Parser
 {
@@ -70,7 +71,6 @@ namespace QuickAccess.Parser
         /// </summary>
         /// <param name="contextStreamFactory">The context stream factory.</param>
         /// <param name="sourceCodeFragmentFactory">The source code fragment factory.</param>
-        /// <param name="productFactory">The product factory.</param>
         /// <param name="sourceCodeBuffer">The buffer that contains the source code.</param>
         /// <param name="maxContextStackSize">
         /// Maximum size of the context stack - defines the maximum depth of the parented parsing context chain.
@@ -130,7 +130,8 @@ namespace QuickAccess.Parser
         /// <inheritdoc />
         public IParsingContextStream GetFurtherContext()
         {
-            return _contextStreamFactory.Create(this, _bufferOffset, _maxContextStackSize);
+            return _contextStreamFactory.Create(this, _bufferOffset, _maxContextStackSize,
+                new ParsingResultCache());
         }
 
         /// <summary>

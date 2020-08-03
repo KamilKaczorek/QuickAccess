@@ -110,12 +110,14 @@ namespace QuickAccess.Parser.Flexpressions.Bricks
 		}
 
 		/// <inheritdoc />
-		protected override IParsingProduct TryParseInternal(IParsingContextStream ctx)
+		protected override IParsingProduct TryParseInternal(IParsingContextStream ctx, ParsingOptions options)
 		{
-			var res = Content.TryParse(ctx);
+			var res = Content.TryParse(ctx, options);
 
             if (res == null)
             {
+                ctx.SetError(new ParsingError(1, $"{GroupName} expected at: '{ctx}'; {Name}"));
+
                 return null;
             }
 

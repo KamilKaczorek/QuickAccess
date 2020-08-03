@@ -42,6 +42,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
+using QuickAccess.DataStructures.Common.CharMatching;
 
 namespace QuickAccess.Parser
 {
@@ -96,7 +97,7 @@ namespace QuickAccess.Parser
 
         public SourceCodeFragmentContentComparer(IEqualityComparer<char> comparer = null)
         {
-            _comparer = comparer ?? CharComparer.CaseSensitive;
+            _comparer = comparer ?? CharComparer.Ordinal;
         }
 
         public bool Equals(IReadOnlyList<char> x, IReadOnlyList<char> y)

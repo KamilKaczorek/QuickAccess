@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using QuickAccess.DataStructures.Algebra;
-using QuickAccess.DataStructures.Common.RegularExpression;
+using QuickAccess.DataStructures.Common.CharMatching;
 using QuickAccess.Parser.Flexpressions.Bricks;
 using QuickAccess.Parser.Product;
 
