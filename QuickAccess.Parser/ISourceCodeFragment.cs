@@ -41,7 +41,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Threading;
 using QuickAccess.DataStructures.Common.CharMatching;
 
 namespace QuickAccess.Parser
@@ -125,34 +124,22 @@ namespace QuickAccess.Parser
             return true;
         }
 
-        private int GetHashCode(IReadOnlyList<char> fragment, int index, int mul)
-        {
-            unchecked
-            {
-                return _comparer.GetHashCode(fragment[index])*mul;
-            }
-        }
-
         public int GetHashCode(IReadOnlyList<char> obj)
         {
             if (obj.Count == 0)
             {
                 return 0;
             }
-            unchecked
+
+            var code = obj.Count switch
             {
-                switch (obj.Count)
-                {
-                    case 1:
-                        return 313 ^ GetHashCode(obj, 0, 277);
-                    case 2:
-                        return 626 ^ GetHashCode(obj, 0, 277) ^ GetHashCode(obj, 1, 557);
-                    case 3:
-                        return 939 ^ GetHashCode(obj, 0, 277) ^ GetHashCode(obj, 1, 557) ^ GetHashCode(obj, 2, 997);
-                    default:
-                        return (obj.Count * 313) ^ GetHashCode(obj, 0, 277) ^ GetHashCode(obj, 1, 557) ^ GetHashCode(obj, obj.Count-1, 997);
-                }
-            }
+                1 => HashCode.Combine(1, obj[0]),
+                2 => HashCode.Combine(2, obj[0], obj[1]),
+                3 => HashCode.Combine(3, obj[0], obj[1], obj[2]),
+                _ => HashCode.Combine(obj.Count, obj[0], obj[1], obj[^2], obj[^1])
+            };
+
+            return code != 0 ? code : 1;
         }
     }
 }

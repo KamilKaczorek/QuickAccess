@@ -1,6 +1,7 @@
 ﻿using QuickAccess.DataStructures.Common.RegularExpression;
 using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using QuickAccess.DataStructures.Common.CharMatching;
 using QuickAccess.Parser;
@@ -26,7 +27,7 @@ namespace QuickAccess.ExpressionParser.Demo
             TestFlex();
 
             
-
+         
             foreach (var option in new[] {ParsingOptions.None, ParsingOptions.Cache})
             {
                 Console.WriteLine($"---- {option} ----");
@@ -36,8 +37,9 @@ namespace QuickAccess.ExpressionParser.Demo
                 st.Start();
                 var start = DateTime.UtcNow;
 
-                Test2(source, count, option);
+                //Test2(source, count, option);
                 Test(fun, count, option);
+
 
                 
                 st.Stop();

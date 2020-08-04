@@ -42,7 +42,8 @@ using QuickAccess.Parser.Product;
 namespace QuickAccess.Parser.Flexpressions.Bricks
 {
 	public sealed class CharBrick : FlexpressionBrick
-	{
+    {
+        protected internal override bool CanCacheParsingResult => false;
 		
 		public char Character { get; }
 

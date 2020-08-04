@@ -51,6 +51,8 @@ namespace QuickAccess.Parser.Flexpressions.Bricks
             IDefineAlgebraicDomain<FlexpressionBrick, IFlexpressionAlgebra>, 
             IEquatable<FlexpressionBrick>
     {
+        protected internal virtual bool CanCacheParsingResult => true;
+
         public const string AnonymousNamePrefix = "Anonym";
 
 		protected FlexpressionBrick(IFlexpressionAlgebra algebra)
@@ -183,12 +185,11 @@ namespace QuickAccess.Parser.Flexpressions.Bricks
 			throw new NotSupportedException($"Conversion to regular expression is not supported for {GetType()}.");
 		}
 
-        
-
         /// <inheritdoc />
         public IParsingProduct TryParse(ISourceCode sourceCode, ParsingOptions options)
         {
-            var res = options.HasFlag(ParsingOptions.Cache) 
+            var canCache = CanCacheParsingResult;
+            var res = canCache && options.HasFlag(ParsingOptions.Cache) 
                 ? TryParseCache(sourceCode, options) 
                 : TryParseNoCache(sourceCode, options);
 
@@ -214,8 +215,6 @@ namespace QuickAccess.Parser.Flexpressions.Bricks
                 {
                     throw new InvalidOperationException($"Circular definition found {Name}");
                 }
-
-
          
 				ctx.SetError(new ParsingError(1, $"{GetType().Name} expected at: '{ctx}'; {Name}"));
 

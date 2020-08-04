@@ -43,9 +43,10 @@ namespace QuickAccess.Parser.Flexpressions.Bricks
 {
 	public abstract class CompositeFlexpressionBrick : FlexpressionBrick
 	{
-		public IReadOnlyList<FlexpressionBrick> Items => Bricks; 
+		public IReadOnlyList<FlexpressionBrick> Items => Bricks;
 
-		protected readonly FlexpressionBrick[] Bricks;
+        protected internal override bool CanCacheParsingResult { get; }
+        protected readonly FlexpressionBrick[] Bricks;
 
 		/// <inheritdoc />
 		public override bool IsEmpty => Bricks.All(b => b.IsEmpty);
@@ -58,7 +59,9 @@ namespace QuickAccess.Parser.Flexpressions.Bricks
 			var pos = 0;
 			AddBrick(Bricks, b1,canFlattenPredicate, ref pos);
 			AddBrick(Bricks, b2,canFlattenPredicate, ref pos);
-		}
+
+            CanCacheParsingResult = Bricks.Any(p => p.CanCacheParsingResult);
+        }
 
 		protected CompositeFlexpressionBrick(IFlexpressionAlgebra algebra, FlexpressionBrick b1, FlexpressionBrick b2, FlexpressionBrick b3, Func<CompositeFlexpressionBrick, bool> canFlattenPredicate)
 			:base(algebra.GetHighestPrioritizedAlgebra(b1, b2, b3))

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
-using System.Text;
 
 namespace QuickAccess.DataStructures.Common
 {
@@ -88,7 +87,7 @@ namespace QuickAccess.DataStructures.Common
 				: new ParsingResult(false, null);
 		}
 
-		private static Dictionary<Type, Func<string, NumberStyles, IFormatProvider, ParsingResult>> ParsersByType = new Dictionary<Type, Func<string, NumberStyles, IFormatProvider, ParsingResult>>(12)
+		private static readonly Dictionary<Type, Func<string, NumberStyles, IFormatProvider, ParsingResult>> ParsersByType = new Dictionary<Type, Func<string, NumberStyles, IFormatProvider, ParsingResult>>(12)
 		{
 			{typeof(byte), (t, n, f) => ParseValue<byte>(t, n, f, byte.TryParse)},
 			{typeof(byte?), (t, n, f) => ParseNullable<byte>(t, n, f, byte.TryParse)},

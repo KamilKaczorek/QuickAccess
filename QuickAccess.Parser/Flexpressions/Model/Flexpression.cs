@@ -201,7 +201,7 @@ namespace QuickAccess.Parser.Flexpressions.Model
 
         public override int GetHashCode()
         {
-            return LocalId.GetHashCode();
+            return HashCode.Combine(LocalId);
         }
 
         public override string ToString()
@@ -211,7 +211,7 @@ namespace QuickAccess.Parser.Flexpressions.Model
 
         public virtual bool Equals(IFlexpression other)
         {
-            if (ReferenceEquals(other, null))
+            if (other is null)
             {
                 return false;
             }

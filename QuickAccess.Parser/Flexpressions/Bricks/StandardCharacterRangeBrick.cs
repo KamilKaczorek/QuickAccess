@@ -43,6 +43,7 @@ namespace QuickAccess.Parser.Flexpressions.Bricks
 {
 	public sealed class StandardCharacterRangeBrick : FlexpressionBrick
 	{
+        protected internal override bool CanCacheParsingResult => false;
 		private readonly StandardCharactersRange _range;
 
 		/// <inheritdoc />

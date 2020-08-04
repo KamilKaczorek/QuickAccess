@@ -44,6 +44,8 @@ using System.Runtime.CompilerServices;
 
 namespace QuickAccess.DataStructures.Common.CharMatching
 {
+
+
     public static class CharactersRangeExtensions
     {
         public const int NegativePatternsShift = 16;
@@ -51,13 +53,33 @@ namespace QuickAccess.DataStructures.Common.CharMatching
         public const int NegativePatternMask = 0x7FFF_0000;
         public const int PositivePatternMask = 0x0000_7FFF;
 
+        private static readonly StandardCharactersRange[] PositiveRangesByCharCode;
+        private static readonly StandardCharactersRange[] NegativeRangesByCharCode;
 
+        private static readonly int MaxPreEvaluatingCharCode = (int)Math.Min(65535u, char.MaxValue);
+
+        public static IReadOnlyList<StandardCharactersRange> RangeByCharacterCode => PositiveRangesByCharCode;
+
+
+        static CharactersRangeExtensions()
+        {
+            PositiveRangesByCharCode = new StandardCharactersRange[MaxPreEvaluatingCharCode+1];
+            NegativeRangesByCharCode = new StandardCharactersRange[MaxPreEvaluatingCharCode+1];
+
+            for (var idx = MaxPreEvaluatingCharCode; idx >= 0; --idx)
+            {
+                var ch = (char) idx;
+
+                PositiveRangesByCharCode[idx] = EvaluateStandardRange(ch, true);
+                NegativeRangesByCharCode[idx] = EvaluateStandardRange(ch, false);
+            }
+        }
 
         [Pure]
 		public static bool IsWordChar(this char source)
-		{
-			return char.IsLetter(source) || char.IsDigit(source) || source == '_';
-		}
+        {
+            return IsCharacterFromRangeInternal(source, StandardCharactersRange.WordCharacter, true);
+        }
 
         [Pure]
         public static bool IsMatch(this StandardCharactersRange range, char character)
@@ -99,23 +121,18 @@ namespace QuickAccess.DataStructures.Common.CharMatching
             return matches;
         }
 
-        [Pure]
-        public static StandardCharactersRange StandardRange(this char ch, bool positive = true) =>
-            ch switch
-            {
-				var c when char.IsDigit(c) => positive ? StandardCharactersRange.Digit : StandardCharactersRange.NonDigit,
-				var c when char.IsUpper(c) => positive ? StandardCharactersRange.UpperLetter : StandardCharactersRange.NonUpperLetter,
-				var c when char.IsLower(c) => positive ? StandardCharactersRange.LowerLetter : StandardCharactersRange.NonLowerLetter,
-				'_' => positive ? StandardCharactersRange.Underscore : StandardCharactersRange.NonUnderscore,
-				' ' => positive ? StandardCharactersRange.Space : StandardCharactersRange.NonSpace,
-				'\r' => positive ? StandardCharactersRange.Return : StandardCharactersRange.NonReturn,
-				'\n' => positive ? StandardCharactersRange.NewLine : StandardCharactersRange.NonNewLine,
-				'\t' => positive ?StandardCharactersRange.Tab : StandardCharactersRange.NonTab, 
-				_ => positive ? StandardCharactersRange.NonWordCharacterOrWhiteSpace : StandardCharactersRange.WordCharacterOrWhiteSpace,
-            };
 
-        
-            
+        [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static StandardCharactersRange StandardRange(this char ch, bool positive = true)
+        {
+            var code = (int) ch;
+            return code <= MaxPreEvaluatingCharCode
+                ? positive
+                    ? PositiveRangesByCharCode[code]
+                    : NegativeRangesByCharCode[code]
+                : EvaluateStandardRange(ch, positive);
+        }
+
         [Pure]
         public static StandardCharactersRange Not(this StandardCharactersRange range)
         {
@@ -347,6 +364,21 @@ namespace QuickAccess.DataStructures.Common.CharMatching
            
             return positive ? matches : !matches;
         }
+
+        [Pure]
+        private static StandardCharactersRange EvaluateStandardRange(char ch, bool positive) =>
+            ch switch
+            {
+                var c when char.IsDigit(c) => positive ? StandardCharactersRange.Digit : StandardCharactersRange.NonDigit,
+                var c when char.IsUpper(c) => positive ? StandardCharactersRange.UpperLetter : StandardCharactersRange.NonUpperLetter,
+                var c when char.IsLower(c) => positive ? StandardCharactersRange.LowerLetter : StandardCharactersRange.NonLowerLetter,
+                '_' => positive ? StandardCharactersRange.Underscore : StandardCharactersRange.NonUnderscore,
+                ' ' => positive ? StandardCharactersRange.Space : StandardCharactersRange.NonSpace,
+                '\r' => positive ? StandardCharactersRange.Return : StandardCharactersRange.NonReturn,
+                '\n' => positive ? StandardCharactersRange.NewLine : StandardCharactersRange.NonNewLine,
+                '\t' => positive ?StandardCharactersRange.Tab : StandardCharactersRange.NonTab, 
+                _ => positive ? StandardCharactersRange.NonWordCharacterOrWhiteSpace : StandardCharactersRange.WordCharacterOrWhiteSpace,
+            };
     }
 
 
