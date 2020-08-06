@@ -59,6 +59,12 @@ namespace QuickAccess.DataStructures.Graphs.Model
 			SymbolToIndexConverter = symbolProvider;
 		}
 
+        public void Deconstruct(out GraphConnectivityDefinition<TEdgeData> connectivity, out ISymbolToIndexReadOnlyConverter<TSymbol> symbolToIndexConverter)
+        {
+            connectivity = Connectivity;
+            symbolToIndexConverter = SymbolToIndexConverter;
+        }
+
 		/// <inheritdoc />
 		public event EventHandler<GraphConnectivityChangedEventArgs> ConnectivityChanged
 		{
@@ -74,5 +80,6 @@ namespace QuickAccess.DataStructures.Graphs.Model
 
 		/// <inheritdoc />
 		public ISymbolToIndexReadOnlyConverter<TSymbol> SymbolToIndexConverter { get; }
+
 	}
 }

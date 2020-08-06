@@ -95,7 +95,7 @@ namespace QuickAccess.DataStructures.Graphs.Model
 	/// </summary>
 	/// <typeparam name="TEdgeData">The type of the edge data.</typeparam>
 	/// <seealso cref="IEquatable{T}" />
-	public struct AdjacentEdge<TEdgeData> : IEquatable<AdjacentEdge<TEdgeData>>
+	public readonly struct AdjacentEdge<TEdgeData> : IEquatable<AdjacentEdge<TEdgeData>>
 	{
 		/// <summary>
 		/// Initializes a new instance of the <see cref="AdjacentEdge{TEdgeData}" /> structure.
@@ -142,6 +142,12 @@ namespace QuickAccess.DataStructures.Graphs.Model
 		/// The destination vertex index.
 		/// </value>
 		public int Destination { get; }
+
+        public void Deconstruct(out int destination, out TEdgeData edgeData)
+        {
+            destination = Destination;
+            edgeData = Data;
+        }
 
 		/// <summary>
 		/// Evaluates if the other adjacent edge is equal to the current one, using default comparer for edge data comparison.

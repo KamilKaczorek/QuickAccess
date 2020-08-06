@@ -22,11 +22,32 @@ namespace QuickAccess.Parser.Flexpressions.Model.Caching
         public uint SourceCodePosition { get; }
         public FlexpressionId FlexpressionId { get; }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining), DebuggerHidden, DebuggerStepThrough]
+        internal static ulong EncodeToLong(uint sourceCodePosition, FlexpressionId flexpressionId)
+        {
+            var id =  flexpressionId.UnderlyingValue;
+
+            if (id == 0)
+            {
+                return 0;
+            }
+
+            ulong pos = sourceCodePosition;
+            pos <<= 32;
+
+            return pos | id;
+        }
+
         [Pure, MethodImpl(MethodImplOptions.AggressiveInlining), DebuggerStepThrough]
         public static ParsingResultCacheKey Create(in uint sourceCodePosition, in FlexpressionId flexpressionId)
         {
-            
             return new ParsingResultCacheKey(sourceCodePosition, flexpressionId);
+        }
+
+        public void Deconstruct(out uint sourcePosition, out FlexpressionId flexpressionId)
+        {
+            sourcePosition = SourceCodePosition;
+            flexpressionId = FlexpressionId;
         }
 
         public bool Equals(ParsingResultCacheKey other)

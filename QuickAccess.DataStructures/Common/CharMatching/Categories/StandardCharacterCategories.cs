@@ -36,12 +36,12 @@
 #endregion
 
 using System;
-using static QuickAccess.DataStructures.Common.CharMatching.CharactersRangeExtensions;
+using static QuickAccess.DataStructures.Common.CharMatching.Categories.StandardCharacterCategoriesExtensions;
 
-namespace QuickAccess.DataStructures.Common.CharMatching
+namespace QuickAccess.DataStructures.Common.CharMatching.Categories
 {
-	[Flags]
-	public enum StandardCharactersRange
+    [Flags]
+	public enum StandardCharacterCategories
 	{
 		None = 0,
 

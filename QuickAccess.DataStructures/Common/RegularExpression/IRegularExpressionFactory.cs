@@ -38,6 +38,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using QuickAccess.DataStructures.Common.CharMatching;
+using QuickAccess.DataStructures.Common.CharMatching.Categories;
 
 namespace QuickAccess.DataStructures.Common.RegularExpression
 {
@@ -71,7 +72,7 @@ namespace QuickAccess.DataStructures.Common.RegularExpression
         string CreateCapturingGroup(IRegularExpressionFactoryContext ctx, string groupContentRegex);
 
         [Pure]
-        string CreateCharRange(IRegularExpressionFactoryContext ctx, StandardCharactersRange range);
+        string CreateCharRange(IRegularExpressionFactoryContext ctx, StandardCharacterCategories range);
 
         [Pure]
         string CreateCharSet(IRegularExpressionFactoryContext ctx, IEnumerable<char> characters);

@@ -1,6 +1,7 @@
 ﻿using System;
 using QuickAccess.DataStructures.Algebra;
 using QuickAccess.DataStructures.Common.CharMatching;
+using QuickAccess.DataStructures.Common.CharMatching.Categories;
 
 namespace QuickAccess.Parser.Flexpressions.Model
 {
@@ -183,7 +184,7 @@ namespace QuickAccess.Parser.Flexpressions.Model
             return CharactersRangeFlexpression.Create(CharactersRangeDefinition.CreateMatching(x));
         }
 
-        public static implicit operator Flexpression(StandardCharactersRange x)
+        public static implicit operator Flexpression(StandardCharacterCategories x)
         {
             return CharactersRangeFlexpression.Create(CharactersRangeDefinition.CreateMatching(x));
         }

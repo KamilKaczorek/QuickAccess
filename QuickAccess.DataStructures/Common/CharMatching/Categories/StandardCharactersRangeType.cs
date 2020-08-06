@@ -1,6 +1,6 @@
-﻿namespace QuickAccess.DataStructures.Common.CharMatching
+﻿namespace QuickAccess.DataStructures.Common.CharMatching.Categories
 {
-    public enum StandardCharactersRangeType
+    public enum StandardCharactersPatternType
     {
         Empty = 0,
         Positive = 0x01,

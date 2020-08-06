@@ -2,6 +2,7 @@
 using System.Linq;
 using QuickAccess.DataStructures.Algebra;
 using QuickAccess.DataStructures.Common.CharMatching;
+using QuickAccess.DataStructures.Common.CharMatching.Categories;
 using QuickAccess.Parser.Flexpressions.Bricks;
 using QuickAccess.Parser.Product;
 
@@ -122,15 +123,15 @@ namespace QuickAccess.Parser.Flexpressions
 		/// <inheritdoc />
 		public FlexpressionBrick NewLine => CreateRulePlaceholder(FXB.StandardRuleName.NewLine, OptionalWhiteSpace + (Start | '\n' | '\r').OneOrMore());
 		/// <inheritdoc />
-		public FlexpressionBrick Letter => CreateRulePlaceholder(FXB.StandardRuleName.Letter, new StandardCharacterRangeBrick(this, StandardCharactersRange.Letter));
+		public FlexpressionBrick Letter => CreateRulePlaceholder(FXB.StandardRuleName.Letter, new StandardCharacterRangeBrick(this, StandardCharacterCategories.Letter));
 		/// <inheritdoc />
-		public FlexpressionBrick UpperLetter => CreateRulePlaceholder(FXB.StandardRuleName.UpperLetter, new StandardCharacterRangeBrick(this, StandardCharactersRange.UpperLetter));
+		public FlexpressionBrick UpperLetter => CreateRulePlaceholder(FXB.StandardRuleName.UpperLetter, new StandardCharacterRangeBrick(this, StandardCharacterCategories.UpperLetter));
 		/// <inheritdoc />
-		public FlexpressionBrick LowerLetter => CreateRulePlaceholder(FXB.StandardRuleName.LowerLetter, new StandardCharacterRangeBrick(this, StandardCharactersRange.LowerLetter));
+		public FlexpressionBrick LowerLetter => CreateRulePlaceholder(FXB.StandardRuleName.LowerLetter, new StandardCharacterRangeBrick(this, StandardCharacterCategories.LowerLetter));
 		/// <inheritdoc />
 		public FlexpressionBrick Symbol => CreateRulePlaceholder(FXB.StandardRuleName.Symbol, null);
 		/// <inheritdoc />
-		public FlexpressionBrick Digit => CreateRulePlaceholder(FXB.StandardRuleName.Digit, new StandardCharacterRangeBrick(this, StandardCharactersRange.Digit));
+		public FlexpressionBrick Digit => CreateRulePlaceholder(FXB.StandardRuleName.Digit, new StandardCharacterRangeBrick(this, StandardCharacterCategories.Digit));
 		/// <inheritdoc />
 		public FlexpressionBrick Current => new CurrentRulePlaceholderBrick(this);
 		

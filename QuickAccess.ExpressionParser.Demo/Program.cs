@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using QuickAccess.DataStructures.Common.CharMatching;
+using QuickAccess.DataStructures.Common.CharMatching.Categories;
 using QuickAccess.Parser;
 using QuickAccess.Parser.Flexpressions;
 using QuickAccess.Parser.Flexpressions.Model;
@@ -125,7 +126,7 @@ namespace QuickAccess.ExpressionParser.Demo
             var z = b["abc"] = b.Text("asda") | b.Char('c') + b["zzz"] + c["aaa"];
             b["zzz"] = b.Text("zzz") + z;
 
-            b["WhiteSpaceChar"] = StandardCharactersRange.WhiteSpace;
+            b["WhiteSpaceChar"] = StandardCharacterCategories.WhiteSpace;
 
             b["WhiteSpace"] = b["WhiteSpaceChar"][1, long.MaxValue];
 

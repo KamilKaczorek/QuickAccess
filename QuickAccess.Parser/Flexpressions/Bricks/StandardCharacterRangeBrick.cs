@@ -36,6 +36,7 @@
 #endregion
 
 using QuickAccess.DataStructures.Common.CharMatching;
+using QuickAccess.DataStructures.Common.CharMatching.Categories;
 using QuickAccess.DataStructures.Common.RegularExpression;
 using QuickAccess.Parser.Product;
 
@@ -44,10 +45,10 @@ namespace QuickAccess.Parser.Flexpressions.Bricks
 	public sealed class StandardCharacterRangeBrick : FlexpressionBrick
 	{
         protected internal override bool CanCacheParsingResult => false;
-		private readonly StandardCharactersRange _range;
+		private readonly StandardCharacterCategories _range;
 
 		/// <inheritdoc />
-		public StandardCharacterRangeBrick(IFlexpressionAlgebra algebra, StandardCharactersRange letterTypes) : base(algebra)
+		public StandardCharacterRangeBrick(IFlexpressionAlgebra algebra, StandardCharacterCategories letterTypes) : base(algebra)
 		{
 			_range = letterTypes;
 		}
@@ -66,7 +67,7 @@ namespace QuickAccess.Parser.Flexpressions.Bricks
 		/// <inheritdoc />
 		protected override IParsingProduct TryParseInternal(IParsingContextStream ctx, ParsingOptions options)
 		{
-			return ctx.MoveNext() && ctx.Current.IsFromRange(_range)
+			return ctx.MoveNext() && ctx.Current.IsAny(_range)
 				? ctx.Accept().CreateTermForAcceptedFragment(FXB.ExpressionTypes.CharTerm)
 				: null;
 		}

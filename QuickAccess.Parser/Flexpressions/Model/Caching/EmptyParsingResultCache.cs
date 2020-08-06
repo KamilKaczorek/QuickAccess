@@ -7,11 +7,11 @@ namespace QuickAccess.Parser.Flexpressions.Model.Caching
     {
         public int CachedResultsCount => 0;
 
-        private readonly HashSet<ParsingResultCacheKey> _underEvaluation = new HashSet<ParsingResultCacheKey>();
+        private readonly HashSet<ulong> _underEvaluation = new HashSet<ulong>();
 
         public IParsingResultDetails GetParsingResult(in uint sourceCodePosition, in FlexpressionId flexpressionId)
         {
-            var key = ParsingResultCacheKey.Create(sourceCodePosition, flexpressionId);
+            var key = ParsingResultCacheKey.EncodeToLong(sourceCodePosition, flexpressionId);
 
             return _underEvaluation.Contains(key) ? ParsingResultDetails.CalculationInProgress : ParsingResultDetails.Undefined;
         }
@@ -21,7 +21,7 @@ namespace QuickAccess.Parser.Flexpressions.Model.Caching
             in FlexpressionId flexpressionId,
             in Func<IParsingResultDetails> getResultCallback)
         {
-            var key = ParsingResultCacheKey.Create(sourceCodePosition, flexpressionId);
+            var key = ParsingResultCacheKey.EncodeToLong(sourceCodePosition, flexpressionId);
 
             if (!_underEvaluation.Add(key))
             {
@@ -47,10 +47,9 @@ namespace QuickAccess.Parser.Flexpressions.Model.Caching
         {
         }
 
-
         public bool ClearParsingResult(in uint sourceCodePosition, in FlexpressionId flexpressionId)
         {
-            var key = ParsingResultCacheKey.Create(sourceCodePosition, flexpressionId);
+            var key = ParsingResultCacheKey.EncodeToLong(sourceCodePosition, flexpressionId);
             return _underEvaluation.Remove(key);
         }
 

@@ -41,6 +41,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using System.IO.Pipes;
 
 namespace QuickAccess.DataStructures.Graphs.Model
 {
@@ -71,7 +72,13 @@ namespace QuickAccess.DataStructures.Graphs.Model
 		{
 			Source = other.Source;
 			Destination = other.Destination;
-		}		
+		}
+
+        public void Deconstruct(out TVertexKey source, out TVertexKey destination)
+        {
+            source = Source;
+            destination = Destination;
+        }
 
 		/// <summary>
 		/// Gets the source vertex key.

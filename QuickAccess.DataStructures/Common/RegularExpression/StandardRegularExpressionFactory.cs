@@ -40,6 +40,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using QuickAccess.DataStructures.Common.CharMatching;
+using QuickAccess.DataStructures.Common.CharMatching.Categories;
 
 namespace QuickAccess.DataStructures.Common.RegularExpression
 {
@@ -166,7 +167,7 @@ namespace QuickAccess.DataStructures.Common.RegularExpression
 		}
 
 		/// <inheritdoc />
-		public string CreateCharRange(IRegularExpressionFactoryContext ctx, StandardCharactersRange range)
+		public string CreateCharRange(IRegularExpressionFactoryContext ctx, StandardCharacterCategories range)
         {
             return range.ToRegexStatement();
         }

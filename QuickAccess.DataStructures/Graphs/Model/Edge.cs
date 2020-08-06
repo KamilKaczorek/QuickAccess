@@ -50,7 +50,7 @@ namespace QuickAccess.DataStructures.Graphs.Model
 	/// </summary>
 	/// <typeparam name="TVertexKey">The type of the vertex key.</typeparam>
 	/// <typeparam name="TEdgeData">The type of the edge data.</typeparam>
-	public struct Edge<TVertexKey, TEdgeData>
+	public readonly struct Edge<TVertexKey, TEdgeData>
 	{
 		/// <summary>
 		///     Initializes a new instance of the <see cref="Edge{TVertexKey, TEdgeData}" /> structure with vertices pair and
@@ -96,8 +96,22 @@ namespace QuickAccess.DataStructures.Graphs.Model
 		/// <param name="edge">The edge.</param>
 		public Edge(Edge<TVertexKey, TEdgeData> edge)
 			: this(edge.Vertices, edge.Data)
-		{
-		}
+        {
+        }
+
+        public void Deconstruct(out TVertexKey source, out TVertexKey destination, out TEdgeData edgeData)
+        {
+            source = Source;
+            destination = Destination;
+            edgeData = Data;
+        }
+
+        public void Deconstruct(out VerticesPair<TVertexKey> vertices, out TEdgeData edgeData)
+        {
+            vertices = Vertices;
+            edgeData = Data;
+        }
+
 
 		/// <summary>
 		///     Gets the vertices of the edge.

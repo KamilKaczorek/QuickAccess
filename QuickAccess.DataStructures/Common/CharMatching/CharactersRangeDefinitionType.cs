@@ -6,7 +6,8 @@
         Empty,
         Any,
         Single,
-        StandardRange,
+        StandardCategory,
+        Bracket,
         Set,
         Predicate,
     }

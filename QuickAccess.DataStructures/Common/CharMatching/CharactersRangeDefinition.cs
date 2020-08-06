@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using QuickAccess.DataStructures.Common.CharMatching.Categories;
 using QuickAccess.DataStructures.Common.Collections;
 using QuickAccess.DataStructures.Common.Guards;
 
@@ -11,12 +12,12 @@ namespace QuickAccess.DataStructures.Common.CharMatching
         public static readonly ICharactersRangeDefinition Any = new AnyChar();
         public static readonly ICharactersRangeDefinition Empty = new EmptyChar();
 
-        public static ICharactersRangeDefinition CreateMatching(StandardCharactersRange range)
+        public static ICharactersRangeDefinition CreateMatching(StandardCharacterCategories range)
         {
-            Guard.ArgSatisfies(range, nameof(range), p => !p.IsEmpty(), p => $"Specified range is empty ({p}).");
-            Guard.ArgSatisfies(range, nameof(range), p => p.IsValid(), p => $"Specified range is not supported ({p})");
+            Guard.ArgSatisfies(range, nameof(range), p => !p.IsEmpty(), p => $"Specified category is empty ({p}).");
+            Guard.ArgSatisfies(range, nameof(range), p => p.IsValid(), p => $"Specified category is not supported ({p})");
 
-            return new StandardRange(range);
+            return new StandardCategory(range);
         }
 
         public static ICharactersRangeDefinition CreateMatching(Func<char, bool> predicate, string description = null)
@@ -106,29 +107,29 @@ namespace QuickAccess.DataStructures.Common.CharMatching
             public CharactersRangeDefinitionType DefinitionType => CharactersRangeDefinitionType.Empty;
         }
 
-        private sealed class StandardRange : ICharactersRangeDefinition
+        private sealed class StandardCategory : ICharactersRangeDefinition
         {
-            private readonly StandardCharactersRange _range;
+            private readonly StandardCharacterCategories _category;
 
-            public StandardRange(StandardCharactersRange range)
+            public StandardCategory(StandardCharacterCategories category)
             {
-                _range = range;
+                _category = category;
             }
 
-            public string Description => $"{_range.ToRegexStatement()}";
-            public bool IsMatch(char character) { return _range.IsMatch(character); }
+            public string Description => $"{_category.ToRegexStatement()}";
+            public bool IsMatch(char character) { return _category.IsMatch(character); }
 
-            public bool IsMatchAny(IEnumerable<char> characters) { return _range.IsMatchAny(characters); }
+            public bool IsMatchAny(IEnumerable<char> characters) { return _category.IsMatchAny(characters); }
 
-            public IEnumerable<char> Matches(IEnumerable<char> characters) { return _range.Matches(characters); }
+            public IEnumerable<char> Matches(IEnumerable<char> characters) { return _category.Matches(characters); }
 
             public override string ToString() { return Description; }
             public TVisitationResult AcceptVisitor<TVisitationResult>(ICharactersRangeDefinitionVisitor<TVisitationResult> visitor)
             {
-                return visitor.VisitRange(_range);
+                return visitor.VisitStandardCategory(_category);
             }
 
-            public CharactersRangeDefinitionType DefinitionType => CharactersRangeDefinitionType.StandardRange;
+            public CharactersRangeDefinitionType DefinitionType => CharactersRangeDefinitionType.StandardCategory;
         }
 
         private sealed class Predicate : ICharactersRangeDefinition
