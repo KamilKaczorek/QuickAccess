@@ -38,12 +38,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using QuickAccess.DataStructures.Common.CharMatching;
 using QuickAccess.DataStructures.Common.CharMatching.Categories;
+using QuickAccess.DataStructures.Common.ValueContract;
 
 namespace QuickAccess.DataStructures.Common.RegularExpression
 {
+    
     public class StandardRegularExpressionFactory : IRegularExpressionFactory
 	{
         private readonly IDefineSpecialCharacters _specialCharactersDefinition;
@@ -92,7 +95,7 @@ namespace QuickAccess.DataStructures.Common.RegularExpression
 		}
 
 		/// <inheritdoc />
-		public string CreateQuantifier(IRegularExpressionFactoryContext ctx, long min, long max, string quantifiedContentRegex)
+		public string CreateQuantifier(IRegularExpressionFactoryContext ctx, Quantifier quantity, string quantifiedContentRegex)
 		{
 			if (string.IsNullOrEmpty(quantifiedContentRegex))
 			{
@@ -100,6 +103,11 @@ namespace QuickAccess.DataStructures.Common.RegularExpression
 			}
 
 			quantifiedContentRegex = CreateNonCapturingGroup(ctx, quantifiedContentRegex);
+
+            var defined = quantity.ToDefinedRange();
+
+            var min = defined.Min.MaxUInt;
+            var max = defined.Max.MaxUInt;
 
 			if (min == 1 && max == 1)
 			{
@@ -116,17 +124,22 @@ namespace QuickAccess.DataStructures.Common.RegularExpression
 					return $"{quantifiedContentRegex}?";
 				}
 
-				if (min == 0 && max == long.MaxValue)
-				{
-					return $"{quantifiedContentRegex}*";
-				}
+                if (defined.Max.IsInfinite)
+                {
+                    if (min == 0)
+                    {
+                        return $"{quantifiedContentRegex}*";
+                    }
 
-				if (min == 1 && max == long.MaxValue)
-				{
-					return $"{quantifiedContentRegex}+";
-				}
+                    if (min == 1)
+                    {
+                        return $"{quantifiedContentRegex}+";
+                    }
 
-				if (min == max)
+                    return $"{quantifiedContentRegex}{{{min},}}";
+                }
+
+                if (min == max)
 				{
 					return $"{quantifiedContentRegex}{{{min}}}";
 				}

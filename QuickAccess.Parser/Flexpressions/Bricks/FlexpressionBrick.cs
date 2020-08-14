@@ -38,6 +38,7 @@
 using System;
 using System.Runtime.CompilerServices;
 using QuickAccess.DataStructures.Algebra;
+using QuickAccess.DataStructures.Common;
 using QuickAccess.DataStructures.Common.RegularExpression;
 using QuickAccess.Parser.Flexpressions.Model;
 using QuickAccess.Parser.Flexpressions.Model.Caching;
@@ -68,10 +69,19 @@ namespace QuickAccess.Parser.Flexpressions.Bricks
 		/// <inheritdoc />
 		public IFlexpressionAlgebra Algebra { get; }
 
-		public FlexpressionBrick this[long minCount, long maxCount] =>
-			Algebra.CreateQuantifierBrick(this, minCount, maxCount);
+		public FlexpressionBrick this[in int minCount, in int maxCount] =>
+			Algebra.CreateQuantifierBrick(this, Quantifier.Create(minCount, maxCount));
 
-		public FlexpressionBrick this[long count] => Algebra.CreateQuantifierBrick(this, count, count);
+		public FlexpressionBrick this[in int count] => Algebra.CreateQuantifierBrick(this, Quantifier.Create(count));
+
+        public FlexpressionBrick this[in CountValue minCount, in CountValue maxCount] =>
+            Algebra.CreateQuantifierBrick(this, Quantifier.Create(minCount, maxCount));
+
+        
+        
+        public FlexpressionBrick this[in CountValue count] => Algebra.CreateQuantifierBrick(this, Quantifier.Create(count));
+
+        public FlexpressionBrick this[in Quantifier quantity] => Algebra.CreateQuantifierBrick(this, quantity);
 
         /// <inheritdoc />
         public virtual MatchingLevel RegularExpressionMatchingLevel => MatchingLevel.None;

@@ -37,7 +37,6 @@
 
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
-using QuickAccess.DataStructures.Common.CharMatching;
 using QuickAccess.DataStructures.Common.CharMatching.Categories;
 
 namespace QuickAccess.DataStructures.Common.RegularExpression
@@ -53,8 +52,7 @@ namespace QuickAccess.DataStructures.Common.RegularExpression
             out string factualGroupName);
 
         [Pure]
-        string CreateQuantifier(IRegularExpressionFactoryContext ctx, long min, long max,
-            string quantifiedContentRegex);
+        string CreateQuantifier(IRegularExpressionFactoryContext ctx, Quantifier quantity, string quantifiedContentRegex);
 
         [Pure]
         string CreateNonCapturingGroup(IRegularExpressionFactoryContext ctx, string groupContentRegex);

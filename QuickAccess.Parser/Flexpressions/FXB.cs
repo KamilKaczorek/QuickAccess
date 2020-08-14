@@ -37,12 +37,18 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
+using QuickAccess.DataStructures.Common;
 using QuickAccess.DataStructures.Common.Guards;
 using QuickAccess.Parser.Flexpressions.Bricks;
 using QuickAccess.Parser.Product;
 
 namespace QuickAccess.Parser.Flexpressions
 {
+	public static class FX
+    {
+        public const long InfiniteCount = long.MaxValue;
+    }
+
 	public static class FXB
 	{
         [SuppressMessage("ReSharper", "MemberHidesStaticFromOuterClass")]
@@ -85,7 +91,6 @@ namespace QuickAccess.Parser.Flexpressions
 		public static FlexpressionBrick Symbol => DefaultAlgebra.Symbol;
 		public static FlexpressionBrick Digit => DefaultAlgebra.Digit;
 
-		public const long Max = Int64.MaxValue;
 
 		public static FlexpressionBrick Empty => DefaultAlgebra.Empty;
 		public static FlexpressionBegin Start => DefaultAlgebra.Start;
@@ -94,11 +99,11 @@ namespace QuickAccess.Parser.Flexpressions
 		public static FlexpressionBrick ToCharacter(char ch) => new CharBrick(DefaultAlgebra, ch);
 		public static FlexpressionBrick ToTextSequence(string text) => new TextMatchingBrick(DefaultAlgebra, text);
 
-		public static FlexpressionBrick ZeroOrMore(this string text) => ToTextSequence(text)[0, FXB.Max];
+		public static FlexpressionBrick ZeroOrMore(this string text) => ToTextSequence(text)[Quantifier.Unlimited];
 
-		public static FlexpressionBrick OneOrMore(this string text) => ToTextSequence(text)[1, FXB.Max];
+		public static FlexpressionBrick OneOrMore(this string text) => ToTextSequence(text)[Quantifier.AtLeastOne];
 
-		public static FlexpressionBrick Optional(this string text) => ToTextSequence(text)[0, 1];
+		public static FlexpressionBrick Optional(this string text) => ToTextSequence(text)[Quantifier.ZeroOrOne];
 
 
         private static ExpressionTypeDescriptor CreateExpressionType(string ruleName, string valueTypeId = null)
@@ -122,11 +127,11 @@ namespace QuickAccess.Parser.Flexpressions
 			return DefaultAlgebra.DefineSealedRule(ToTextSequence(text), CreateExpressionType(patternName));
 		}
 
-		public static FlexpressionBrick ZeroOrMore(this FlexpressionBrick source) => source[0, FXB.Max];
+		public static FlexpressionBrick ZeroOrMore(this FlexpressionBrick source) => source[Quantifier.Unlimited];
 
-		public static FlexpressionBrick OneOrMore(this FlexpressionBrick source) => source[1, FXB.Max];
+		public static FlexpressionBrick OneOrMore(this FlexpressionBrick source) => source[Quantifier.AtLeastOne];
 
-		public static FlexpressionBrick Optional(this FlexpressionBrick source) => source[0, 1];
+		public static FlexpressionBrick Optional(this FlexpressionBrick source) => source[Quantifier.ZeroOrOne];
 
 		public static FlexpressionBrick DefinesRule(this FlexpressionBrick source, string patternName, string valueTypeId = null)
 		{

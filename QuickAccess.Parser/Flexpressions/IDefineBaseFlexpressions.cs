@@ -1,11 +1,12 @@
-﻿using QuickAccess.Parser.Flexpressions.Bricks;
+﻿using QuickAccess.DataStructures.Common;
+using QuickAccess.Parser.Flexpressions.Bricks;
 using QuickAccess.Parser.Product;
 
 namespace QuickAccess.Parser.Flexpressions
 {
     public interface IDefineBaseFlexpressions
     {
-        FlexpressionBrick CreateQuantifierBrick(FlexpressionBrick content, long min, long max);
+        FlexpressionBrick CreateQuantifierBrick(FlexpressionBrick content, in Quantifier quantity);
         FlexpressionBrick DefineRule(FlexpressionBrick content, ExpressionTypeDescriptor expressionType);
         FlexpressionBrick DefineSealedRule(FlexpressionBrick content, ExpressionTypeDescriptor expressionType);
         FlexpressionBrick CreateRulePlaceholder(string ruleName, FlexpressionBrick defaultExpression);

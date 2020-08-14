@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using QuickAccess.DataStructures.Algebra;
+using QuickAccess.DataStructures.Common;
 using QuickAccess.DataStructures.Common.CharMatching;
 using QuickAccess.DataStructures.Common.CharMatching.Categories;
 using QuickAccess.Parser.Flexpressions.Bricks;
@@ -158,7 +159,7 @@ namespace QuickAccess.Parser.Flexpressions
 		}
 
         /// <inheritdoc />
-        public FlexpressionBrick CreateQuantifierBrick(FlexpressionBrick content, long min, long max)
+        public FlexpressionBrick CreateQuantifierBrick(FlexpressionBrick content, in Quantifier quantity)
 		{
 			EvaluateArguments(ref content);
 
@@ -167,17 +168,20 @@ namespace QuickAccess.Parser.Flexpressions
 				return content;
 			}
 
+            var min = quantity.Min.MaxUInt;
+            var max = quantity.Max.MaxUInt;
+
 			if (min == 1 && max == 1)
 			{
 				return content;
 			}
 
-			if (min == 0 && max == 1 && content is QuantifierBrick qb && qb.Min <= 1)
+			if (min == 0 && max == 1 && content is QuantifierBrick qb && qb.Quantity.Min.MaxUInt <= 1)
 			{
-				return new QuantifierBrick(content.Algebra, qb.Content, 0, qb.Max);
+				return new QuantifierBrick(content.Algebra, qb.Content, Quantifier.Create(CountValue.Zero, qb.Quantity.Max));
 			}
 
-			return new QuantifierBrick(content.Algebra, content, min, max);
+			return new QuantifierBrick(content.Algebra, content, quantity);
 		}
 
 		/// <inheritdoc />
@@ -203,16 +207,14 @@ namespace QuickAccess.Parser.Flexpressions
             };
         }
 
-        private const long MaxQuantification = int.MaxValue;
-		
 		public FlexpressionBrick EvaluateOperatorResult(OverloadableCodeUnarySymmetricOperator unaryOperator, FlexpressionBrick arg)
 		{
 			EvaluateArguments(ref arg);
 
             return unaryOperator switch
             {
-                OverloadableCodeUnarySymmetricOperator.BitwiseComplement => CreateQuantifierBrick(arg, 0, 1),
-                OverloadableCodeUnarySymmetricOperator.Increment => CreateQuantifierBrick(arg, 1, MaxQuantification),
+                OverloadableCodeUnarySymmetricOperator.BitwiseComplement => CreateQuantifierBrick(arg, Quantifier.ZeroOrOne),
+                OverloadableCodeUnarySymmetricOperator.Increment => CreateQuantifierBrick(arg, Quantifier.AtLeastOne),
 
                 _ => throw new NotSupportedException($"{nameof(FlexpressionBrick)} doesn't support unary operator '{unaryOperator.GetSymbol()}' ({unaryOperator})."),
             };

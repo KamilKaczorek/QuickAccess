@@ -37,6 +37,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Data;
+using QuickAccess.DataStructures.Common;
 using QuickAccess.DataStructures.Common.Guards;
 using QuickAccess.DataStructures.Common.RegularExpression;
 using QuickAccess.Parser.Product;
@@ -45,11 +47,10 @@ namespace QuickAccess.Parser.Flexpressions.Bricks
 {
 	public sealed class QuantifierBrick : FlexpressionBrick
 	{
-		public long Min { get; }
-		public long Max { get; }
+		public Quantifier Quantity { get; }
 		public FlexpressionBrick Content { get; }
 
-		public override bool IsEmpty => (Min == 0 && Max == 0) || Content.IsEmpty;
+		public override bool IsEmpty => Quantity.IsEmpty || Content.IsEmpty;
 
 		/// <inheritdoc />
 		protected override void ApplyRuleDefinition(string name, FlexpressionBrick content, bool recursion, bool freeze)
@@ -57,36 +58,19 @@ namespace QuickAccess.Parser.Flexpressions.Bricks
 			ApplyRuleDefinition(Content, name, content, recursion, freeze);
 		}
 
-		public QuantifierBrick(IFlexpressionAlgebra algebra, FlexpressionBrick content, long min, long max)
+		public QuantifierBrick(IFlexpressionAlgebra algebra, FlexpressionBrick content, in Quantifier quantity)
 		: base(algebra.GetHighestPrioritizedAlgebra(content))
 		{
 			Content = content ?? throw new ArgumentNullException(nameof(content));
-
-			if (min < 0)
-			{
-				throw new ArgumentException($"Min value {min} is smaller than 0.", nameof(min));
-			}
-
-			if (max < 0)
-			{
-				throw new ArgumentException($"Max value {max} is smaller than 0.", nameof(max));
-			}
-
-			if (max < min)
-			{
-				throw new ArgumentException($"Max value {max} is smaller than min value {min}.", nameof(max));
-			}
-
-			Min = min;
-			Max = max;
-		}
+            Quantity = quantity.ToDefinedRange();
+        }
 
 		/// <inheritdoc />
 		//public override string ExpressionId => $"${Content.ExpressionId}${{{Min}${Max}}}$";
 
 		public override string ToRegularExpressionString(RegularExpressionBuildingContext ctx)
 		{
-			return ctx.Factory.CreateQuantifier(ctx.Context, Min, Max, Content.ToRegularExpressionString(ctx));
+			return ctx.Factory.CreateQuantifier(ctx.Context, Quantity, Content.ToRegularExpressionString(ctx));
 		}		
 
 		/// <inheritdoc />
@@ -102,32 +86,36 @@ namespace QuickAccess.Parser.Flexpressions.Bricks
 				return true;
 			}
 
-			return other is QuantifierBrick qb && qb.Min == Min && qb.Max == Max && qb.Content.Equals(Content);
+			return other is QuantifierBrick qb && Quantity.Equals(qb.Quantity) && qb.Content.Equals(Content);
 		}
 
 		/// <inheritdoc />
 		protected override IParsingProduct TryParseInternal(IParsingContextStream ctx, ParsingOptions options)
-		{
-			if (Min == 1 && Max == 1)
+        {
+            var min = Quantity.Min.MaxUInt;
+            var max = Quantity.Max.MaxUInt;
+
+			if (min == 1 && max == 1)
 			{
 				return Content.TryParse(ctx, options);
 			}
 
-			if (Min == 0 && Max == 1)
+			if (min == 0 && max == 1)
 			{
 				return Content.TryParse(ctx, options) ?? new EmptyNode(ctx);
 			}
 
 			List<IParsingProduct> nodes = null;
 
-			
-			for (var idx = 0; idx <= Max; idx++)
+            var infinite = Quantity.Max.IsInfinite;
+
+			for (var idx = 0; idx <= max || infinite; idx++)
 			{
-				var res = idx < Max ? Content.TryParse(ctx, options) : null;
+				var res = idx < max ? Content.TryParse(ctx, options) : null;
 
 				if (res == null)
 				{
-					if (idx >= Min)
+					if (idx >= min)
                     {
                         ctx.Accept();
 						return nodes != null
@@ -138,7 +126,7 @@ namespace QuickAccess.Parser.Flexpressions.Bricks
 					return null;
 				}
 
-				nodes ??= new List<IParsingProduct>((int)Math.Min(Math.Max(Min, 16), Max));
+				nodes ??= new List<IParsingProduct>((int)Math.Min(Math.Max(min, 16), max));
 
 				if (!EmptyNode.IsEmptyNode(res))
 				{
@@ -153,39 +141,43 @@ namespace QuickAccess.Parser.Flexpressions.Bricks
 		/// <inheritdoc />
 		public override string ToString()
 		{
-			var contentExpression = Content.ToString();
-
 			if (IsEmpty)
 			{
 				return FXB.Empty.ToString();
 			}
 
-			if (Min == 1 && Max == 1)
+            var contentExpression = Content.ToString();
+
+
+            var min = Quantity.Min.MaxUInt;
+            var max = Quantity.Max.MaxUInt;
+
+			if (min == 1 && max == 1)
 			{
 				return contentExpression;
 			}
 
-			if (Min == 0 && Max == 1)
+			if (min == 0 && max == 1)
 			{
 				return $"Optional({contentExpression})";
 			}
 
-			if (Min == 0 && Max == long.MaxValue)
+			if (min == 0 && Quantity.Max.IsInfinite)
 			{
 				return $"ZeroOrMany({contentExpression})";
 			}
 
-			if (Min == 1 && Max == long.MaxValue)
+			if (min == 1 && Quantity.Max.IsInfinite)
 			{
 				return $"OneOrMany({contentExpression})";
 			}
 
-			if (Min == Max)
+			if (min == max)
 			{
-				return $"Repeated{Min}Times({contentExpression})";
+				return $"Repeated{min}Times({contentExpression})";
 			}
 
-			return $"RepeatedBetween{Min}And{Max}Times({contentExpression})";
+			return $"RepeatedBetween{min}And{max}Times({contentExpression})";
 		}
 	}
 }
