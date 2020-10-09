@@ -42,7 +42,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using QuickAccess.DataStructures.Common.CharMatching;
+using QuickAccess.Infrastructure.CharMatching;
 
 namespace QuickAccess.Parser
 {

@@ -38,7 +38,7 @@
 #endregion
 
 using System.Collections.Generic;
-using QuickAccess.DataStructures.MultiDictionaries;
+using QuickAccess.Infrastructure.Collections;
 
 namespace QuickAccess.Parser.ValueExpressionTypes
 {

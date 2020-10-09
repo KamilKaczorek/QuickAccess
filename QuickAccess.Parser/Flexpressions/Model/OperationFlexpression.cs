@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using QuickAccess.DataStructures.Common.Guards;
+using QuickAccess.Infrastructure.Guards;
 
 namespace QuickAccess.Parser.Flexpressions.Model
 {

@@ -10,17 +10,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Code\**" />
     <Compile Remove="ParserBuilder\**" />
+    <EmbeddedResource Remove="Code\**" />
     <EmbeddedResource Remove="ParserBuilder\**" />
+    <None Remove="Code\**" />
     <None Remove="ParserBuilder\**" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\QuickAccess.DataStructures\QuickAccess.DataStructures.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Code\" />
+    <ProjectReference Include="..\QuickAccess.Infrastructure\QuickAccess.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>

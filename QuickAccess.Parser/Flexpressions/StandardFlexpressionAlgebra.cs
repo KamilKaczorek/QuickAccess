@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Linq;
-using QuickAccess.DataStructures.Algebra;
-using QuickAccess.DataStructures.Common;
-using QuickAccess.DataStructures.Common.CharMatching;
-using QuickAccess.DataStructures.Common.CharMatching.Categories;
+using QuickAccess.Infrastructure;
+using QuickAccess.Infrastructure.Algebra;
+using QuickAccess.Infrastructure.CharMatching.Categories;
 using QuickAccess.Parser.Flexpressions.Bricks;
 using QuickAccess.Parser.Product;
 

@@ -1,4 +1,4 @@
-﻿using QuickAccess.DataStructures.Common.ValueContract;
+﻿using QuickAccess.Infrastructure.ValueContract;
 
 namespace QuickAccess.Parser.Flexpressions.Model.Caching
 {

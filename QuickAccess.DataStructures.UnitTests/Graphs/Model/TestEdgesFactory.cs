@@ -39,9 +39,9 @@
 
 using System;
 using System.Linq;
-using QuickAccess.DataStructures.Common.Collections;
 using QuickAccess.DataStructures.Graphs.Extensions;
 using QuickAccess.DataStructures.Graphs.Model;
+using QuickAccess.Infrastructure.Collections;
 
 namespace QuickAccess.DataStructures.UnitTests.Graphs.Model
 {

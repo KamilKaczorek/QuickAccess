@@ -36,9 +36,9 @@
 #endregion
 
 using System.Collections.Generic;
-using QuickAccess.DataStructures.Common.Freezable;
-using QuickAccess.DataStructures.Common.RegularExpression;
-using QuickAccess.DataStructures.Common.ValueContract;
+using QuickAccess.Infrastructure.Freezable;
+using QuickAccess.Infrastructure.RegularExpression;
+using QuickAccess.Infrastructure.ValueContract;
 using QuickAccess.Parser.Product;
 
 namespace QuickAccess.Parser.Flexpressions.Bricks

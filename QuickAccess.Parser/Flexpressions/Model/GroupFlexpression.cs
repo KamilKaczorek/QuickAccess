@@ -1,5 +1,5 @@
-﻿using QuickAccess.DataStructures.Common.Guards;
-using QuickAccess.DataStructures.Common.ValueContract;
+﻿using QuickAccess.Infrastructure.Guards;
+using QuickAccess.Infrastructure.ValueContract;
 
 namespace QuickAccess.Parser.Flexpressions.Model
 {

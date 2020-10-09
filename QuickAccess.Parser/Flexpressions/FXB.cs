@@ -37,8 +37,8 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
-using QuickAccess.DataStructures.Common;
-using QuickAccess.DataStructures.Common.Guards;
+using QuickAccess.Infrastructure;
+using QuickAccess.Infrastructure.Guards;
 using QuickAccess.Parser.Flexpressions.Bricks;
 using QuickAccess.Parser.Product;
 

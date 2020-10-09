@@ -37,9 +37,9 @@
 
 using System;
 using System.Runtime.CompilerServices;
-using QuickAccess.DataStructures.Algebra;
-using QuickAccess.DataStructures.Common;
-using QuickAccess.DataStructures.Common.RegularExpression;
+using QuickAccess.Infrastructure;
+using QuickAccess.Infrastructure.Algebra;
+using QuickAccess.Infrastructure.RegularExpression;
 using QuickAccess.Parser.Flexpressions.Model;
 using QuickAccess.Parser.Flexpressions.Model.Caching;
 using QuickAccess.Parser.Product;

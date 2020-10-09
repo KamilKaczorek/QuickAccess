@@ -1,7 +1,7 @@
 ﻿using System;
-using QuickAccess.DataStructures.Algebra;
-using QuickAccess.DataStructures.Common.CharMatching;
-using QuickAccess.DataStructures.Common.CharMatching.Categories;
+using QuickAccess.Infrastructure.Algebra;
+using QuickAccess.Infrastructure.CharMatching;
+using QuickAccess.Infrastructure.CharMatching.Categories;
 
 namespace QuickAccess.Parser.Flexpressions.Model
 {

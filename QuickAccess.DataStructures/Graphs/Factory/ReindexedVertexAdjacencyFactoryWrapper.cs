@@ -39,8 +39,8 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using QuickAccess.DataStructures.Common.Collections;
 using QuickAccess.DataStructures.Graphs.Model;
+using QuickAccess.Infrastructure.Collections;
 
 namespace QuickAccess.DataStructures.Graphs.Factory
 {

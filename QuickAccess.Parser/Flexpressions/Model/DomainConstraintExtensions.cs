@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Runtime.CompilerServices;
-using QuickAccess.DataStructures.Algebra;
+using QuickAccess.Infrastructure.Algebra;
 
 namespace QuickAccess.Parser.Flexpressions.Model
 {

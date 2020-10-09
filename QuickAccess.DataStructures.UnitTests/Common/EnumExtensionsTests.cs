@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using QuickAccess.DataStructures.Common;
-using UUT = QuickAccess.DataStructures.Common.EnumExtensions;
+using QuickAccess.Infrastructure;
+using UUT = QuickAccess.Infrastructure.EnumExtensions;
 
 namespace QuickAccess.DataStructures.UnitTests.Common
 {

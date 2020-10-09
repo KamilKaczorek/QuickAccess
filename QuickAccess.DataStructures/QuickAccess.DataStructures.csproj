@@ -51,4 +51,8 @@ Specification implemented.</PackageReleaseNotes>
     </AssemblyAttribute>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\QuickAccess.Infrastructure\QuickAccess.Infrastructure.csproj" />
+  </ItemGroup>
+
 </Project>

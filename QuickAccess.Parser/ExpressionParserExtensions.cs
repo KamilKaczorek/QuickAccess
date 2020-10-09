@@ -38,7 +38,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using QuickAccess.DataStructures.Common.Collections;
+using QuickAccess.Infrastructure.Collections;
 using QuickAccess.Parser.Flexpressions;
 using QuickAccess.Parser.Product;
 

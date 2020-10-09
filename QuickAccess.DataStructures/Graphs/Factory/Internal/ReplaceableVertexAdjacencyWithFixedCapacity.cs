@@ -40,8 +40,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using QuickAccess.DataStructures.Common;
 using QuickAccess.DataStructures.Graphs.Model;
+using QuickAccess.Infrastructure;
 
 namespace QuickAccess.DataStructures.Graphs.Factory.Internal
 {

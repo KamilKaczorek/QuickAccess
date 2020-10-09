@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using QuickAccess.DataStructures.Algebra;
-using QuickAccess.DataStructures.Common.Guards;
+using QuickAccess.Infrastructure.Algebra;
+using QuickAccess.Infrastructure.Guards;
 
 namespace QuickAccess.Parser.Flexpressions.Model
 {

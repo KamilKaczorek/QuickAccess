@@ -1,16 +1,19 @@
-﻿using QuickAccess.DataStructures.Common.RegularExpression;
-using System;
+﻿using System;
 using System.Diagnostics;
-using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
-using QuickAccess.DataStructures.Common.CharMatching;
-using QuickAccess.DataStructures.Common.CharMatching.Categories;
+using QuickAccess.Infrastructure.CharMatching.Categories;
+using QuickAccess.Infrastructure.Guards;
+using QuickAccess.Infrastructure.RegularExpression;
+using QuickAccess.Infrastructure.ValueContract;
 using QuickAccess.Parser;
 using QuickAccess.Parser.Flexpressions;
 using QuickAccess.Parser.Flexpressions.Model;
 
 namespace QuickAccess.ExpressionParser.Demo
 {
+
+   
 	class Program
 	{
         static void Main()
@@ -39,7 +42,7 @@ namespace QuickAccess.ExpressionParser.Demo
                 var start = DateTime.UtcNow;
 
                 //Test2(source, count, option);
-                Test(fun, count, option);
+                ParseFunctionDescriptorUsingFlexpressionBricksAndProvideRegEx(fun, count, option);
 
 
                 
@@ -56,8 +59,12 @@ namespace QuickAccess.ExpressionParser.Demo
 
 
 
-        public static void Test2(string expression, int count = 1, ParsingOptions options = ParsingOptions.Cache)
+        public static void ParseMathExpressionWithFlexpressionBricks(string expression, int performanceTestExecutionsCount = 1, ParsingOptions options = ParsingOptions.Cache)
         {
+            Console.WriteLine();
+            Console.WriteLine("Math expression demo using Flexpression Bricks");
+            Console.WriteLine($"Expression: {expression}");
+
 			var fx = new StandardFlexpressionAlgebra(-1);
 
             var intNumber = fx.Digit.OneOrMore().DefinesSealedRule("Integer", "Integer");
@@ -83,38 +90,48 @@ namespace QuickAccess.ExpressionParser.Demo
             var ctx = RegularExpressionBuildingContext.CreateStandard();
             var regularExpressionString = expr.ToRegularExpressionString(ctx);
 
-            //Console.WriteLine($"Regex: {regularExpressionString}");
+            Console.WriteLine($"Regex: {regularExpressionString}");
 
 
             var source = new StringSourceCode(new ParsingContextStreamFactory(new ProductFactory(), fx), new SourceCodeFragmentFactory(),  expression);
 
-            for (var idx = 0; idx < count; ++idx)
+            for (var idx = 0; idx < performanceTestExecutionsCount; ++idx)
             {
                 var rootNode = expr.TryParse(source.GetFurtherContext(), options);
             }
-
-            //Console.WriteLine(expr);
-            //Console.WriteLine($"{rootNode != null}");
-            //Console.ReadLine();
-
-		}
-
-        
-
-
-        
-        
-
-       
-        public class ParsingConstraint : CustomFXConstraint
-        {
-
         }
 
-        public class ParsingExt : ParsingConstraint
+        public static void ParseFunctionDescriptorUsingFlexpressionBricksAndProvideRegEx(string expression, int performanceTestExecutionsCount = 1, ParsingOptions options = ParsingOptions.Cache)
         {
+            var name = (FXB.Letter + (FXB.Digit | FXB.Letter).ZeroOrMore()).DefinesSealedRule("Name", "String");
+            var intNumber = FXB.Digit.OneOrMore().DefinesSealedRule("Integer", "Integer");
+            var floatNumber = (intNumber + "." + intNumber).DefinesSealedRule("Float", "Float");
+            var functionArg = (floatNumber | intNumber | name).DefinesSealedRule("FunctionArg");
+            var functionArgList = (functionArg & ("," & functionArg).ZeroOrMore()).DefinesRule("FunctionArgList");
+            var functionInvocation = (name & "(" & ~functionArgList & ")" & ';').DefinesSealedRule("FunctionInvocation");
 
+            var ctx = RegularExpressionBuildingContext.CreateStandard();
+            var regularExpressionString = functionInvocation.ToRegularExpressionString(ctx);
+
+            var regex = new Regex(regularExpressionString, RegexOptions.Compiled);
+
+            var res = regex.IsMatch(expression);
+
+            var source = new StringSourceCode(new ParsingContextStreamFactory(new ProductFactory(), FXB.DefaultAlgebra), new SourceCodeFragmentFactory(), expression);
+
+            for (var idx = 0; idx < performanceTestExecutionsCount; ++idx)
+            {
+                var rootNode = functionInvocation.TryParse(source, options);
+
+                if (rootNode == null)
+                {
+                    throw new InvalidOperationException($"Parsing error {source.GetError()}");
+                }
+            }
+			
         }
+
+        
 
         
 		public static void TestFlex()
@@ -145,39 +162,279 @@ namespace QuickAccess.ExpressionParser.Demo
             //Console.ReadLine();
         }
 
-		public static void Test(string expression, int count = 1, ParsingOptions options = ParsingOptions.Cache)
-		{
+		
+	}
 
-			var name = (FXB.Letter + (FXB.Digit | FXB.Letter).ZeroOrMore()).DefinesSealedRule("Name", "String");
-			var intNumber = FXB.Digit.OneOrMore().DefinesSealedRule("Integer", "Integer");
-			var floatNumber = (intNumber + "." + intNumber).DefinesSealedRule("Float", "Float");
-			var functionArg = (floatNumber | intNumber | name).DefinesSealedRule("FunctionArg");
-			var functionArgList = (functionArg & ("," & functionArg).ZeroOrMore()).DefinesRule("FunctionArgList");
-			var functionInvocation = (name & "(" & ~functionArgList & ")" & ';').DefinesSealedRule("FunctionInvocation");
+     public readonly struct PerformanceTime : ICanBeUndefined,
+        IComparable<PerformanceTime>, IComparable, IEquatable<PerformanceTime>
+    {
+        private readonly TimeSpan _executionsTime;
+        private readonly int _numberOfExecutions;
 
-			var ctx = RegularExpressionBuildingContext.CreateStandard();
-			//var regularExpressionString = functionInvocation.ToRegularExpressionString(ctx);
-
-			//var regex = new Regex(regularExpressionString, RegexOptions.Compiled);
-
-			//var res = regex.IsMatch(expression);
+        public static readonly PerformanceTime Undefined = new PerformanceTime(0, TimeSpan.Zero, null);
 
 
+        public static PerformanceTime Create(int numberOfExecutions, TimeSpan executionsTime, string operationName = null)
+        {
+            Guard.ArgGreaterThan(numberOfExecutions, nameof(numberOfExecutions), 0);
+            Guard.ArgEqualOrGreaterThan(executionsTime, nameof(executionsTime), TimeSpan.Zero);
 
-			var source = new StringSourceCode(new ParsingContextStreamFactory(new ProductFactory(), FXB.DefaultAlgebra), new SourceCodeFragmentFactory(), expression);
+            return new PerformanceTime(numberOfExecutions, executionsTime, operationName);
+        }
 
-            for (var idx = 0; idx < count; ++idx)
+        private PerformanceTime(int numberOfExecutions, TimeSpan executionsTime, string operationName)
+        {
+            _numberOfExecutions = numberOfExecutions;
+            _executionsTime = executionsTime;
+            _operationName = operationName;
+        }
+
+        public TimeSpan SingleExecutionTime
+        {
+            get
             {
-                var rootNode = functionInvocation.TryParse(source, options);
+                ValidateIsDefined();
 
-                if (rootNode == null)
+                if (_executionsTime.Ticks <= 0)
                 {
-                    throw new InvalidOperationException($"Parsing error {source.GetError()}");
+                    return TimeSpan.Zero;
                 }
+
+                return _executionsTime / _numberOfExecutions;
+            }
+        }
+
+        public double SingleExecutionTimeInMilliseconds
+        {
+            get
+            {
+                ValidateIsDefined();
+
+                if (_executionsTime.Ticks <= 0)
+                {
+                    return 0.0;
+                }
+
+                return _executionsTime.TotalMilliseconds / _numberOfExecutions;
+            }
+        }
+
+        public double NumberOfExecutionsPerSecond
+        {
+            get
+            {
+                ValidateIsDefined();
+
+                if (_executionsTime <= TimeSpan.Zero)
+                {
+                    return double.PositiveInfinity;
+                }
+                
+                return _numberOfExecutions / _executionsTime.TotalSeconds;
+            }
+        }
+
+        public double NumberOfExecutionsPerMillisecond
+        {
+            get
+            {
+                ValidateIsDefined();
+
+                if (_executionsTime <= TimeSpan.Zero)
+                {
+                    return double.PositiveInfinity;
+                }
+                
+                return _numberOfExecutions / _executionsTime.TotalMilliseconds;
+            }
+        }
+
+        public double NumberOfExecutionsPerTicks
+        {
+            get
+            {
+                ValidateIsDefined();
+
+                if (_executionsTime <= TimeSpan.Zero)
+                {
+                    return double.PositiveInfinity;
+                }
+                
+                return _numberOfExecutions / (double)_executionsTime.Ticks;
+            }
+        }
+
+        public double GetNumberOfExecutionsPer(TimeSpan timeRange)
+        {
+            ValidateIsDefined();
+
+            if (_executionsTime <= TimeSpan.Zero)
+            {
+                return double.PositiveInfinity;
             }
 
-           
-			
+            var factor = timeRange / _executionsTime;
+                
+            return _numberOfExecutions * factor;
         }
-	}
+
+        [DebuggerHidden, DebuggerStepThrough]
+        private void ValidateIsDefined()
+        {
+            if (!IsDefined)
+            {
+                throw new InvalidOperationException("Can't provide value - the performance time is undefined.");
+            }
+        }
+
+        private readonly string _operationName;
+
+        public string OperationName => IsDefined ? _operationName : "<UNDEFINED>";
+
+        public bool IsDefined => _numberOfExecutions > 0;
+
+        public int CompareTo(PerformanceTime other)
+        {
+            var cmp = IsDefined.CompareTo(other.IsDefined);
+
+            if (cmp != 0)
+            {
+                return cmp;
+            }
+
+            return SingleExecutionTimeInMilliseconds.CompareTo(other.SingleExecutionTimeInMilliseconds);
+        }
+
+        public int CompareTo(object obj)
+        {
+            if(obj is null) return 1;
+            return obj is PerformanceTime other ? CompareTo(other) : throw new ArgumentException($"Object must be of type {nameof(PerformanceTime)}");
+        }
+
+        public static bool operator <(PerformanceTime left, PerformanceTime right)
+        {
+            return left.CompareTo(right) < 0;
+        }
+
+        public static bool operator >(PerformanceTime left, PerformanceTime right)
+        {
+            return left.CompareTo(right) > 0;
+        }
+
+        public static bool operator <=(PerformanceTime left, PerformanceTime right)
+        {
+            return left.CompareTo(right) <= 0;
+        }
+
+        public static bool operator >=(PerformanceTime left, PerformanceTime right)
+        {
+            return left.CompareTo(right) >= 0;
+        }
+
+        public bool Equals(PerformanceTime other)
+        {
+            if (IsDefined != other.IsDefined)
+            {
+                return false;
+            }
+
+            if (!IsDefined)
+            {
+                return true;
+            }
+
+            return SingleExecutionTime.Equals(other.SingleExecutionTime);
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is PerformanceTime other && Equals(other);
+        }
+
+        public override int GetHashCode()
+        {
+            return SingleExecutionTime.GetHashCode();
+        }
+
+        public static bool operator ==(PerformanceTime left, PerformanceTime right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(PerformanceTime left, PerformanceTime right)
+        {
+            return !left.Equals(right);
+        }
+
+        public override string ToString()
+        {
+            if (!IsDefined)
+            {
+                return "<UNDEFINED>";
+            }
+
+            return $"AVGExecutionTime({OperationName})='{SingleExecutionTime}'";
+        }
+    }
+
+    public class PerformanceMeasurementExecutor
+    {
+        public PerformanceMeasurementExecutor() : this(TimeSpan.FromMilliseconds(100))
+        {
+        }
+
+        public PerformanceMeasurementExecutor(TimeSpan minimalExecutionTime)
+        {
+            MinimalTestTime = minimalExecutionTime;
+        }
+
+        public TimeSpan MinimalTestTime { get; }
+
+        public PerformanceTime MeasureActionPerformance(Action action)
+        {
+            var stopWatch = new Stopwatch();
+
+            var executionCount = 1;
+
+            Thread.Sleep(0);
+
+            while (true)
+            {
+                var executionTime = MeasureActionPerformance(action, executionCount, stopWatch);
+
+                if (executionTime >= MinimalTestTime)
+                {
+                    return PerformanceTime.Create(executionCount, executionTime);
+                }
+
+                if (executionTime <= TimeSpan.Zero)
+                {
+                    executionCount *= 100;
+                }
+                else
+                {
+                    executionCount *= (int) Math.Max(10, MinimalTestTime.Ticks / executionTime.Ticks);
+                }
+            }
+        }
+
+
+        private TimeSpan MeasureActionPerformance(Action action, int executionCount, Stopwatch stopwatch)
+        {
+            stopwatch.Reset();
+
+            stopwatch.Start();
+
+            for (var idx = executionCount; idx > 0; --idx)
+            {
+                action.Invoke();
+            }
+
+            stopwatch.Stop();
+
+            return stopwatch.Elapsed;
+        }
+    }
+
+
 }

@@ -41,11 +41,11 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
-using QuickAccess.DataStructures.Common;
-using QuickAccess.DataStructures.Common.Collections;
 using QuickAccess.DataStructures.Graphs.Algorithms;
 using QuickAccess.DataStructures.Graphs.Factory;
 using QuickAccess.DataStructures.Graphs.Model;
+using QuickAccess.Infrastructure;
+using QuickAccess.Infrastructure.Collections;
 
 namespace QuickAccess.DataStructures.Graphs.Extensions
 {

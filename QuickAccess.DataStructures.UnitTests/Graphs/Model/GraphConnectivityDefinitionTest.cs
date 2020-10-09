@@ -42,9 +42,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using QuickAccess.DataStructures.Common.Collections;
 using QuickAccess.DataStructures.Graphs.Model;
 using QuickAccess.DataStructures.UnitTests.Graphs.TestUtils;
+using QuickAccess.Infrastructure.Collections;
 
 namespace QuickAccess.DataStructures.UnitTests.Graphs.Model
 {

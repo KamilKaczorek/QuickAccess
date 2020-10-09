@@ -9,7 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QuickAccess.DataStructures"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QuickAccess.ExpressionParser.Demo", "QuickAccess.ExpressionParser.Demo\QuickAccess.ExpressionParser.Demo.csproj", "{66E22648-B81C-40FB-ABB3-4E41DDFCBDEA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuickAccess.DataStructures.UnitTests", "QuickAccess.DataStructures.UnitTests\QuickAccess.DataStructures.UnitTests.csproj", "{B1D9E2BE-C9AC-4A21-82BE-AFB886126088}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QuickAccess.DataStructures.UnitTests", "QuickAccess.DataStructures.UnitTests\QuickAccess.DataStructures.UnitTests.csproj", "{B1D9E2BE-C9AC-4A21-82BE-AFB886126088}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuickAccess.Infrastructure", "QuickAccess.Infrastructure\QuickAccess.Infrastructure.csproj", "{B5D67D18-CEA6-4E90-B3EC-A874F856DACC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{B1D9E2BE-C9AC-4A21-82BE-AFB886126088}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B1D9E2BE-C9AC-4A21-82BE-AFB886126088}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B1D9E2BE-C9AC-4A21-82BE-AFB886126088}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B5D67D18-CEA6-4E90-B3EC-A874F856DACC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B5D67D18-CEA6-4E90-B3EC-A874F856DACC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B5D67D18-CEA6-4E90-B3EC-A874F856DACC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B5D67D18-CEA6-4E90-B3EC-A874F856DACC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

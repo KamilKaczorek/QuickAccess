@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
-using QuickAccess.DataStructures.Common.CharMatching;
-using QuickAccess.DataStructures.Common.Collections;
-using QuickAccess.DataStructures.Common.Freezable;
-using QuickAccess.DataStructures.Common.ValueContract;
+using QuickAccess.Infrastructure.CharMatching;
+using QuickAccess.Infrastructure.Collections;
+using QuickAccess.Infrastructure.Freezable;
+using QuickAccess.Infrastructure.ValueContract;
 using QuickAccess.Parser.Flexpressions.Model.Algebra;
 
 namespace QuickAccess.Parser.Flexpressions.Model
@@ -147,12 +148,14 @@ namespace QuickAccess.Parser.Flexpressions.Model
 
     public class FXSpecification
     {
+        [Pure]
         public static FXSpecification Create()
 
         {
             return new FXSpecification(new Dictionary<string, GroupFlexpressionDefinition>());
         }
 
+        [Pure]
         public static FXSpecification Create(IEqualityComparer<string> groupNameComparer)
 
         {
@@ -160,6 +163,7 @@ namespace QuickAccess.Parser.Flexpressions.Model
                 new Dictionary<string, GroupFlexpressionDefinition>(groupNameComparer));
         }
 
+        [Pure]
         public static FXSpecification Create(
             IEnumerable<IDefineGroupFlexpression> predefinedOverwritableGroups,
             IEnumerable<IDefineGroupFlexpression> predefinedSealedGroups,

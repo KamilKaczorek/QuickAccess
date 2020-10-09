@@ -1,4 +1,4 @@
-﻿using QuickAccess.DataStructures.Common.CharMatching;
+﻿using QuickAccess.Infrastructure.CharMatching;
 
 namespace QuickAccess.Parser.Flexpressions.Model
 {

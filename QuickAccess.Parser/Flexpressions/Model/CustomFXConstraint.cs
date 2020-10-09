@@ -1,5 +1,5 @@
 ﻿using System.Diagnostics.Contracts;
-using QuickAccess.DataStructures.Algebra;
+using QuickAccess.Infrastructure.Algebra;
 
 namespace QuickAccess.Parser.Flexpressions.Model
 {

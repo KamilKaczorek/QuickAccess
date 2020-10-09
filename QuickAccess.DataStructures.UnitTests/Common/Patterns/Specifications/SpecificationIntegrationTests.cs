@@ -1,5 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using QuickAccess.DataStructures.Common.Patterns.Specifications;
+using QuickAccess.Infrastructure.Patterns.Specifications;
 
 namespace QuickAccess.DataStructures.UnitTests.Common.Patterns.Specifications
 {

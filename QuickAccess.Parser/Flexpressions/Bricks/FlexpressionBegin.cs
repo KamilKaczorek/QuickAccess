@@ -35,7 +35,7 @@
 // e-mail: kamil.piotr.kaczorek@gmail.com
 #endregion
 
-using QuickAccess.DataStructures.Algebra;
+using QuickAccess.Infrastructure.Algebra;
 
 namespace QuickAccess.Parser.Flexpressions.Bricks
 {

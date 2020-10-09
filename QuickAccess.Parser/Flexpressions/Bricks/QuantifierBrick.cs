@@ -38,9 +38,9 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using QuickAccess.DataStructures.Common;
-using QuickAccess.DataStructures.Common.Guards;
-using QuickAccess.DataStructures.Common.RegularExpression;
+using QuickAccess.Infrastructure;
+using QuickAccess.Infrastructure.Guards;
+using QuickAccess.Infrastructure.RegularExpression;
 using QuickAccess.Parser.Product;
 
 namespace QuickAccess.Parser.Flexpressions.Bricks

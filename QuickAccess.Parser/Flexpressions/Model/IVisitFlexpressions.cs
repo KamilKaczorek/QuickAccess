@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using QuickAccess.DataStructures.Algebra;
-using QuickAccess.DataStructures.Common.CharMatching;
-using QuickAccess.DataStructures.Common.Patterns.Visitor;
+using QuickAccess.Infrastructure.Algebra;
+using QuickAccess.Infrastructure.CharMatching;
+using QuickAccess.Infrastructure.Patterns.Visitor;
 
 namespace QuickAccess.Parser.Flexpressions.Model
 {

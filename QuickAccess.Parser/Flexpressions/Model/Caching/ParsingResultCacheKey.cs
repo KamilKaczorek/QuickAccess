@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using QuickAccess.DataStructures.Common.ValueContract;
+using QuickAccess.Infrastructure.ValueContract;
 
 namespace QuickAccess.Parser.Flexpressions.Model.Caching
 {

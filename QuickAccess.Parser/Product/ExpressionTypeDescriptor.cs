@@ -2,8 +2,8 @@
 using System.Runtime.CompilerServices;
 using System.Threading;
 using JetBrains.Annotations;
-using QuickAccess.DataStructures.Algebra;
-using QuickAccess.DataStructures.Common.Guards;
+using QuickAccess.Infrastructure.Algebra;
+using QuickAccess.Infrastructure.Guards;
 using QuickAccess.Parser.Flexpressions.Bricks;
 using @Pure = System.Diagnostics.Contracts.PureAttribute;
 

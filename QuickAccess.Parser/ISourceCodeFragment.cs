@@ -41,7 +41,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using QuickAccess.DataStructures.Common.CharMatching;
+using QuickAccess.Infrastructure.CharMatching;
 
 namespace QuickAccess.Parser
 {

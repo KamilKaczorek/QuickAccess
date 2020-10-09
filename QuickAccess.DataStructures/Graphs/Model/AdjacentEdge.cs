@@ -39,7 +39,7 @@
 
 using System;
 using System.Collections.Generic;
-using QuickAccess.DataStructures.Common;
+using QuickAccess.Infrastructure;
 
 namespace QuickAccess.DataStructures.Graphs.Model
 {
